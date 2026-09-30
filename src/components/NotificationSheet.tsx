@@ -1,7 +1,6 @@
 import { Box } from '@mui/material';
 import NotificationCard from './NotificationCard';
 
-// src/components/NotificationSheet.tsx
 
 export interface Notificacion {
   id: number;
