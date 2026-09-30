@@ -5,16 +5,16 @@ import NotificationSheet, { type Notificacion } from '../components/Notification
 import BottomNav from '../components/BottomNav';
 
 const notificacionesData: Notificacion[] = [
-  { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.' },
-  { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.' },
-  { id: 3, titulo: 'Revisión de equipo', detalle: 'Mantenimiento del camión A-14.' },
-  { id: 4, titulo: 'Turno finalizado', detalle: 'Recuerda firmar tu salida.' },
-  { id: 5, titulo: 'Nueva zona', detalle: 'Sector sur habilitado para inspección.' },
-  { id: 6, titulo: 'Batería baja', detalle: 'Conecta el dispositivo a la brevedad.' },
-  { id: 7, titulo: 'Reporte subido', detalle: 'El reporte de voladura se envió con éxito.' },
-  { id: 8, titulo: 'Mensaje de central', detalle: 'Reunión de seguridad a las 14:00 hrs.' },
-  { id: 9, titulo: 'Actualización de mapa', detalle: 'Nuevas rutas topográficas descargadas.' },
-  { id: 10, titulo: 'Falla de sensor', detalle: 'Sensor de proximidad en sector B inactivo.' },
+  { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true },
+  { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.', tiempo: 'hace 5 min', unread: true },
+  { id: 3, titulo: 'Revisión de equipo', detalle: 'Mantenimiento del camión A-14.', tiempo: 'hace 14 min', unread: true },
+  { id: 4, titulo: 'Turno finalizado', detalle: 'Recuerda firmar tu salida.', tiempo: 'hace 45 min', unread: false },
+  { id: 5, titulo: 'Nueva zona', detalle: 'Sector sur habilitado para inspección.', tiempo: 'hace 1 hora', unread: false },
+  { id: 6, titulo: 'Batería baja', detalle: 'Conecta el dispositivo a la brevedad.', tiempo: 'hace 3 horas', unread: false },
+  { id: 7, titulo: 'Reporte subido', detalle: 'El reporte de voladura se envió con éxito.', tiempo: 'hace 5 horas', unread: false },
+  { id: 8, titulo: 'Mensaje de central', detalle: 'Reunión de seguridad a las 14:00 hrs.', tiempo: 'ayer', unread: false },
+  { id: 9, titulo: 'Actualización de mapa', detalle: 'Nuevas rutas topográficas descargadas.', tiempo: 'ayer', unread: false },
+  { id: 10, titulo: 'Falla de sensor', detalle: 'Sensor de proximidad en sector B inactivo.', tiempo: 'hace 2 días', unread: false },
 ];
 
 export default function Home() {
