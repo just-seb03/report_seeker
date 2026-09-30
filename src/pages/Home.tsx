@@ -22,15 +22,16 @@ export default function Home() {
   const [touchStart, setTouchStart] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Función para colapsar la lista y reiniciar el scroll de manera invisible
+  // Función corregida: Baja el panel y scrollea suavemente al mismo tiempo
   const handleCollapse = () => {
     setIsExpanded(false);
     
-    setTimeout(() => {
-      if (listRef.current) {
-        listRef.current.scrollTop = 0;
-      }
-    }, 400);
+    if (listRef.current) {
+      listRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
