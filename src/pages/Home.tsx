@@ -5,8 +5,8 @@ import NotificationSheet, { type Notificacion } from '../components/Notification
 import BottomNav from '../components/BottomNav';
 
 const notificacionesData: Notificacion[] = [
-  { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true },
-  { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.', tiempo: 'hace 5 min', unread: true },
+  { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },
+  { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.', tiempo: 'hace 5 min', unread: true, prioridad: 'Alta' },
   { id: 3, titulo: 'Revisión de equipo', detalle: 'Mantenimiento del camión A-14.', tiempo: 'hace 14 min', unread: true },
   { id: 4, titulo: 'Turno finalizado', detalle: 'Recuerda firmar tu salida.', tiempo: 'hace 45 min', unread: false },
   { id: 5, titulo: 'Nueva zona', detalle: 'Sector sur habilitado para inspección.', tiempo: 'hace 1 hora', unread: false },
@@ -14,7 +14,7 @@ const notificacionesData: Notificacion[] = [
   { id: 7, titulo: 'Reporte subido', detalle: 'El reporte de voladura se envió con éxito.', tiempo: 'hace 5 horas', unread: false },
   { id: 8, titulo: 'Mensaje de central', detalle: 'Reunión de seguridad a las 14:00 hrs.', tiempo: 'ayer', unread: false },
   { id: 9, titulo: 'Actualización de mapa', detalle: 'Nuevas rutas topográficas descargadas.', tiempo: 'ayer', unread: false },
-  { id: 10, titulo: 'Falla de sensor', detalle: 'Sensor de proximidad en sector B inactivo.', tiempo: 'hace 2 días', unread: false },
+  { id: 10, titulo: 'Falla de sensor', detalle: 'Sensor de proximidad en sector B inactivo.', tiempo: 'hace 2 días', unread: false, prioridad: 'Alta' },
 ];
 
 export default function Home() {
@@ -22,7 +22,6 @@ export default function Home() {
   const [touchStart, setTouchStart] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Función corregida: Baja el panel y scrollea suavemente al mismo tiempo
   const handleCollapse = () => {
     setIsExpanded(false);
     

@@ -9,17 +9,16 @@ export interface Notificacion {
   detalle: string;
   tiempo?: string;
   unread?: boolean;
+  prioridad?: string; // NUEVA: Propiedad añadida a la interfaz
 }
 
 interface NotificationSheetProps {
   isExpanded: boolean;
   listRef: React.RefObject<HTMLDivElement | null>;
   notificaciones: Notificacion[];
-  // NUEVO: Propiedad para recibir la función que colapsa la lista
   onCollapse: () => void; 
 }
 
-// Animación invertida: salta hacia arriba (-20px)
 const bounceSwipeUp = keyframes`
   0% { transform: translateY(0); animation-timing-function: ease-in; }
   15% { transform: translateY(-20px); animation-timing-function: ease-out; }
@@ -50,11 +49,11 @@ export default function NotificationSheet({ isExpanded, listRef, notificaciones,
             titulo={noti.titulo} 
             detalle={noti.detalle} 
             tiempo={noti.tiempo} 
-            unread={noti.unread} 
+            unread={noti.unread}
+            prioridad={noti.prioridad} // NUEVA: Pasamos el dato a la tarjeta
           />
         ))}
 
-        {/* FLECHA ANIMADA HACIA ARRIBA */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
           <IconButton onClick={onCollapse} sx={{ color: 'text.secondary', p: 2 }}>
             <KeyboardArrowUpIcon 

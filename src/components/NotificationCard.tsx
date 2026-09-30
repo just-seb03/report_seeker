@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Box, Typography, Paper, Collapse } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 
@@ -18,33 +19,34 @@ export default function NotificationCard({
   detalle,
   tiempo = 'ahora', 
   unread = false, 
-  prioridad = 'Alta', 
-  fecha = '29 Sept 2026' 
+  prioridad = 'Normal', // Cambiado a 'Normal' por defecto
+  fecha = '30 Sept 2026' 
 }: NotificationCardProps) {
   
-  // Estado para la expansión del acordeón
   const [expanded, setExpanded] = useState(false);
-  
-  // NUEVO: Estado que define si la tarjeta ya fue vista. 
-  // Inicia siendo falso si 'unread' viene como true desde los datos.
   const [isRead, setIsRead] = useState(!unread);
+
+  // Evaluamos de forma segura si la prioridad es alta (ignorando mayúsculas/minúsculas)
+  const isHighPriority = prioridad.toLowerCase() === 'alta';
+
+  // Si no está leída, decidimos si el borde será rojo (#d32f2f) o negro (#000000)
+  const unreadBorderColor = isHighPriority ? '#d32f2f' : '#000000';
 
   return (
     <Paper
       elevation={0}
       sx={{
         borderRadius: 4, 
-        // Verificamos el estado local 'isRead' en lugar de la propiedad original
-        border: !isRead ? '2px solid #000000' : '1px solid #e0e0e0', 
+        // Aplicamos la condicional de color dinámico al borde
+        border: !isRead ? `2px solid ${unreadBorderColor}` : '1px solid #e0e0e0', 
         backgroundColor: '#ffffff',
         overflow: 'hidden', 
-        transition: 'border 0.3s ease', // Suaviza la transición del borde al leerse
+        transition: 'border 0.3s ease',
       }}
     >
       <Box 
         onClick={() => {
           setExpanded(!expanded);
-          // Si estaba sin leer, al dar clic la marcamos permanentemente como leída
           if (!isRead) setIsRead(true);
         }}
         sx={{ 
@@ -55,10 +57,20 @@ export default function NotificationCard({
           cursor: 'pointer' 
         }}
       >
-        <InfoOutlinedIcon sx={{ color: 'text.secondary', mr: 2, flexShrink: 0 }} />
+{/* Renderizado condicional del ícono */}
+        {isHighPriority ? (
+          <ErrorOutlinedIcon // <-- Cambio de nombre aquí
+            sx={{ 
+              color: !isRead ? '#d32f2f' : 'text.secondary',
+              mr: 2, 
+              flexShrink: 0 
+            }} 
+          />
+        ) : (
+          <InfoOutlinedIcon sx={{ color: 'text.secondary', mr: 2, flexShrink: 0 }} />
+        )}
         
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
-          
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
             <Typography 
               variant="subtitle2" 
@@ -119,7 +131,7 @@ export default function NotificationCard({
             {detalle}
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 'bold', color: prioridad.toLowerCase() === 'alta' ? 'error.main' : 'warning.main' }}>
+            <Typography variant="body2" sx={{ fontWeight: 'bold', color: isHighPriority ? 'error.main' : 'warning.main' }}>
               Prioridad: {prioridad}
             </Typography>
             <Typography variant="caption" color="text.secondary">
