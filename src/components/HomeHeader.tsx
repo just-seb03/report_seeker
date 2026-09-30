@@ -31,7 +31,7 @@ export default function HomeHeader({ isExpanded }: HomeHeaderProps) {
       }}
     > 
       <Typography variant="h3" component="h1" color="text.primary" sx={{ textAlign: 'center', mb: 3 }}>
-        No hay<br />reportes<br />aún..
+        Hay<br />Nuevos<br />Reportes
       </Typography>
       <KeyboardArrowDownIcon sx={{ fontSize: 48, color: 'text.secondary', animation: `${bounceSwipe} 2.5s infinite` }} />
     </Box>

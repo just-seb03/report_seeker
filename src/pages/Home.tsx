@@ -22,6 +22,17 @@ export default function Home() {
   const [touchStart, setTouchStart] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
 
+  // Función para colapsar la lista y reiniciar el scroll de manera invisible
+  const handleCollapse = () => {
+    setIsExpanded(false);
+    
+    setTimeout(() => {
+      if (listRef.current) {
+        listRef.current.scrollTop = 0;
+      }
+    }, 400);
+  };
+
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
     const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
     setTouchStart(clientY);
@@ -65,6 +76,7 @@ export default function Home() {
         isExpanded={isExpanded} 
         listRef={listRef} 
         notificaciones={notificacionesData} 
+        onCollapse={handleCollapse}
       />
 
       <Box 

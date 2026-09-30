@@ -1,21 +1,32 @@
-import { Box } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
+import { keyframes } from '@emotion/react';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NotificationCard from './NotificationCard';
 
 export interface Notificacion {
   id: number;
   titulo: string;
   detalle: string;
-  tiempo?: string; // Nuevo: Texto como "hace 2 min"
-  unread?: boolean; // Nuevo: Estado de no leído
+  tiempo?: string;
+  unread?: boolean;
 }
 
 interface NotificationSheetProps {
   isExpanded: boolean;
   listRef: React.RefObject<HTMLDivElement | null>;
   notificaciones: Notificacion[];
+  // NUEVO: Propiedad para recibir la función que colapsa la lista
+  onCollapse: () => void; 
 }
 
-export default function NotificationSheet({ isExpanded, listRef, notificaciones }: NotificationSheetProps) {
+// Animación invertida: salta hacia arriba (-20px)
+const bounceSwipeUp = keyframes`
+  0% { transform: translateY(0); animation-timing-function: ease-in; }
+  15% { transform: translateY(-20px); animation-timing-function: ease-out; }
+  100% { transform: translateY(0); }
+`;
+
+export default function NotificationSheet({ isExpanded, listRef, notificaciones, onCollapse }: NotificationSheetProps) {
   return (
     <Box
       ref={listRef}
@@ -32,15 +43,29 @@ export default function NotificationSheet({ isExpanded, listRef, notificaciones 
       }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, px: 4, pt: 6, pb: 24, maxWidth: 400, mx: 'auto' }}>
+        
         {notificaciones.map((noti) => (
           <NotificationCard 
             key={noti.id} 
             titulo={noti.titulo} 
             detalle={noti.detalle} 
-            tiempo={noti.tiempo} // Pasamos la nueva propiedad
-            unread={noti.unread} // Pasamos la nueva propiedad
+            tiempo={noti.tiempo} 
+            unread={noti.unread} 
           />
         ))}
+
+        {/* FLECHA ANIMADA HACIA ARRIBA */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <IconButton onClick={onCollapse} sx={{ color: 'text.secondary', p: 2 }}>
+            <KeyboardArrowUpIcon 
+              sx={{ 
+                fontSize: 48, 
+                animation: `${bounceSwipeUp} 2.5s infinite` 
+              }} 
+            />
+          </IconButton>
+        </Box>
+
       </Box>
     </Box>
   );
