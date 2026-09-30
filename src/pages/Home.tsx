@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
+import './Home.css'; // <-- Importamos su CSS exclusivo
 
 const notificacionesData: Notificacion[] = [
   { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },
@@ -24,12 +25,8 @@ export default function Home() {
 
   const handleCollapse = () => {
     setIsExpanded(false);
-    
     if (listRef.current) {
-      listRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -40,16 +37,12 @@ export default function Home() {
 
   const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
     if (touchStart === 0) return;
-    
     const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : e.clientY;
     const deltaY = touchStart - clientY;
 
-    if (!isExpanded && deltaY > 40) {
-      setIsExpanded(true);
-    } else if (isExpanded && deltaY < -40) {
-      if (listRef.current && listRef.current.scrollTop <= 0) {
-        setIsExpanded(false); 
-      }
+    if (!isExpanded && deltaY > 40) setIsExpanded(true);
+    else if (isExpanded && deltaY < -40 && listRef.current && listRef.current.scrollTop <= 0) {
+      setIsExpanded(false); 
     }
     setTouchStart(0);
   };
@@ -63,12 +56,9 @@ export default function Home() {
 
   return (
     <Box 
-      sx={{ height: '100%', position: 'relative', overflow: 'hidden' }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleTouchStart}
-      onMouseUp={handleTouchEnd}
-      onWheel={handleWheel}
+      className="home-container"
+      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}
+      onMouseDown={handleTouchStart} onMouseUp={handleTouchEnd} onWheel={handleWheel}
     >
       <HomeHeader isExpanded={isExpanded} />
       
@@ -79,15 +69,9 @@ export default function Home() {
         onCollapse={handleCollapse}
       />
 
-      <Box 
-        sx={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '220px', 
-          background: 'linear-gradient(to bottom, transparent, #f5f5f5 75%)',
-          pointerEvents: 'none', zIndex: 2, 
-        }}
-      />
+      <Box className="home-gradient-overlay" />
 
-      <Box sx={{ position: 'absolute', bottom: 0, width: '100%', zIndex: 10 }}>
+      <Box className="home-bottom-nav">
         <BottomNav />
       </Box>
     </Box>

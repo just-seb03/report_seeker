@@ -1,0 +1,62 @@
+/* src/components/NotificationSheet.css */
+.sheet-wrapper {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.sheet-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari y Opera */
+}
+
+/* Modificadores de estado inyectados por React */
+.sheet-wrapper.expanded {
+  overflow-y: auto;
+  transform: translateY(0);
+}
+
+.sheet-wrapper.collapsed {
+  overflow-y: hidden;
+  transform: translateY(42vh);
+}
+
+.sheet-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 48px 32px 192px 32px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.sheet-action-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.sheet-collapse-btn {
+  color: #9e9e9e !important;
+  padding: 16px !important;
+}
+
+@keyframes bounceSwipeUp {
+  0% { transform: translateY(0); animation-timing-function: ease-in; }
+  15% { transform: translateY(-20px); animation-timing-function: ease-out; }
+  100% { transform: translateY(0); }
+}
+
+.sheet-collapse-icon {
+  font-size: 48px !important;
+  animation: bounceSwipeUp 2.5s infinite;
+}
+
+/* MODO OSCURO */
+@media (prefers-color-scheme: dark) {
+  .sheet-collapse-btn {
+    color: #aaaaaa !important;
+  }
+}
