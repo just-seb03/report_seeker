@@ -30,7 +30,7 @@ export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps
         <Box
           component="button"
           type="button"
-          onClick={() => setValue(0)}
+          onClick={handleHomeClick}
           className={`nav-item ${value === 0 ? 'active' : ''}`}
           aria-label="Home"
           aria-pressed={value === 0}
@@ -42,7 +42,7 @@ export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps
         <Box
           component="button"
           type="button"
-          onClick={() => setValue(1)}
+          onClick={handleReportClick}
           className={`nav-fab-container ${value === 1 ? 'active' : ''}`}
           aria-label="Reportar"
           aria-pressed={value === 1}
