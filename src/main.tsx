@@ -1,8 +1,10 @@
 // src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import { DarkMode } from '@aparajita/capacitor-dark-mode';
+import { initializeDatabase } from './database';
 import './index.css';
 
 const applyDarkMode = (dark: boolean) => {
@@ -35,6 +37,12 @@ const initTheme = async () => {
 };
 
 void initTheme();
+
+if (Capacitor.isNativePlatform()) {
+  void initializeDatabase().catch((error: unknown) => {
+    console.error('No se pudo inicializar la base de datos SQLite', error);
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
