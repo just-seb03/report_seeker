@@ -42,13 +42,13 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             type="button"
             onClick={handleHomeClick}
             className={`nav-item ${value === 0 ? 'active' : ''}`}
-            aria-label="Home"
+            aria-label="Inicio"
             aria-pressed={value === 0}
           >
             <Box className="nav-icon-wrap">
               <HomeIcon className="nav-icon" sx={{ fontSize: 26 }} />
             </Box>
-            <Typography className="nav-item-text">Home</Typography>
+            <Typography className="nav-item-text">Inicio</Typography>
           </Box>
 
           <Box

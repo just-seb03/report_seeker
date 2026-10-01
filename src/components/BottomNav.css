@@ -1,4 +1,10 @@
 /* src/components/BottomNav.css */
+@font-face {
+  font-family: 'Ndot';
+  src: url('../assets/fonts/ndot-47-inspired-by-nothing.otf') format('opentype');
+  font-display: swap;
+}
+
 .nav-wrapper {
   position: fixed; bottom: 24px; left: 0; right: 0;
   display: flex; justify-content: center; z-index: 50; padding: 0 16px;
@@ -49,8 +55,9 @@
 .nav-item:active .nav-icon-wrap { transform: scale(0.92); }
 
 /* --- TEXTOS INFERIORES --- */
-.nav-item-text { 
+.nav-pill-content .nav-item-text { 
   display: block; 
+  font-family: 'Ndot', sans-serif;
   font-size: 0.65rem;
   font-weight: 500;
   letter-spacing: 0.3px;
