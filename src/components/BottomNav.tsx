@@ -8,9 +8,10 @@ import './BottomNav.css'; // <-- Importamos su CSS exclusivo
 type BottomNavProps = {
   onHomeClick?: () => void;
   onReportClick?: () => void;
+  onProfileClick?: () => void;
 };
 
-export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps) {
+export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }: BottomNavProps) {
   const [value, setValue] = useState(0);
 
   const handleHomeClick = () => {
@@ -21,6 +22,11 @@ export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps
   const handleReportClick = () => {
     setValue(1);
     onReportClick?.();
+  };
+
+  const handleProfileClick = () => {
+    setValue(2);
+    onProfileClick?.();
   };
 
   return (
@@ -58,7 +64,7 @@ export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps
         <Box
           component="button"
           type="button"
-          onClick={() => setValue(2)}
+          onClick={handleProfileClick}
           className={`nav-item ${value === 2 ? 'active' : ''}`}
           aria-label="Perfil"
           aria-pressed={value === 2}
