@@ -1,18 +1,16 @@
-/* src/components/NotificationSheet.css */
 .sheet-wrapper {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 1;
   transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-  -ms-overflow-style: none; /* IE y Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .sheet-wrapper::-webkit-scrollbar {
-  display: none; /* Chrome, Safari y Opera */
+  display: none;
 }
 
-/* Modificadores de estado inyectados por React */
 .sheet-wrapper.expanded {
   overflow-y: auto;
   transform: translateY(0);
@@ -40,23 +38,15 @@
 
 .sheet-collapse-btn {
   color: #9e9e9e !important;
-  padding: 16px !important;
+  padding: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
 }
 
-@keyframes bounceSwipeUp {
-  0% { transform: translateY(0); animation-timing-function: ease-in; }
-  15% { transform: translateY(-20px); animation-timing-function: ease-out; }
-  100% { transform: translateY(0); }
+.sheet-collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .sheet-collapse-icon {
-  font-size: 48px !important;
-  animation: bounceSwipeUp 2.5s infinite;
-}
-
-/* MODO OSCURO */
-@media (prefers-color-scheme: dark) {
-  .sheet-collapse-btn {
-    color: #aaaaaa !important;
-  }
+  font-size: 28px;
 }

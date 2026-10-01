@@ -3,6 +3,36 @@ html, body, #root {
   padding: 0;
   width: 100%;
   height: 100dvh;
-  overflow: hidden; /* Evita que la app entera se deslice; el scroll debe ir dentro de tus componentes */
-  background-color: #ffffff; /* Color de fondo base */
+  overflow: hidden;
+  background-color: #ffffff;
+  color: #111111;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+button,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+html.dark,
+body.dark {
+  background-color: #121212;
+  color: #f5f5f5;
+}
+
+html.dark *,
+body.dark * {
+  scrollbar-color: #555 #121212;
 }
