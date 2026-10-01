@@ -1,3 +1,4 @@
+import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import './profile.css';
 
 const profileDetails = [
@@ -19,6 +20,10 @@ export default function Profile() {
 						</div>
 					))}
 				</dl>
+					<button className="profile-settings" type="button">
+						<SettingsOutlined />
+						Configuración
+					</button>
 			</section>
 		</main>
 	);
