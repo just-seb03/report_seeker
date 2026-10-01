@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, useMediaQuery } from '@mui/material';
 import Home from './pages/Home';
 
@@ -6,23 +6,34 @@ import '@fontsource/inter/400.css';
 import '@fontsource/inter/700.css';
 import '@fontsource/inter/800.css';
 
+type ManualThemeMode = 'system' | 'light' | 'dark';
+
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [manualThemeMode, setManualThemeMode] = useState<ManualThemeMode>('system');
+
+  const effectiveDarkMode =
+    manualThemeMode === 'system' ? prefersDarkMode : manualThemeMode === 'dark';
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', effectiveDarkMode);
+    document.body.classList.toggle('dark', effectiveDarkMode);
+  }, [effectiveDarkMode]);
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          mode: effectiveDarkMode ? 'dark' : 'light',
           primary: {
-            main: prefersDarkMode ? '#ffffff' : '#000000',
+            main: effectiveDarkMode ? '#ffffff' : '#000000',
           },
           background: {
-            default: prefersDarkMode ? '#121212' : '#f5f5f5',
-            paper: prefersDarkMode ? '#1e1e1e' : '#ffffff',
+            default: effectiveDarkMode ? '#121212' : '#f5f5f5',
+            paper: effectiveDarkMode ? '#1e1e1e' : '#ffffff',
           },
           text: {
-            primary: prefersDarkMode ? '#ffffff' : '#111111',
+            primary: effectiveDarkMode ? '#ffffff' : '#111111',
           },
         },
         typography: {
@@ -34,13 +45,25 @@ function App() {
           },
         },
       }),
-    [prefersDarkMode],
+    [effectiveDarkMode],
   );
+
+  const handleToggleManualTheme = () => {
+    setManualThemeMode((prev) => {
+      if (prev === 'system') {
+        return prefersDarkMode ? 'light' : 'dark';
+      }
+      return prev === 'light' ? 'dark' : 'light';
+    });
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Home />
+      <Home
+        isDarkMode={effectiveDarkMode}
+        onToggleManualTheme={handleToggleManualTheme}
+      />
     </ThemeProvider>
   );
 }

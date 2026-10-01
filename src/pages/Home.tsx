@@ -3,7 +3,12 @@ import { Box } from '@mui/material';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
-import './Home.css'; // <-- Importamos su CSS exclusivo
+import './Home.css';
+
+interface HomeProps {
+  isDarkMode: boolean;
+  onToggleManualTheme: () => void;
+}
 
 const notificacionesData: Notificacion[] = [
   { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },
@@ -12,55 +17,62 @@ const notificacionesData: Notificacion[] = [
   { id: 4, titulo: 'Turno finalizado', detalle: 'Recuerda firmar tu salida.', tiempo: 'hace 45 min', unread: false },
   { id: 5, titulo: 'Nueva zona', detalle: 'Sector sur habilitado para inspección.', tiempo: 'hace 1 hora', unread: false },
   { id: 6, titulo: 'Batería baja', detalle: 'Conecta el dispositivo a la brevedad.', tiempo: 'hace 3 horas', unread: false },
-  { id: 7, titulo: 'Reporte subido', detalle: 'El reporte de voladura se envió con éxito.', tiempo: 'hace 5 horas', unread: false },
-  { id: 8, titulo: 'Mensaje de central', detalle: 'Reunión de seguridad a las 14:00 hrs.', tiempo: 'ayer', unread: false },
-  { id: 9, titulo: 'Actualización de mapa', detalle: 'Nuevas rutas topográficas descargadas.', tiempo: 'ayer', unread: false },
-  { id: 10, titulo: 'Falla de sensor', detalle: 'Sensor de proximidad en sector B inactivo.', tiempo: 'hace 2 días', unread: false, prioridad: 'Alta' },
 ];
 
-export default function Home() {
+export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
+  const touchStart = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   const handleCollapse = () => {
     setIsExpanded(false);
-    if (listRef.current) {
-      listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (listRef.current) listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    setTouchStart(clientY);
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+    touchStart.current = clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
-    if (touchStart === 0) return;
-    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : e.clientY;
-    const deltaY = touchStart - clientY;
+    if (touchStart.current === null) return;
+    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : (e as React.MouseEvent).clientY;
+    const deltaY = touchStart.current - clientY;
 
-    if (!isExpanded && deltaY > 40) setIsExpanded(true);
-    else if (isExpanded && deltaY < -40 && listRef.current && listRef.current.scrollTop <= 0) {
+    if (!isExpanded && deltaY > 40) {
+      setIsExpanded(true);
+    } else if (isExpanded && deltaY < -40 && listRef.current && listRef.current.scrollTop <= 0) {
       setIsExpanded(false); 
     }
-    setTouchStart(0);
-  };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    if (!isExpanded && e.deltaY > 0) setIsExpanded(true);
-    else if (isExpanded && e.deltaY < 0 && listRef.current && listRef.current.scrollTop <= 0) {
-      setIsExpanded(false);
-    }
+    touchStart.current = null;
   };
 
   return (
     <Box 
       className="home-container"
-      onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}
-      onMouseDown={handleTouchStart} onMouseUp={handleTouchEnd} onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      // Soporte para mouse en navegador web
+      onMouseDown={handleTouchStart}
+      onMouseUp={handleTouchEnd}
+      onMouseLeave={handleTouchEnd} 
     >
-      <HomeHeader isExpanded={isExpanded} />
+      {/* BARRA INDICADORA ANIMADA */}
+      <Box 
+        sx={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: '4px',
+          backgroundColor: isDarkMode ? '#ffffff' : '#000000',
+          transform: 'scaleX(0)',
+          transformOrigin: 'center',
+          opacity: 0,
+          transition: 'transform 0.3s ease, opacity 0.3s ease',
+          zIndex: 100,
+        }}
+      />
+
+      <HomeHeader isExpanded={isExpanded} onSwipeDown={onToggleManualTheme} />
       
       <NotificationSheet 
         isExpanded={isExpanded} 

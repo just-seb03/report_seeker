@@ -1,7 +1,7 @@
 .card-paper {
   border-radius: 16px; overflow: hidden;
   background-color: #ffffff;
-  transition: border 0.3s ease, background-color 0.3s ease;
+  transition: border 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-paper.read { border: 1px solid #e0e0e0; }
