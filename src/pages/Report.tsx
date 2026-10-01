@@ -13,6 +13,7 @@ export default function Report({ onReportCreated }: ReportProps) {
   const [reportUid, setReportUid] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
   const [severity, setSeverity] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -57,6 +58,7 @@ export default function Report({ onReportCreated }: ReportProps) {
       const issueId = await saveIssueReport({
         title: title.trim(),
         description: description.trim(),
+        location: location.trim(),
         priority: severityOptions[severity],
         image: imageFile,
       });
@@ -185,6 +187,23 @@ export default function Report({ onReportCreated }: ReportProps) {
               required
             />
             <div className="report-character-count" aria-live="polite">{description.length} / 1000</div>
+          </section>
+
+          <section className="report-field">
+            <label className="report-label" htmlFor="report-location">Ubicación</label>
+            <input
+              id="report-location"
+              className="report-location-input"
+              type="text"
+              value={location}
+              onChange={(event) => {
+                setLocation(event.target.value);
+                setSubmitMessage('');
+                setReportUid(null);
+              }}
+              placeholder="Ingresa la ubicación"
+              maxLength={200}
+            />
           </section>
 
           <section className="report-field">

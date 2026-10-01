@@ -42,6 +42,25 @@
 .report-title-input::placeholder { color: #888888; }
 .report-title-input:focus { border-color: #999999; box-shadow: 0 0 0 3px rgb(0 0 0 / 8%); }
 
+.report-location-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  outline: none;
+  background: #ffffff;
+  color: #222222;
+  font: inherit;
+  font-size: 14px;
+  text-align: center;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.report-location-input::placeholder { color: #888888; }
+.report-location-input:focus { border-color: #999999; box-shadow: 0 0 0 3px rgb(0 0 0 / 8%); }
+
 .report-upload {
   position: relative;
   display: flex;
@@ -219,9 +238,12 @@
 body.dark .report-screen { background: #121212; color: #ffffff; }
 body.dark .report-intro p,
 body.dark .report-character-count { color: #aaaaaa; }
-body.dark .report-title-input { border-color: #333333; background: #1e1e1e; color: #ffffff; }
+body.dark .report-title-input,
+body.dark .report-location-input { border-color: #333333; background: #1e1e1e; color: #ffffff; }
 body.dark .report-title-input::placeholder { color: #aaaaaa; }
+body.dark .report-location-input::placeholder { color: #aaaaaa; }
 body.dark .report-title-input:focus { border-color: #ffffff; box-shadow: 0 0 0 3px rgb(255 255 255 / 12%); }
+body.dark .report-location-input:focus { border-color: #ffffff; box-shadow: 0 0 0 3px rgb(255 255 255 / 12%); }
 body.dark .report-upload { border-color: #555555; background: #1e1e1e; }
 body.dark .report-upload:hover { border-color: #aaaaaa; background: #222222; }
 body.dark .report-upload-icon { background: #29382e; color: #a8d5b5; }
@@ -250,6 +272,7 @@ body.dark .report-submit-message { color: #aeb8b1; }
 
 @media (prefers-reduced-motion: reduce) {
   .report-title-input,
+  .report-location-input,
   .report-upload,
   .report-remove-image,
   .report-description,

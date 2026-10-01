@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS issues_riesgos (
   fotografia_url TEXT,
   fecha_captura DATETIME DEFAULT CURRENT_TIMESTAMP,
   trabajador_id INTEGER,
+  ubicacion TEXT,
   estado TEXT DEFAULT 'capturado',
   prioridad TEXT,
   FOREIGN KEY (trabajador_id) REFERENCES trabajadores(trabajador_id)
@@ -154,6 +155,7 @@ export function initializeDatabase(): Promise<SQLiteDBConnection> {
 export async function saveIssueReport(report: {
   title: string;
   description: string;
+  location: string;
   priority: string;
   image: Blob | null;
 }): Promise<number> {
@@ -164,8 +166,8 @@ export async function saveIssueReport(report: {
   const connection = await initializeDatabase();
   const imageData = report.image ? await blobToDataUrl(report.image) : null;
   const result = await connection.run(
-    'INSERT INTO issues_riesgos (titulo, descripcion, prioridad, fotografia_url) VALUES (?, ?, ?, ?);',
-    [report.title, report.description, report.priority, imageData],
+    'INSERT INTO issues_riesgos (titulo, descripcion, ubicacion, prioridad, fotografia_url) VALUES (?, ?, ?, ?, ?);',
+    [report.title, report.description, report.location, report.priority, imageData],
   );
   const issueId = result.changes?.lastId;
 
@@ -176,6 +178,7 @@ export async function saveIssueReport(report: {
 function saveIssueReportOnWeb(report: {
   title: string;
   description: string;
+  location: string;
   priority: string;
   image: Blob | null;
 }): Promise<number> {
@@ -192,6 +195,7 @@ function saveIssueReportOnWeb(report: {
       const addRequest = transaction.objectStore(webObjectStore).add({
         titulo: report.title,
         descripcion: report.description,
+        ubicacion: report.location,
         prioridad: report.priority,
         fotografia: report.image,
         fecha_captura: new Date().toISOString(),
