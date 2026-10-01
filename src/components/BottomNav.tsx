@@ -5,8 +5,23 @@ import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
 import './BottomNav.css'; // <-- Importamos su CSS exclusivo
 
-export default function BottomNav() {
+type BottomNavProps = {
+  onHomeClick?: () => void;
+  onReportClick?: () => void;
+};
+
+export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps) {
   const [value, setValue] = useState(0);
+
+  const handleHomeClick = () => {
+    setValue(0);
+    onHomeClick?.();
+  };
+
+  const handleReportClick = () => {
+    setValue(1);
+    onReportClick?.();
+  };
 
   return (
     <Box className="nav-wrapper">
