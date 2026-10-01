@@ -11,6 +11,7 @@ export interface Notificacion {
   fecha?: string;
   unread?: boolean;
   prioridad?: string;
+  issueId?: number;
 }
 
 interface NotificationSheetProps {
@@ -38,6 +39,7 @@ export default function NotificationSheet({ isExpanded, listRef, notificaciones,
             unread={noti.unread}
             prioridad={noti.prioridad} 
             fecha={noti.fecha}
+            issueId={noti.issueId}
           />
         ))}
 

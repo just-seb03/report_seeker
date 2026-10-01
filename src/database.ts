@@ -175,6 +175,21 @@ export async function saveIssueReport(report: {
   return issueId;
 }
 
+export async function getIssueReportImage(issueId: number): Promise<string | null> {
+  if (!Capacitor.isNativePlatform()) {
+    const image = await getIssueReportImageOnWeb(issueId);
+    return image instanceof Blob ? blobToDataUrl(image) : image;
+  }
+
+  const connection = await initializeDatabase();
+  const result = await connection.query(
+    'SELECT fotografia_url FROM issues_riesgos WHERE issue_id = ?;',
+    [issueId],
+  );
+  const image = result.values?.[0]?.fotografia_url;
+  return typeof image === 'string' ? image : null;
+}
+
 function saveIssueReportOnWeb(report: {
   title: string;
   description: string;
@@ -214,6 +229,34 @@ function saveIssueReportOnWeb(report: {
       transaction.onabort = () => {
         database.close();
         reject(transaction.error ?? new Error('Se canceló el guardado del reporte web.'));
+      };
+    };
+  });
+}
+
+function getIssueReportImageOnWeb(issueId: number): Promise<Blob | string | null> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 1);
+
+    request.onerror = () => reject(request.error ?? new Error('No se pudo abrir el almacenamiento web.'));
+    request.onsuccess = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(webObjectStore)) {
+        database.close();
+        resolve(null);
+        return;
+      }
+
+      const transaction = database.transaction(webObjectStore, 'readonly');
+      const getRequest = transaction.objectStore(webObjectStore).get(issueId);
+      getRequest.onsuccess = () => {
+        const image = getRequest.result?.fotografia;
+        database.close();
+        resolve(image instanceof Blob || typeof image === 'string' ? image : null);
+      };
+      getRequest.onerror = () => {
+        database.close();
+        reject(getRequest.error ?? new Error('No se pudo leer la fotografía del reporte.'));
       };
     };
   });

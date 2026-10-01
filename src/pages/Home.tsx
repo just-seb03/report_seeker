@@ -83,6 +83,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     const now = new Date();
     setNotificaciones((current) => [{
       id: now.getTime(),
+      issueId: report.issueId,
       titulo: `Nuevo reporte: ${report.title}`,
       detalle: `UID-${report.issueId} · ${report.description}`,
       tiempo: 'ahora',

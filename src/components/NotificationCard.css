@@ -30,6 +30,8 @@
   margin-bottom: 16px; border: 1px dashed #bdbdbd;
 }
 .card-placeholder-icon { color: #bdbdbd; }
+.card-image-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.card-report-image { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 
 .text-error { color: #d32f2f; font-weight: bold; }
 .text-warning { color: #ed6c02; font-weight: bold; }

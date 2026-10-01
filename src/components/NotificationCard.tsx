@@ -1,23 +1,47 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography, Collapse } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
+import { getIssueReportImage } from '../database';
 import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
   titulo: string; detalle: string; tiempo?: string;
-  unread?: boolean; prioridad?: string; fecha?: string;
+  unread?: boolean; prioridad?: string; fecha?: string; issueId?: number;
 }
 
 export default function NotificationCard({ 
-  titulo, detalle, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026' 
+  titulo, detalle, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId
 }: NotificationCardProps) {
   
   const [expanded, setExpanded] = useState(false);
   const [isRead, setIsRead] = useState(!unread);
+  const [image, setImage] = useState<string | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
+
+  useEffect(() => {
+    if (!expanded || issueId === undefined) {
+      setImage(null);
+      setImageLoading(false);
+      return;
+    }
+
+    let isActive = true;
+    setImageLoading(true);
+    getIssueReportImage(issueId)
+      .then((reportImage) => {
+        if (isActive) setImage(reportImage);
+      })
+      .catch((error: unknown) => console.error('No se pudo cargar la fotografía del reporte', error))
+      .finally(() => {
+        if (isActive) setImageLoading(false);
+      });
+
+    return () => { isActive = false; };
+  }, [expanded, issueId]);
 
   // Determinamos las clases CSS a inyectar en el contenedor principal
   const cardClass = `card-paper ${isRead ? 'read' : 'unread'} ${isHighPriority ? 'high-priority' : ''}`;
@@ -55,7 +79,16 @@ export default function NotificationCard({
       <Collapse in={expanded} timeout={250} unmountOnExit>
         <Box sx={{ p: 2, pt: 0 }}>
           <Box className="card-placeholder">
-            <InsertPhotoOutlinedIcon className="card-placeholder-icon" sx={{ fontSize: 48 }} />
+            {image ? (
+              <img className="card-report-image" src={image} alt={`Evidencia del reporte: ${titulo}`} />
+            ) : (
+              <Box className="card-image-empty">
+                <InsertPhotoOutlinedIcon className="card-placeholder-icon" sx={{ fontSize: 48 }} />
+                <Typography variant="caption" className="card-text-muted">
+                  {imageLoading ? 'Cargando fotografía...' : 'Sin fotografía asociada'}
+                </Typography>
+              </Box>
+            )}
           </Box>
           <Typography variant="subtitle1" className="card-title" sx={{ mb: 1 }}>{titulo}</Typography>
           <Typography variant="body2" className="card-text-muted" sx={{ mb: 2 }}>{detalle}</Typography>
