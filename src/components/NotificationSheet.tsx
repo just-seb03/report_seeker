@@ -8,6 +8,7 @@ export interface Notificacion {
   titulo: string;
   detalle: string;
   tiempo?: string;
+  fecha?: string;
   unread?: boolean;
   prioridad?: string;
 }
