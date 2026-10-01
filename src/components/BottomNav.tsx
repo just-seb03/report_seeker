@@ -11,29 +11,47 @@ export default function BottomNav() {
   return (
     <Box className="nav-wrapper">
       <Box className="nav-pill">
-        
-        {/* BOTÓN IZQUIERDO: HOME */}
-        <Box onClick={() => setValue(0)} className={`nav-item ${value === 0 ? 'active' : ''}`}>
-          <HomeIcon sx={{ fontSize: 28 }} />
+
+        <Box
+          component="button"
+          type="button"
+          onClick={() => setValue(0)}
+          className={`nav-item ${value === 0 ? 'active' : ''}`}
+          aria-label="Home"
+          aria-pressed={value === 0}
+        >
+          <Box className="nav-icon-wrap"><HomeIcon className="nav-icon" sx={{ fontSize: 25 }} /></Box>
           <Typography className="nav-item-text">Home</Typography>
         </Box>
 
-        {/* BOTÓN CENTRAL: REPORTAR */}
-        <Box onClick={() => setValue(1)} className="nav-fab-container">
+        <Box
+          component="button"
+          type="button"
+          onClick={() => setValue(1)}
+          className={`nav-fab-container ${value === 1 ? 'active' : ''}`}
+          aria-label="Reportar"
+          aria-pressed={value === 1}
+        >
           <Box className="nav-fab">
-            <AddIcon sx={{ fontSize: 32 }} />
+            <AddIcon className="nav-icon" sx={{ fontSize: 30 }} />
           </Box>
-          <Typography className={`nav-item-text ${value === 1 ? 'active' : ''}`} sx={{ color: value === 1 ? 'inherit' : '#9e9e9e' }}>
+          <Typography className="nav-item-text">
             Reportar
           </Typography>
         </Box>
 
-        {/* BOTÓN DERECHO: PERFIL */}
-        <Box onClick={() => setValue(2)} className={`nav-item ${value === 2 ? 'active' : ''}`}>
-          <PersonIcon sx={{ fontSize: 28 }} />
+        <Box
+          component="button"
+          type="button"
+          onClick={() => setValue(2)}
+          className={`nav-item ${value === 2 ? 'active' : ''}`}
+          aria-label="Perfil"
+          aria-pressed={value === 2}
+        >
+          <Box className="nav-icon-wrap"><PersonIcon className="nav-icon" sx={{ fontSize: 25 }} /></Box>
           <Typography className="nav-item-text">Perfil</Typography>
         </Box>
-        
+
       </Box>
     </Box>
   );
