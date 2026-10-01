@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
+import Report from '../components/Report';
 import './Home.css';
 
 interface HomeProps {
@@ -21,6 +22,7 @@ const notificacionesData: Notificacion[] = [
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -49,54 +51,67 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     touchStart.current = null;
   };
 
+  const handleHomeClick = () => {
+    setIsReportOpen(false);
+    setPullDistance(0);
+  };
+
+  const handleReportClick = () => {
+    setIsReportOpen(true);
+    setPullDistance(0);
+  };
+
   return (
-    <Box 
-      className="home-container"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      // Soporte para mouse en navegador web
-      onMouseDown={handleTouchStart}
-      onMouseUp={handleTouchEnd}
-      onMouseLeave={handleTouchEnd} 
-    >
-      <Box
-        className="home-scene"
-        sx={{
-          transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
-          transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
-        }}
-      >
-        <HomeHeader
-          isExpanded={isExpanded}
-          onSwipeDown={onToggleManualTheme}
-          onSwipeProgress={setPullDistance}
-        />
+    <Box className="home-container">
+      {isReportOpen ? (
+        <Report />
+      ) : (
+        <>
+          <Box
+            className="home-scene"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleTouchStart}
+            onMouseUp={handleTouchEnd}
+            onMouseLeave={handleTouchEnd}
+            sx={{
+              transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
+              transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
+            }}
+          >
+            <HomeHeader
+              isExpanded={isExpanded}
+              onSwipeDown={onToggleManualTheme}
+              onSwipeProgress={setPullDistance}
+            />
 
-        <NotificationSheet
-          isExpanded={isExpanded}
-          listRef={listRef}
-          notificaciones={notificacionesData}
-          onCollapse={handleCollapse}
-        />
+            <NotificationSheet
+              isExpanded={isExpanded}
+              listRef={listRef}
+              notificaciones={notificacionesData}
+              onCollapse={handleCollapse}
+            />
 
-        <Box className="home-gradient-overlay" />
+            <Box className="home-gradient-overlay" />
+          </Box>
 
-        <Box className="home-bottom-nav">
-          <BottomNav />
-        </Box>
+          <Typography
+            aria-hidden={pullDistance < 8}
+            className="theme-swipe-feedback"
+            sx={{
+              opacity: Math.min(pullDistance / 36, 1),
+              transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
+              transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
+            }}
+          >
+            Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
+          </Typography>
+        </>
+      )}
+
+      <Box className="home-bottom-nav">
+        <BottomNav onHomeClick={handleHomeClick} onReportClick={handleReportClick} />
       </Box>
-
-      <Typography
-        aria-hidden={pullDistance < 8}
-        className="theme-swipe-feedback"
-        sx={{
-          opacity: Math.min(pullDistance / 36, 1),
-          transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
-          transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
-        }}
-      >
-        Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
-      </Typography>
     </Box>
   );
 }

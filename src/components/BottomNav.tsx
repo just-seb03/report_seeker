@@ -5,21 +5,36 @@ import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
 import './BottomNav.css'; // <-- Importamos su CSS exclusivo
 
-export default function BottomNav() {
+type BottomNavProps = {
+  onHomeClick?: () => void;
+  onReportClick?: () => void;
+};
+
+export default function BottomNav({ onHomeClick, onReportClick }: BottomNavProps) {
   const [value, setValue] = useState(0);
+
+  const handleHomeClick = () => {
+    setValue(0);
+    onHomeClick?.();
+  };
+
+  const handleReportClick = () => {
+    setValue(1);
+    onReportClick?.();
+  };
 
   return (
     <Box className="nav-wrapper">
       <Box className="nav-pill">
         
         {/* BOTÓN IZQUIERDO: HOME */}
-        <Box onClick={() => setValue(0)} className={`nav-item ${value === 0 ? 'active' : ''}`}>
+        <Box onClick={handleHomeClick} className={`nav-item ${value === 0 ? 'active' : ''}`}>
           <HomeIcon sx={{ fontSize: 28 }} />
           <Typography className="nav-item-text">Home</Typography>
         </Box>
 
         {/* BOTÓN CENTRAL: REPORTAR */}
-        <Box onClick={() => setValue(1)} className="nav-fab-container">
+        <Box onClick={handleReportClick} className="nav-fab-container">
           <Box className="nav-fab">
             <AddIcon sx={{ fontSize: 32 }} />
           </Box>
