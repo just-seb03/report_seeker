@@ -3,8 +3,8 @@ import { Box, Typography } from '@mui/material';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
-import Report from '../components/Report';
-import Profile from '../components/profile';
+import Report from './Report';
+import Profile from './profile';
 import './Home.css';
 
 interface HomeProps {
@@ -19,13 +19,10 @@ const viewOrder: NavigationView[] = ['home', 'report', 'profile'];
 const notificacionesData: Notificacion[] = [
   { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },
   { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.', tiempo: 'hace 5 min', unread: true, prioridad: 'Alta' },
-  { id: 3, titulo: 'Revisión de equipo', detalle: 'Mantenimiento del camión A-14.', tiempo: 'hace 14 min', unread: true },
-  { id: 4, titulo: 'Turno finalizado', detalle: 'Recuerda firmar tu salida.', tiempo: 'hace 45 min', unread: false },
-  { id: 5, titulo: 'Nueva zona', detalle: 'Sector sur habilitado para inspección.', tiempo: 'hace 1 hora', unread: false },
-  { id: 6, titulo: 'Batería baja', detalle: 'Conecta el dispositivo a la brevedad.', tiempo: 'hace 3 horas', unread: false },
 ];
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
+  const [notificaciones, setNotificaciones] = useState(notificacionesData);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
@@ -82,8 +79,22 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const handleReportClick = () => navigateTo('report');
   const handleProfileClick = () => navigateTo('profile');
 
+  const handleReportCreated = (report: { issueId: number; title: string; description: string; priority: string }) => {
+    const now = new Date();
+    setNotificaciones((current) => [{
+      id: now.getTime(),
+      titulo: `Nuevo reporte: ${report.title}`,
+      detalle: `UID-${report.issueId} · ${report.description}`,
+      tiempo: 'ahora',
+      unread: true,
+      prioridad: report.priority,
+      fecha: new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(now),
+    }, ...current]);
+    navigateTo('home');
+  };
+
   const renderView = (view: NavigationView) => {
-    if (view === 'report') return <Report />;
+    if (view === 'report') return <Report onReportCreated={handleReportCreated} />;
     if (view === 'profile') return <Profile />;
 
     return (
@@ -109,7 +120,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           <NotificationSheet
             isExpanded={isExpanded}
             listRef={listRef}
-            notificaciones={notificacionesData}
+            notificaciones={notificaciones}
             onCollapse={handleCollapse}
           />
 

@@ -17,7 +17,7 @@ export default function NotificationCard({
   
   const [expanded, setExpanded] = useState(false);
   const [isRead, setIsRead] = useState(!unread);
-  const isHighPriority = prioridad.toLowerCase() === 'alta';
+  const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
 
   // Determinamos las clases CSS a inyectar en el contenedor principal
   const cardClass = `card-paper ${isRead ? 'read' : 'unread'} ${isHighPriority ? 'high-priority' : ''}`;

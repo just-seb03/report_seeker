@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { AddPhotoAlternateOutlined, DeleteOutlined } from '@mui/icons-material';
 import { saveIssueReport } from '../database';
-import '../pages/Report.css';
+import './Report.css';
 
 const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
 
-export default function Report() {
+interface ReportProps {
+  onReportCreated: (report: { issueId: number; title: string; description: string; priority: string }) => void;
+}
+
+export default function Report({ onReportCreated }: ReportProps) {
   const [reportUid, setReportUid] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -57,6 +61,12 @@ export default function Report() {
         image: imageFile,
       });
 
+      onReportCreated({
+        issueId,
+        title: title.trim(),
+        description: description.trim(),
+        priority: severityOptions[severity],
+      });
       setReportUid(issueId);
       setSubmitMessage(`Reporte completo guardado con UID-${issueId}.`);
     } catch (error) {

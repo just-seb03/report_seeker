@@ -36,6 +36,7 @@ export default function NotificationSheet({ isExpanded, listRef, notificaciones,
             tiempo={noti.tiempo} 
             unread={noti.unread}
             prioridad={noti.prioridad} 
+            fecha={noti.fecha}
           />
         ))}
 
