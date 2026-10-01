@@ -14,7 +14,7 @@ interface HomeProps {
 
 type NavigationView = 'home' | 'report' | 'profile';
 type TransitionDirection = 'forward' | 'backward';
-const viewOrder: NavigationView[] = ['home', 'report', 'profile'];
+const viewOrder: NavigationView[] = ['report', 'home', 'profile'];
 
 const notificacionesData: Notificacion[] = [
   { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
-import AddIcon from '@mui/icons-material/Add';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import './BottomNav.css';
 
 type BottomNavProps = {
@@ -12,15 +12,15 @@ type BottomNavProps = {
 };
 
 export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }: BottomNavProps) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(1);
 
   const handleHomeClick = () => {
-    setValue(0);
+    setValue(1);
     onHomeClick?.();
   };
 
   const handleReportClick = () => {
-    setValue(1);
+    setValue(0);
     onReportClick?.();
   };
 
@@ -32,38 +32,46 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
   return (
     <Box className="nav-wrapper">
       <Box className="nav-container">
-        {/* Capa 1: Fondo blanco con la curva recortada y la sombra inteligente */}
+        {/* Capa 1: Fondo sólido principal de la barra */}
         <Box className="nav-pill-bg" />
 
-        {/* Capa 2: Contenedor de botones reales */}
+        {/* Capa 2: La "isla líquida" que viaja animada al botón seleccionado */}
+        <Box 
+          className="indicator-wrapper" 
+          style={{ transform: `translateX(${value * 100}%)` }}
+        >
+          <Box className="nav-indicator" />
+        </Box>
+
+        {/* Capa 3: Contenedor de botones reales */}
         <Box className="nav-pill-content">
+          
           <Box
             component="button"
             type="button"
-            onClick={handleHomeClick}
+            onClick={handleReportClick}
             className={`nav-item ${value === 0 ? 'active' : ''}`}
-            aria-label="Inicio"
+            aria-label="Reportar"
             aria-pressed={value === 0}
           >
             <Box className="nav-icon-wrap">
-              <HomeIcon className="nav-icon" sx={{ fontSize: 26 }} />
+              <AssignmentOutlinedIcon className="nav-icon" sx={{ fontSize: 28 }} />
             </Box>
-            <span className="nav-item-text">Inicio</span>
+            <span className="nav-item-text">Reportar</span>
           </Box>
 
           <Box
             component="button"
             type="button"
-            onClick={handleReportClick}
-            className={`nav-fab-container ${value === 1 ? 'active' : ''}`}
-            aria-label="Reportar"
+            onClick={handleHomeClick}
+            className={`nav-item ${value === 1 ? 'active' : ''}`}
+            aria-label="Inicio"
             aria-pressed={value === 1}
           >
-            {/* El botón central flota encima del recorte de la máscara */}
-            <Box className="nav-fab">
-              <AddIcon className="nav-icon" sx={{ fontSize: 32 }} />
+            <Box className="nav-icon-wrap">
+              <HomeIcon className="nav-icon" sx={{ fontSize: 26 }} />
             </Box>
-            <span className="nav-item-text">Reportar</span>
+            <span className="nav-item-text">Inicio</span>
           </Box>
 
           <Box
@@ -79,6 +87,7 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             </Box>
             <span className="nav-item-text">Perfil</span>
           </Box>
+
         </Box>
       </Box>
     </Box>
