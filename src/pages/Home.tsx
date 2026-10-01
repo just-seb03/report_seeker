@@ -4,6 +4,7 @@ import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
 import Report from '../components/Report';
+import Profile from '../components/profile';
 import './Home.css';
 
 interface HomeProps {
@@ -22,7 +23,7 @@ const notificacionesData: Notificacion[] = [
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [activeView, setActiveView] = useState<'home' | 'report' | 'profile'>('home');
   const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -52,19 +53,26 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const handleHomeClick = () => {
-    setIsReportOpen(false);
+    setActiveView('home');
     setPullDistance(0);
   };
 
   const handleReportClick = () => {
-    setIsReportOpen(true);
+    setActiveView('report');
+    setPullDistance(0);
+  };
+
+  const handleProfileClick = () => {
+    setActiveView('profile');
     setPullDistance(0);
   };
 
   return (
     <Box className="home-container">
-      {isReportOpen ? (
+      {activeView === 'report' ? (
         <Report />
+      ) : activeView === 'profile' ? (
+        <Profile />
       ) : (
         <>
           <Box
@@ -110,7 +118,11 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       )}
 
       <Box className="home-bottom-nav">
-        <BottomNav onHomeClick={handleHomeClick} onReportClick={handleReportClick} />
+        <BottomNav
+          onHomeClick={handleHomeClick}
+          onReportClick={handleReportClick}
+          onProfileClick={handleProfileClick}
+        />
       </Box>
     </Box>
   );
