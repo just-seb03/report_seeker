@@ -6,6 +6,7 @@ import {
 } from '@capacitor-community/sqlite';
 
 const databaseName = 'report_seeker';
+const webObjectStore = 'issues_riesgos';
 const sqlite = new SQLiteConnection(CapacitorSQLite);
 
 const schema = `
@@ -154,14 +155,74 @@ export async function saveIssueReport(report: {
   title: string;
   description: string;
   priority: string;
+  image: Blob | null;
 }): Promise<number> {
+  if (!Capacitor.isNativePlatform()) {
+    return saveIssueReportOnWeb(report);
+  }
+
   const connection = await initializeDatabase();
+  const imageData = report.image ? await blobToDataUrl(report.image) : null;
   const result = await connection.run(
-    'INSERT INTO issues_riesgos (titulo, descripcion, prioridad) VALUES (?, ?, ?);',
-    [report.title, report.description, report.priority],
+    'INSERT INTO issues_riesgos (titulo, descripcion, prioridad, fotografia_url) VALUES (?, ?, ?, ?);',
+    [report.title, report.description, report.priority, imageData],
   );
   const issueId = result.changes?.lastId;
 
   if (issueId === undefined) throw new Error('SQLite no devolvió el ID del reporte.');
   return issueId;
+}
+
+function saveIssueReportOnWeb(report: {
+  title: string;
+  description: string;
+  priority: string;
+  image: Blob | null;
+}): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 1);
+
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(webObjectStore, { keyPath: 'issue_id', autoIncrement: true });
+    };
+    request.onerror = () => reject(request.error ?? new Error('No se pudo abrir el almacenamiento web.'));
+    request.onsuccess = () => {
+      const database = request.result;
+      const transaction = database.transaction(webObjectStore, 'readwrite');
+      const addRequest = transaction.objectStore(webObjectStore).add({
+        titulo: report.title,
+        descripcion: report.description,
+        prioridad: report.priority,
+        fotografia: report.image,
+        fecha_captura: new Date().toISOString(),
+        estado: 'capturado',
+      });
+      let issueId: number | undefined;
+
+      addRequest.onsuccess = () => { issueId = addRequest.result as number; };
+      addRequest.onerror = () => reject(addRequest.error ?? new Error('No se pudo guardar el reporte web.'));
+      transaction.oncomplete = () => {
+        database.close();
+        if (issueId === undefined) reject(new Error('IndexedDB no devolvió el ID del reporte.'));
+        else resolve(issueId);
+      };
+      transaction.onerror = () => reject(transaction.error ?? new Error('No se pudo guardar el reporte web.'));
+      transaction.onabort = () => {
+        database.close();
+        reject(transaction.error ?? new Error('Se canceló el guardado del reporte web.'));
+      };
+    };
+  });
+}
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') resolve(reader.result);
+      else reject(new Error('No se pudo leer la fotografía.'));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error('No se pudo leer la fotografía.'));
+    reader.readAsDataURL(blob);
+  });
 }

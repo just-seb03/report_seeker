@@ -11,6 +11,7 @@ export default function Report() {
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [submitMessage, setSubmitMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const severityDragActive = useRef(false);
@@ -28,13 +29,18 @@ export default function Report() {
     const previewUrl = image ? URL.createObjectURL(image) : null;
     previewUrlRef.current = previewUrl;
     setImagePreview(previewUrl);
+    setImageFile(image ?? null);
     setSubmitMessage('');
+    setReportUid(null);
   };
 
   const handleRemoveImage = () => {
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     previewUrlRef.current = null;
     setImagePreview(null);
+    setImageFile(null);
+    setSubmitMessage('');
+    setReportUid(null);
     if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
@@ -48,15 +54,14 @@ export default function Report() {
         title: title.trim(),
         description: description.trim(),
         priority: severityOptions[severity],
+        image: imageFile,
       });
 
       setReportUid(issueId);
-      setSubmitMessage(imagePreview
-        ? `Ficha guardada con UID-${issueId}. La fotografía solo está en vista previa.`
-        : `Ficha guardada con UID-${issueId}.`);
+      setSubmitMessage(`Reporte completo guardado con UID-${issueId}.`);
     } catch (error) {
       console.error('No se pudo guardar la ficha', error);
-      setSubmitMessage('No se pudo guardar la ficha. Comprueba que la app esté ejecutándose en Android o iOS.');
+      setSubmitMessage('No se pudo guardar el reporte. Comprueba el almacenamiento del dispositivo e inténtalo de nuevo.');
     } finally {
       setIsSaving(false);
     }
