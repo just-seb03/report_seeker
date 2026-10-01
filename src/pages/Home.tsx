@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
@@ -12,6 +12,10 @@ interface HomeProps {
   onToggleManualTheme: () => void;
 }
 
+type NavigationView = 'home' | 'report' | 'profile';
+type TransitionDirection = 'forward' | 'backward';
+const viewOrder: NavigationView[] = ['home', 'report', 'profile'];
+
 const notificacionesData: Notificacion[] = [
   { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },
   { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.', tiempo: 'hace 5 min', unread: true, prioridad: 'Alta' },
@@ -23,10 +27,17 @@ const notificacionesData: Notificacion[] = [
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeView, setActiveView] = useState<'home' | 'report' | 'profile'>('home');
+  const [activeView, setActiveView] = useState<NavigationView>('home');
+  const [previousView, setPreviousView] = useState<NavigationView | null>(null);
+  const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
   const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const transitionTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+  }, []);
 
   const handleCollapse = () => {
     setIsExpanded(false);
@@ -52,70 +63,93 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     touchStart.current = null;
   };
 
-  const handleHomeClick = () => {
-    setActiveView('home');
+  const navigateTo = (nextView: NavigationView) => {
+    if (nextView === activeView) return;
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+
+    const direction = viewOrder.indexOf(nextView) > viewOrder.indexOf(activeView) ? 'forward' : 'backward';
+    setTransitionDirection(direction);
+    setPreviousView(activeView);
+    setActiveView(nextView);
     setPullDistance(0);
+    transitionTimer.current = window.setTimeout(() => {
+      setPreviousView(null);
+      transitionTimer.current = null;
+    }, 380);
   };
 
-  const handleReportClick = () => {
-    setActiveView('report');
-    setPullDistance(0);
-  };
+  const handleHomeClick = () => navigateTo('home');
+  const handleReportClick = () => navigateTo('report');
+  const handleProfileClick = () => navigateTo('profile');
 
-  const handleProfileClick = () => {
-    setActiveView('profile');
-    setPullDistance(0);
+  const renderView = (view: NavigationView) => {
+    if (view === 'report') return <Report />;
+    if (view === 'profile') return <Profile />;
+
+    return (
+      <>
+        <Box
+          className="home-scene"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleTouchStart}
+          onMouseUp={handleTouchEnd}
+          onMouseLeave={handleTouchEnd}
+          sx={{
+            transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
+            transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
+          }}
+        >
+          <HomeHeader
+            isExpanded={isExpanded}
+            onSwipeDown={onToggleManualTheme}
+            onSwipeProgress={setPullDistance}
+          />
+
+          <NotificationSheet
+            isExpanded={isExpanded}
+            listRef={listRef}
+            notificaciones={notificacionesData}
+            onCollapse={handleCollapse}
+          />
+
+          <Box className="home-gradient-overlay" />
+        </Box>
+
+        <Typography
+          aria-hidden={pullDistance < 8}
+          className="theme-swipe-feedback"
+          sx={{
+            opacity: Math.min(pullDistance / 36, 1),
+            transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
+            transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
+          }}
+        >
+          Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
+        </Typography>
+      </>
+    );
   };
 
   return (
     <Box className="home-container">
-      {activeView === 'report' ? (
-        <Report />
-      ) : activeView === 'profile' ? (
-        <Profile />
-      ) : (
-        <>
+      <Box className="home-view-stage">
+        {previousView && (
           <Box
-            className="home-scene"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={handleTouchStart}
-            onMouseUp={handleTouchEnd}
-            onMouseLeave={handleTouchEnd}
-            sx={{
-              transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
-              transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
-            }}
+            key={`exit-${previousView}`}
+            className={`home-view home-view-exit exit-${transitionDirection}`}
+            aria-hidden="true"
           >
-            <HomeHeader
-              isExpanded={isExpanded}
-              onSwipeDown={onToggleManualTheme}
-              onSwipeProgress={setPullDistance}
-            />
-
-            <NotificationSheet
-              isExpanded={isExpanded}
-              listRef={listRef}
-              notificaciones={notificacionesData}
-              onCollapse={handleCollapse}
-            />
-
-            <Box className="home-gradient-overlay" />
+            {renderView(previousView)}
           </Box>
-
-          <Typography
-            aria-hidden={pullDistance < 8}
-            className="theme-swipe-feedback"
-            sx={{
-              opacity: Math.min(pullDistance / 36, 1),
-              transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
-              transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
-            }}
-          >
-            Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
-          </Typography>
-        </>
-      )}
+        )}
+        <Box
+          key={`active-${activeView}`}
+          className={`home-view home-view-active${previousView ? ` enter-${transitionDirection}` : ''}`}
+        >
+          {renderView(activeView)}
+        </Box>
+      </Box>
 
       <Box className="home-bottom-nav">
         <BottomNav

@@ -5,6 +5,7 @@ import './Report.css';
 const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
 
 export default function Report() {
+  const [reportUid] = useState(() => Math.floor(100000 + Math.random() * 900000));
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState(0);
@@ -75,56 +76,25 @@ export default function Report() {
     <main className="report-screen">
       <div className="report-content">
         <header className="report-intro">
-          <h1>Nuevo reporte</h1>
+          <h1>UID-{reportUid}</h1>
         </header>
 
         <form className="report-form" onSubmit={handleSubmit}>
           <section className="report-field">
-            <label className="report-label" htmlFor="report-title">Título</label>
             <input
               id="report-title"
               className="report-title-input"
+              aria-label="Título del reporte"
               type="text"
               value={title}
               onChange={(event) => {
                 setTitle(event.target.value);
                 setSubmitMessage('');
               }}
-              placeholder="Ej. Fuga en tubería"
+              placeholder="Título"
               maxLength={100}
               required
             />
-          </section>
-
-          <section className="report-field">
-            <label className="report-label" htmlFor="report-image">Fotografía</label>
-            <label className={`report-upload${imagePreview ? ' has-image' : ''}`} htmlFor="report-image">
-              {imagePreview ? (
-                <img className="report-image-preview" src={imagePreview} alt="Vista previa de la evidencia" />
-              ) : (
-                <>
-                  <span className="report-upload-icon"><AddPhotoAlternateOutlined /></span>
-                  <span className="report-upload-title">Añadir fotografía</span>
-                  <span className="report-upload-hint">Usa la cámara o elige una imagen</span>
-                </>
-              )}
-              <input
-                ref={imageInputRef}
-                id="report-image"
-                className="report-file-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={handleImageChange}
-              />
-            </label>
-
-            {imagePreview && (
-              <button className="report-remove-image" type="button" onClick={handleRemoveImage}>
-                <DeleteOutlined />
-                Quitar imagen
-              </button>
-            )}
           </section>
 
           <section className="report-field report-severity-field">
@@ -160,21 +130,52 @@ export default function Report() {
           </section>
 
           <section className="report-field">
-            <label className="report-label" htmlFor="report-description">Descripción</label>
             <textarea
               id="report-description"
               className="report-description"
+              aria-label="Descripción del reporte"
               value={description}
               onChange={(event) => {
                 setDescription(event.target.value);
                 setSubmitMessage('');
               }}
-              placeholder="Describe lo que observaste..."
+              placeholder="Descripción"
               maxLength={1000}
-              rows={5}
+              rows={3}
               required
             />
             <div className="report-character-count" aria-live="polite">{description.length} / 1000</div>
+          </section>
+
+          <section className="report-field">
+            <label className={`report-upload${imagePreview ? ' has-image' : ''}`} htmlFor="report-image">
+              {imagePreview ? (
+                <img className="report-image-preview" src={imagePreview} alt="Vista previa de la evidencia" />
+              ) : (
+                <>
+                  <span className="report-upload-icon"><AddPhotoAlternateOutlined /></span>
+                  <span className="report-upload-title">Fotografía</span>
+                  <span className="report-upload-hint">Toca para añadir una imagen</span>
+                </>
+              )}
+              <input
+                ref={imageInputRef}
+                id="report-image"
+                className="report-file-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                aria-label="Añadir fotografía"
+                onChange={handleImageChange}
+              />
+            </label>
+
+            {imagePreview && (
+              <button className="report-remove-image" type="button" onClick={handleRemoveImage}>
+                <DeleteOutlined />
+                Quitar imagen
+              </button>
+            )}
           </section>
 
           <button className="report-submit" type="submit">Reportar</button>
