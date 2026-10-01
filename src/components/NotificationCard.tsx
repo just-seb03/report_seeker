@@ -4,16 +4,17 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { getIssueReportImage } from '../database';
 import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
-  titulo: string; detalle: string; tiempo?: string;
+  titulo: string; detalle: string; ubicacion?: string; tiempo?: string;
   unread?: boolean; prioridad?: string; fecha?: string; issueId?: number;
 }
 
 export default function NotificationCard({ 
-  titulo, detalle, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId
+  titulo, detalle, ubicacion, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId
 }: NotificationCardProps) {
   
   const [expanded, setExpanded] = useState(false);
@@ -92,6 +93,13 @@ export default function NotificationCard({
           </Box>
           <Typography variant="subtitle1" className="card-title" sx={{ mb: 1 }}>{titulo}</Typography>
           <Typography variant="body2" className="card-text-muted" sx={{ mb: 2 }}>{detalle}</Typography>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 2 }}>
+            <LocationOnOutlinedIcon className="card-text-muted" fontSize="small" />
+            <Typography variant="body2" className="card-text-muted">
+              {ubicacion || 'Ubicación no especificada'}
+            </Typography>
+          </Box>
           
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
             <Typography variant="body2" className={isHighPriority ? "text-error" : "text-warning"}>

@@ -79,13 +79,14 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const handleReportClick = () => navigateTo('report');
   const handleProfileClick = () => navigateTo('profile');
 
-  const handleReportCreated = (report: { issueId: number; title: string; description: string; priority: string }) => {
+  const handleReportCreated = (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
     const now = new Date();
     setNotificaciones((current) => [{
       id: now.getTime(),
       issueId: report.issueId,
       titulo: `Nuevo reporte: ${report.title}`,
       detalle: `UID-${report.issueId} · ${report.description}`,
+      ubicacion: report.location,
       tiempo: 'ahora',
       unread: true,
       prioridad: report.priority,

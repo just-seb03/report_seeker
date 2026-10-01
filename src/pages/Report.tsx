@@ -6,7 +6,7 @@ import './Report.css';
 const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
 
 interface ReportProps {
-  onReportCreated: (report: { issueId: number; title: string; description: string; priority: string }) => void;
+  onReportCreated: (report: { issueId: number; title: string; description: string; location: string; priority: string }) => void;
 }
 
 export default function Report({ onReportCreated }: ReportProps) {
@@ -67,6 +67,7 @@ export default function Report({ onReportCreated }: ReportProps) {
         issueId,
         title: title.trim(),
         description: description.trim(),
+        location: location.trim(),
         priority: severityOptions[severity],
       });
       setReportUid(issueId);

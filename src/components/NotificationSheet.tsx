@@ -7,6 +7,7 @@ export interface Notificacion {
   id: number;
   titulo: string;
   detalle: string;
+  ubicacion?: string;
   tiempo?: string;
   fecha?: string;
   unread?: boolean;
@@ -35,6 +36,7 @@ export default function NotificationSheet({ isExpanded, listRef, notificaciones,
             key={noti.id} 
             titulo={noti.titulo} 
             detalle={noti.detalle} 
+            ubicacion={noti.ubicacion}
             tiempo={noti.tiempo} 
             unread={noti.unread}
             prioridad={noti.prioridad} 
