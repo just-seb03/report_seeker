@@ -32,7 +32,8 @@ export default function Report() {
     <main className="report-screen">
       <div className="report-content">
         <header className="report-intro">
-          <h1>Reportar</h1>
+          <p className="report-kicker">OPERACIONES</p>
+          <h1>Nuevo reporte</h1>
           <p>Describe la situación y adjunta una fotografía.</p>
         </header>
 
@@ -45,6 +46,7 @@ export default function Report() {
               <>
                 <span className="report-upload-icon"><AddPhotoAlternateOutlined /></span>
                 <span className="report-upload-title">Añadir fotografía</span>
+                <span className="report-upload-hint">Usa la cámara o elige una imagen</span>
               </>
             )}
             <input
