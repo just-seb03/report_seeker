@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { AddPhotoAlternateOutlined, DeleteOutlined } from '@mui/icons-material';
+import { saveIssueReport } from '../database';
 import './Report.css';
 
 const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
 
 export default function Report() {
-  const [reportUid] = useState(() => Math.floor(100000 + Math.random() * 900000));
+  const [reportUid, setReportUid] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [severity, setSeverity] = useState(0);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const severityDragActive = useRef(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const previewUrlRef = useRef<string | null>(null);
@@ -36,9 +38,28 @@ export default function Report() {
     if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitMessage('Formulario validado. El envío todavía no está conectado a un servicio.');
+    setIsSaving(true);
+    setSubmitMessage('Guardando ficha...');
+
+    try {
+      const issueId = await saveIssueReport({
+        title: title.trim(),
+        description: description.trim(),
+        priority: severityOptions[severity],
+      });
+
+      setReportUid(issueId);
+      setSubmitMessage(imagePreview
+        ? `Ficha guardada con UID-${issueId}. La fotografía solo está en vista previa.`
+        : `Ficha guardada con UID-${issueId}.`);
+    } catch (error) {
+      console.error('No se pudo guardar la ficha', error);
+      setSubmitMessage('No se pudo guardar la ficha. Comprueba que la app esté ejecutándose en Android o iOS.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const updateSeverityFromPointer = (clientX: number, element: HTMLDivElement) => {
@@ -46,6 +67,7 @@ export default function Report() {
     const position = Math.max(0, Math.min(0.999, (clientX - bounds.left) / bounds.width));
     setSeverity(Math.floor(position * severityOptions.length));
     setSubmitMessage('');
+    setReportUid(null);
   };
 
   const handleSeverityPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -70,13 +92,14 @@ export default function Report() {
     event.preventDefault();
     setSeverity(Math.max(0, Math.min(severityOptions.length - 1, nextSeverity)));
     setSubmitMessage('');
+    setReportUid(null);
   };
 
   return (
     <main className="report-screen">
       <div className="report-content">
         <header className="report-intro">
-          <h1>UID-{reportUid}</h1>
+          <h1>{reportUid === null ? 'Nueva ficha' : `UID-${reportUid}`}</h1>
         </header>
 
         <form className="report-form" onSubmit={handleSubmit}>
@@ -90,6 +113,7 @@ export default function Report() {
               onChange={(event) => {
                 setTitle(event.target.value);
                 setSubmitMessage('');
+                setReportUid(null);
               }}
               placeholder="Título"
               maxLength={100}
@@ -138,6 +162,7 @@ export default function Report() {
               onChange={(event) => {
                 setDescription(event.target.value);
                 setSubmitMessage('');
+                setReportUid(null);
               }}
               placeholder="Descripción"
               maxLength={1000}
@@ -178,7 +203,9 @@ export default function Report() {
             )}
           </section>
 
-          <button className="report-submit" type="submit">Reportar</button>
+          <button className="report-submit" type="submit" disabled={isSaving}>
+            {isSaving ? 'Guardando...' : 'Reportar'}
+          </button>
           <p className="report-submit-message" role="status">{submitMessage}</p>
         </form>
       </div>
