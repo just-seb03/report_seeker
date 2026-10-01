@@ -1,10 +1,4 @@
 /* src/components/BottomNav.css */
-@font-face {
-  font-family: 'Ndot';
-  src: url('../assets/fonts/ndot-47-inspired-by-nothing.otf') format('opentype');
-  font-display: swap;
-}
-
 .nav-wrapper {
   position: fixed; bottom: 24px; left: 0; right: 0;
   display: flex; justify-content: center; z-index: 50; padding: 0 16px;
@@ -47,26 +41,25 @@
 
 .nav-icon-wrap {
   width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-  border-radius: 20px; transition: transform 0.2s cubic-bezier(0.22, 0.8, 0.2, 1);
+  border-radius: 20px; transition: transform 0.24s cubic-bezier(0.22, 0.8, 0.2, 1);
   margin-bottom: 2px;
 }
 
 .nav-item.active { color: #111111; } 
-.nav-item:active .nav-icon-wrap { transform: scale(0.92); }
+.nav-item.active .nav-icon-wrap { transform: translateY(-2px) scale(1.08); }
+.nav-item:active .nav-icon-wrap { transform: scale(0.88); }
 
-/* --- TEXTOS INFERIORES --- */
-.nav-pill-content .nav-item-text { 
-  display: block; 
-  font-family: 'Ndot', sans-serif;
+.nav-item-text {
+  font-family: inherit;
   font-size: 0.65rem;
   font-weight: 500;
-  letter-spacing: 0.3px;
+  line-height: 1;
   transition: font-weight 0.2s ease;
 }
 
 .nav-item.active .nav-item-text,
-.nav-fab-container.active .nav-item-text { 
-  font-weight: 700; 
+.nav-fab-container.active .nav-item-text {
+  font-weight: 700;
 }
 
 /* --- BOTÓN CENTRAL (FAB) --- */
@@ -74,7 +67,7 @@
   appearance: none; border: 0; background: transparent; font: inherit;
   display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
   cursor: pointer; flex: 1.2; height: 100%; padding: 0 0 10px 0;
-  color: #aeb1b6; /* Color del texto "Reportar" */
+  color: #aeb1b6;
   position: relative; -webkit-tap-highlight-color: transparent;
   transition: color 0.3s ease;
 }

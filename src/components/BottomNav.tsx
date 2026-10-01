@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
@@ -48,7 +48,7 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             <Box className="nav-icon-wrap">
               <HomeIcon className="nav-icon" sx={{ fontSize: 26 }} />
             </Box>
-            <Typography className="nav-item-text">Inicio</Typography>
+            <span className="nav-item-text">Inicio</span>
           </Box>
 
           <Box
@@ -63,7 +63,7 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             <Box className="nav-fab">
               <AddIcon className="nav-icon" sx={{ fontSize: 32 }} />
             </Box>
-            <Typography className="nav-item-text">Reportar</Typography>
+            <span className="nav-item-text">Reportar</span>
           </Box>
 
           <Box
@@ -77,7 +77,7 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             <Box className="nav-icon-wrap">
               <PersonIcon className="nav-icon" sx={{ fontSize: 26 }} />
             </Box>
-            <Typography className="nav-item-text">Perfil</Typography>
+            <span className="nav-item-text">Perfil</span>
           </Box>
         </Box>
       </Box>
