@@ -6,20 +6,32 @@ import './HomeHeader.css';
 interface HomeHeaderProps {
   isExpanded: boolean;
   onSwipeDown: () => void;
+  onSwipeProgress: (distance: number) => void;
 }
 
-export default function HomeHeader({ isExpanded, onSwipeDown }: HomeHeaderProps) {
+export default function HomeHeader({ isExpanded, onSwipeDown, onSwipeProgress }: HomeHeaderProps) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return;
     pointerStart.current = { x: event.clientX, y: event.clientY };
     event.currentTarget.setPointerCapture(event.pointerId);
+    onSwipeProgress(0);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const start = pointerStart.current;
+    if (!start) return;
+
+    const deltaY = event.clientY - start.y;
+    const deltaX = Math.abs(event.clientX - start.x);
+    onSwipeProgress(deltaY > 0 && deltaY > deltaX ? Math.min(deltaY, 160) : 0);
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
     const start = pointerStart.current;
     pointerStart.current = null;
+    onSwipeProgress(0);
     if (!start) return;
 
     const deltaY = event.clientY - start.y;
@@ -30,8 +42,12 @@ export default function HomeHeader({ isExpanded, onSwipeDown }: HomeHeaderProps)
   return (
     <Box 
       onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerCancel={() => { pointerStart.current = null; }}
+      onPointerCancel={() => {
+        pointerStart.current = null;
+        onSwipeProgress(0);
+      }}
       sx={{ 
         position: 'absolute', top: '12%', left: 0, right: 0,
         display: 'flex', flexDirection: 'column', alignItems: 'center', 

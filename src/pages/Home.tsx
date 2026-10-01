@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
@@ -21,6 +21,7 @@ const notificacionesData: Notificacion[] = [
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -58,34 +59,44 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       onMouseUp={handleTouchEnd}
       onMouseLeave={handleTouchEnd} 
     >
-      {/* BARRA INDICADORA ANIMADA */}
-      <Box 
+      <Box
+        className="home-scene"
         sx={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          height: '4px',
-          backgroundColor: isDarkMode ? '#ffffff' : '#000000',
-          transform: 'scaleX(0)',
-          transformOrigin: 'center',
-          opacity: 0,
-          transition: 'transform 0.3s ease, opacity 0.3s ease',
-          zIndex: 100,
+          transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
+          transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
         }}
-      />
+      >
+        <HomeHeader
+          isExpanded={isExpanded}
+          onSwipeDown={onToggleManualTheme}
+          onSwipeProgress={setPullDistance}
+        />
 
-      <HomeHeader isExpanded={isExpanded} onSwipeDown={onToggleManualTheme} />
-      
-      <NotificationSheet 
-        isExpanded={isExpanded} 
-        listRef={listRef} 
-        notificaciones={notificacionesData} 
-        onCollapse={handleCollapse}
-      />
+        <NotificationSheet
+          isExpanded={isExpanded}
+          listRef={listRef}
+          notificaciones={notificacionesData}
+          onCollapse={handleCollapse}
+        />
 
-      <Box className="home-gradient-overlay" />
+        <Box className="home-gradient-overlay" />
 
-      <Box className="home-bottom-nav">
-        <BottomNav />
+        <Box className="home-bottom-nav">
+          <BottomNav />
+        </Box>
       </Box>
+
+      <Typography
+        aria-hidden={pullDistance < 8}
+        className="theme-swipe-feedback"
+        sx={{
+          opacity: Math.min(pullDistance / 36, 1),
+          transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
+          transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
+        }}
+      >
+        Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
+      </Typography>
     </Box>
   );
 }
