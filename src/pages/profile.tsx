@@ -5,6 +5,10 @@ import PhoneOutlined from '@mui/icons-material/PhoneOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import './profile.css';
 
+interface ProfileProps {
+	onSettingsClick?: () => void;
+}
+
 const profileName = 'Sebastian Arredondo Vega Cantuarias';
 const profileDetails = [
 	{ label: 'Teléfono', value: '+56 9 6234 8170', Icon: PhoneOutlined },
@@ -12,7 +16,7 @@ const profileDetails = [
 	{ label: 'ID de usuario', value: 'No asignado', Icon: BadgeOutlined },
 ];
 
-export default function Profile() {
+export default function Profile({ onSettingsClick }: ProfileProps) {
 	return (
 		<main className="profile-screen">
 			<div className="profile-banner" aria-hidden="true" />
@@ -21,7 +25,7 @@ export default function Profile() {
 					<AccountCircleOutlined />
 				</div>
 				<h1 id="profile-title">{profileName}</h1>
-				<button className="profile-settings" type="button">
+				<button className="profile-settings" type="button" onClick={onSettingsClick}>
 					<SettingsOutlined />
 					Configuración
 				</button>

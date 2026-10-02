@@ -1,0 +1,133 @@
+@font-face {
+  font-family: 'NDot';
+  src: url('../assets/fonts/ndot-47-inspired-by-nothing.otf') format('opentype');
+  font-display: swap;
+}
+
+.configuration-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background: #f5f5f5;
+  color: #111111;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.configuration-back {
+  position: absolute !important;
+  z-index: 2;
+  top: max(12px, env(safe-area-inset-top));
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #e0e0e0 !important;
+  background: #ffffff !important;
+  color: #111111 !important;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+}
+
+.configuration-content {
+  display: flex;
+  width: min(100%, 460px);
+  min-height: 100%;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: max(16px, env(safe-area-inset-top)) 24px calc(112px + env(safe-area-inset-bottom));
+  animation: configuration-enter 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.configuration-brand {
+  display: grid;
+  justify-items: center;
+  margin-top: clamp(110px, 20dvh, 190px);
+  text-align: center;
+}
+
+.configuration-brand h1 {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  color: #222222;
+  font-family: 'NDot', sans-serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.configuration-brand p {
+  margin: 14px 0 0;
+  color: #858585;
+  font-family: 'NDot', sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.configuration-actions {
+  display: grid;
+  width: min(100%, 340px);
+  gap: 12px;
+  margin-top: clamp(42px, 8vh, 72px);
+}
+
+.configuration-button {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  gap: 13px;
+  padding: 0 17px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #333333;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+  cursor: default;
+  animation: configuration-action-enter 440ms ease-out both;
+}
+
+.configuration-button:nth-child(1) { animation-delay: 100ms; }
+.configuration-button:nth-child(2) { animation-delay: 170ms; }
+.configuration-button svg { flex: 0 0 auto; color: #777777; font-size: 20px; }
+
+.configuration-logout {
+  margin-top: clamp(28px, 6vh, 48px);
+  border-color: #ead4d4;
+  background: #fffafa;
+  color: #a83b3b;
+  box-shadow: 0 2px 8px rgb(120 25 25 / 5%);
+  animation-delay: 250ms;
+}
+.configuration-logout svg { color: #b74a4a; }
+
+@keyframes configuration-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes configuration-action-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.dark .configuration-screen { background: #121212; color: #ffffff; }
+body.dark .configuration-back { border-color: #333333 !important; background: #1e1e1e !important; color: #ffffff !important; }
+body.dark .configuration-brand h1 { color: #f5f5f5; }
+body.dark .configuration-brand p { color: #aaaaaa; }
+body.dark .configuration-button { border-color: #333333; background: #1e1e1e; color: #eeeeee; box-shadow: 0 2px 8px rgb(0 0 0 / 20%); }
+body.dark .configuration-button svg { color: #aaaaaa; }
+body.dark .configuration-logout { border-color: #503030; background: #261b1b; color: #e58b8b; }
+body.dark .configuration-logout svg { color: #e58b8b; }
+
+@media (prefers-reduced-motion: reduce) {
+  .configuration-content,
+  .configuration-button { animation-duration: 1ms; animation-delay: 0ms; }
+}

@@ -5,6 +5,7 @@ import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
 import ReportCancelDialog from '../components/ReportCancelDialog';
+import Configuration from './Configuration';
 import InfoReport from './InfoReport';
 import Report, { type ReportPhoto } from './Report';
 import Profile from './profile';
@@ -16,9 +17,9 @@ interface HomeProps {
   onToggleManualTheme: () => void;
 }
 
-type NavigationView = 'home' | 'report' | 'profile' | 'info-report';
+type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration';
 type TransitionDirection = 'forward' | 'backward';
-const viewOrder: NavigationView[] = ['report', 'home', 'info-report', 'profile'];
+const viewOrder: NavigationView[] = ['report', 'home', 'info-report', 'profile', 'configuration'];
 const notificationPageSize = 5;
 
 function toNotification(report: IssueReport): Notificacion {
@@ -172,6 +173,8 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     navigateTo('info-report');
   };
 
+  const handleOpenConfiguration = () => navigateTo('configuration');
+
   const captureReportPhoto = async (): Promise<ReportPhoto | null> => {
     try {
       const capturedPhoto = await Camera.getPhoto({
@@ -238,6 +241,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const renderView = (view: NavigationView) => {
+    if (view === 'configuration') return <Configuration onBack={() => navigateTo('profile')} />;
     if (view === 'info-report') {
       return selectedReport ? (
         <InfoReport
@@ -257,7 +261,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         />
       ) : null;
     }
-    if (view === 'profile') return <Profile />;
+    if (view === 'profile') return <Profile onSettingsClick={handleOpenConfiguration} />;
 
     return (
       <>
@@ -336,7 +340,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           }}
         >
           <BottomNav
-            activeView={activeView === 'report' ? 'report' : activeView === 'profile' ? 'profile' : 'home'}
+            activeView={activeView === 'report' ? 'report' : activeView === 'profile' || activeView === 'configuration' ? 'profile' : 'home'}
             onHomeClick={handleHomeClick}
             onReportClick={handleReportClick}
             onProfileClick={() => requestNavigation('profile')}
