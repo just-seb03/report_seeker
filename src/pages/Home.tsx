@@ -35,7 +35,7 @@ function toNotification(report: IssueReport): Notificacion {
     titulo: `Nuevo reporte: ${report.title}`,
     detalle: `UID-${report.issueId} · ${report.description}`,
     ubicacion: report.location,
-    tiempo: dateLabel,
+    fechaPublicacion: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
     fecha: dateLabel,
     unread: true,
     prioridad: report.priority,

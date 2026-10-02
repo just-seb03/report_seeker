@@ -9,13 +9,35 @@ import { getIssueReportImage } from '../database';
 import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
-  titulo: string; detalle: string; ubicacion?: string; tiempo?: string;
+  titulo: string; detalle: string; ubicacion?: string; fechaPublicacion?: string; currentTime: number;
   unread?: boolean; prioridad?: string; fecha?: string; issueId?: number;
   onOpenReport?: () => void;
 }
 
+function formatRelativeTime(fechaPublicacion: string, currentTime: number): string {
+  const publishedAt = Date.parse(fechaPublicacion);
+  if (Number.isNaN(publishedAt)) return 'ahora';
+
+  const elapsedMinutes = Math.floor(Math.max(0, currentTime - publishedAt) / 60_000);
+  if (elapsedMinutes === 0) return 'ahora';
+
+  const relativeTime = new Intl.RelativeTimeFormat('es-CL', { numeric: 'auto' });
+  if (elapsedMinutes < 60) return relativeTime.format(-elapsedMinutes, 'minute');
+
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return relativeTime.format(-elapsedHours, 'hour');
+
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  if (elapsedDays < 30) return relativeTime.format(-elapsedDays, 'day');
+
+  const elapsedMonths = Math.floor(elapsedDays / 30);
+  if (elapsedMonths < 12) return relativeTime.format(-elapsedMonths, 'month');
+
+  return relativeTime.format(-Math.floor(elapsedMonths / 12), 'year');
+}
+
 export default function NotificationCard({ 
-  titulo, detalle, ubicacion, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId, onOpenReport,
+  titulo, detalle, ubicacion, fechaPublicacion, currentTime, unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId, onOpenReport,
 }: NotificationCardProps) {
   
   const [expanded, setExpanded] = useState(false);
@@ -23,16 +45,12 @@ export default function NotificationCard({
   const [image, setImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
+  const relativeTime = fechaPublicacion ? formatRelativeTime(fechaPublicacion, currentTime) : 'ahora';
 
   useEffect(() => {
-    if (!expanded || issueId === undefined) {
-      setImage(null);
-      setImageLoading(false);
-      return;
-    }
+    if (!expanded || issueId === undefined) return;
 
     let isActive = true;
-    setImageLoading(true);
     getIssueReportImage(issueId)
       .then((reportImage) => {
         if (isActive) setImage(reportImage);
@@ -46,7 +64,10 @@ export default function NotificationCard({
   }, [expanded, issueId]);
 
   const handleHeaderClick = () => {
-    setExpanded((current) => !current);
+    const isOpening = !expanded;
+    setImage(null);
+    setImageLoading(isOpening && issueId !== undefined);
+    setExpanded(isOpening);
     if (!isRead) setIsRead(true);
   };
 
@@ -84,7 +105,7 @@ export default function NotificationCard({
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
             <Typography variant="subtitle2" className="card-title">{titulo}</Typography>
-            <Typography variant="caption" className="card-text-muted" sx={{ flexShrink: 0 }}>{tiempo}</Typography>
+            <Typography variant="caption" className="card-text-muted" sx={{ flexShrink: 0 }}>{relativeTime}</Typography>
           </Box>
           <Typography variant="body2" className="card-detail">{detalle}</Typography>
         </Box>

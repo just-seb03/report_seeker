@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NotificationCard from './NotificationCard';
@@ -10,7 +10,7 @@ export interface Notificacion {
   titulo: string;
   detalle: string;
   ubicacion?: string;
-  tiempo?: string;
+  fechaPublicacion?: string;
   fecha?: string;
   unread?: boolean;
   prioridad?: string;
@@ -33,6 +33,12 @@ export default function NotificationSheet({
   isExpanded, listRef, notificaciones, hasMore, isLoading, onOpenReport, onLoadMore, onCollapse,
 }: NotificationSheetProps) {
   const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setCurrentTime(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const container = listRef.current;
@@ -70,7 +76,8 @@ export default function NotificationSheet({
                 titulo={noti.titulo}
                 detalle={noti.detalle}
                 ubicacion={noti.ubicacion}
-                tiempo={noti.tiempo}
+                fechaPublicacion={noti.fechaPublicacion}
+                currentTime={currentTime}
                 unread={noti.unread}
                 prioridad={noti.prioridad}
                 fecha={noti.fecha}
