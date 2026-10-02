@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Collapse } from '@mui/material';
+import { Box, Button, Typography, Collapse } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import { getIssueReportImage } from '../database';
 import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; tiempo?: string;
   unread?: boolean; prioridad?: string; fecha?: string; issueId?: number;
+  onOpenReport?: () => void;
 }
 
 export default function NotificationCard({ 
-  titulo, detalle, ubicacion, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId
+  titulo, detalle, ubicacion, tiempo = 'ahora', unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId, onOpenReport,
 }: NotificationCardProps) {
   
   const [expanded, setExpanded] = useState(false);
@@ -107,6 +109,18 @@ export default function NotificationCard({
             </Typography>
             <Typography variant="caption" className="card-text-muted">{fecha}</Typography>
           </Box>
+
+          {onOpenReport && (
+            <Button
+              className="card-report-open-button"
+              variant="outlined"
+              size="small"
+              startIcon={<OpenInFullOutlinedIcon />}
+              onClick={onOpenReport}
+            >
+              Ver reporte completo
+            </Button>
+          )}
         </Box>
       </Collapse>
     </Box>

@@ -1,6 +1,7 @@
 import { Box, Button, IconButton, Typography } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NotificationCard from './NotificationCard';
+import type { IssueReport } from '../database';
 import './NotificationSheet.css'; // <-- Importamos su CSS exclusivo
 
 export interface Notificacion {
@@ -13,6 +14,7 @@ export interface Notificacion {
   unread?: boolean;
   prioridad?: string;
   issueId?: number;
+  reporte?: IssueReport;
 }
 
 interface NotificationSheetProps {
@@ -21,12 +23,13 @@ interface NotificationSheetProps {
   notificaciones: Notificacion[];
   hasMore: boolean;
   isLoading: boolean;
+  onOpenReport: (report: IssueReport) => void;
   onLoadMore: () => void;
   onCollapse: () => void; 
 }
 
 export default function NotificationSheet({
-  isExpanded, listRef, notificaciones, hasMore, isLoading, onLoadMore, onCollapse,
+  isExpanded, listRef, notificaciones, hasMore, isLoading, onOpenReport, onLoadMore, onCollapse,
 }: NotificationSheetProps) {
   return (
     <Box
@@ -36,19 +39,23 @@ export default function NotificationSheet({
     >
       <Box className="sheet-content">
         
-        {notificaciones.map((noti) => (
-          <NotificationCard 
-            key={noti.id} 
-            titulo={noti.titulo} 
-            detalle={noti.detalle} 
-            ubicacion={noti.ubicacion}
-            tiempo={noti.tiempo} 
-            unread={noti.unread}
-            prioridad={noti.prioridad} 
-            fecha={noti.fecha}
-            issueId={noti.issueId}
-          />
-        ))}
+        {notificaciones.map((noti) => {
+          const report = noti.reporte;
+          return (
+            <NotificationCard
+              key={noti.id}
+              titulo={noti.titulo}
+              detalle={noti.detalle}
+              ubicacion={noti.ubicacion}
+              tiempo={noti.tiempo}
+              unread={noti.unread}
+              prioridad={noti.prioridad}
+              fecha={noti.fecha}
+              issueId={noti.issueId}
+              onOpenReport={report ? () => onOpenReport(report) : undefined}
+            />
+          );
+        })}
 
         {!isLoading && notificaciones.length === 0 && (
           <Typography className="sheet-empty-message">No hay notificaciones</Typography>

@@ -5,6 +5,7 @@ import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
 import ReportCancelDialog from '../components/ReportCancelDialog';
+import InfoReport from './InfoReport';
 import Report, { type ReportPhoto } from './Report';
 import Profile from './profile';
 import { getIssueReportsPage, type IssueReport } from '../database';
@@ -15,9 +16,9 @@ interface HomeProps {
   onToggleManualTheme: () => void;
 }
 
-type NavigationView = 'home' | 'report' | 'profile';
+type NavigationView = 'home' | 'report' | 'profile' | 'info-report';
 type TransitionDirection = 'forward' | 'backward';
-const viewOrder: NavigationView[] = ['report', 'home', 'profile'];
+const viewOrder: NavigationView[] = ['report', 'home', 'info-report', 'profile'];
 const notificationPageSize = 5;
 
 function toNotification(report: IssueReport): Notificacion {
@@ -38,6 +39,7 @@ function toNotification(report: IssueReport): Notificacion {
     fecha: dateLabel,
     unread: true,
     prioridad: report.priority,
+    reporte: report,
   };
 }
 
@@ -48,6 +50,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
+  const [selectedReport, setSelectedReport] = useState<IssueReport | null>(null);
   const [reportPhoto, setReportPhoto] = useState<ReportPhoto | null>(null);
   const [reportIsComplete, setReportIsComplete] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -154,6 +157,11 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const handleHomeClick = () => requestNavigation('home');
+  const handleOpenReport = (report: IssueReport) => {
+    setSelectedReport(report);
+    navigateTo('info-report');
+  };
+
   const captureReportPhoto = async (): Promise<ReportPhoto | null> => {
     try {
       const capturedPhoto = await Camera.getPhoto({
@@ -220,6 +228,15 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const renderView = (view: NavigationView) => {
+    if (view === 'info-report') {
+      return selectedReport ? (
+        <InfoReport
+          key={selectedReport.issueId}
+          report={selectedReport}
+          onBack={() => navigateTo('home')}
+        />
+      ) : null;
+    }
     if (view === 'report') {
       return reportPhoto ? (
         <Report
@@ -258,6 +275,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
             notificaciones={notificaciones}
             hasMore={hasMoreNotifications}
             isLoading={isLoadingNotifications}
+            onOpenReport={handleOpenReport}
             onLoadMore={handleLoadMoreNotifications}
             onCollapse={handleCollapse}
           />
@@ -302,7 +320,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
       <Box className="home-bottom-nav">
         <BottomNav
-          activeView={activeView}
+          activeView={activeView === 'report' ? 'report' : activeView === 'profile' ? 'profile' : 'home'}
           onHomeClick={handleHomeClick}
           onReportClick={handleReportClick}
           onProfileClick={() => requestNavigation('profile')}
