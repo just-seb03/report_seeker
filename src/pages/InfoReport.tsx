@@ -19,6 +19,13 @@ function getImageData(image: string) {
   return { mimeType, extension, base64: data ?? image };
 }
 
+function formatReportDate(capturedAt: string) {
+  const date = new Date(capturedAt);
+  return Number.isNaN(date.getTime())
+    ? 'Fecha desconocida'
+    : new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+}
+
 export default function InfoReport({ report, onBack }: InfoReportProps) {
   const [image, setImage] = useState<string | null>(null);
   const [isLoadingImage, setIsLoadingImage] = useState(true);
@@ -67,7 +74,10 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
         <IconButton className="info-report-back" aria-label="Volver a Inicio" onClick={onBack}>
           <ArrowBackRoundedIcon />
         </IconButton>
-        <Typography component="h1" className="info-report-heading">Detalle del reporte</Typography>
+        <Box className="info-report-heading">
+          <Typography component="span">Detalle del reporte</Typography>
+          <Typography component="h1">{report.title}</Typography>
+        </Box>
       </header>
 
       <div className="info-report-content">
@@ -86,27 +96,23 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
         </button>
 
         <section className="info-report-details" aria-label="Información del reporte">
-          <div className="info-report-title-row">
-            <Typography component="h2">{report.title}</Typography>
-            <span className="info-report-uid">UID-{report.issueId}</span>
+          <div className="info-report-detail-grid">
+            <div className="info-report-detail-row">
+              <Typography component="h3">Ubicación</Typography>
+              <p>{report.location || 'Ubicación no especificada'}</p>
+            </div>
+            <div className="info-report-detail-row">
+              <Typography component="h3">Gravedad</Typography>
+              <p>{report.priority}</p>
+            </div>
           </div>
           <div className="info-report-detail-row">
             <Typography component="h3">Descripción</Typography>
             <p>{report.description || 'Sin descripción'}</p>
           </div>
-          <div className="info-report-detail-row">
-            <Typography component="h3">Ubicación</Typography>
-            <p>{report.location || 'Ubicación no especificada'}</p>
-          </div>
-          <div className="info-report-detail-grid">
-            <div className="info-report-detail-row">
-              <Typography component="h3">Gravedad</Typography>
-              <p>{report.priority}</p>
-            </div>
-            <div className="info-report-detail-row">
-              <Typography component="h3">Fecha</Typography>
-              <p>{report.capturedAt}</p>
-            </div>
+          <div className="info-report-metadata">
+            <span className="info-report-uid">UID-{report.issueId}</span>
+            <span>{formatReportDate(report.capturedAt)}</span>
           </div>
         </section>
       </div>

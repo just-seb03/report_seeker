@@ -50,6 +50,8 @@ export default function NotificationCard({
   const [image, setImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
+  const isLowPriority = ['leve', 'baja', 'low'].includes(prioridad.toLowerCase());
+  const priorityClass = isHighPriority ? 'text-error' : isLowPriority ? 'text-success' : 'text-warning';
   const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
 
   useEffect(() => {
@@ -160,14 +162,14 @@ export default function NotificationCard({
             </Box>
             <Typography
               variant="body2"
-              className={isHighPriority ? 'text-error' : 'text-warning'}
+              className={priorityClass}
               sx={{ flexShrink: 0, textAlign: 'right' }}
             >
-              Prioridad: {prioridad}
+              {prioridad}
             </Typography>
           </Box>
 
-          <Typography variant="body2" className="card-text-muted" sx={{ mb: 2, overflowWrap: 'anywhere' }}>{detalle}</Typography>
+          <Typography variant="body2" className="card-description" sx={{ mb: 2, overflowWrap: 'anywhere' }}>{detalle}</Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
             <Typography variant="caption" className="card-text-muted">
