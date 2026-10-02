@@ -1,4 +1,5 @@
-import { Box, Button, IconButton, Typography } from '@mui/material';
+import { useEffect, useRef } from 'react';
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NotificationCard from './NotificationCard';
 import type { IssueReport } from '../database';
@@ -31,6 +32,24 @@ interface NotificationSheetProps {
 export default function NotificationSheet({
   isExpanded, listRef, notificaciones, hasMore, isLoading, onOpenReport, onLoadMore, onCollapse,
 }: NotificationSheetProps) {
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = listRef.current;
+    const sentinel = loadMoreSentinelRef.current;
+    if (!isExpanded || !hasMore || isLoading || !container || !sentinel) return;
+
+    let requestStarted = false;
+    const observer = new IntersectionObserver((entries) => {
+      if (requestStarted || !entries.some((entry) => entry.isIntersecting)) return;
+      requestStarted = true;
+      onLoadMore();
+    }, { root: container, rootMargin: '0px 0px 120px 0px' });
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isExpanded, isLoading, listRef, onLoadMore]);
+
   return (
     <Box
       ref={listRef}
@@ -39,21 +58,26 @@ export default function NotificationSheet({
     >
       <Box className="sheet-content">
         
-        {notificaciones.map((noti) => {
+        {notificaciones.map((noti, index) => {
           const report = noti.reporte;
           return (
-            <NotificationCard
+            <Box
+              className="sheet-notification-item"
               key={noti.id}
-              titulo={noti.titulo}
-              detalle={noti.detalle}
-              ubicacion={noti.ubicacion}
-              tiempo={noti.tiempo}
-              unread={noti.unread}
-              prioridad={noti.prioridad}
-              fecha={noti.fecha}
-              issueId={noti.issueId}
-              onOpenReport={report ? () => onOpenReport(report) : undefined}
-            />
+              style={{ animationDelay: `${(index % 5) * 55}ms` }}
+            >
+              <NotificationCard
+                titulo={noti.titulo}
+                detalle={noti.detalle}
+                ubicacion={noti.ubicacion}
+                tiempo={noti.tiempo}
+                unread={noti.unread}
+                prioridad={noti.prioridad}
+                fecha={noti.fecha}
+                issueId={noti.issueId}
+                onOpenReport={report ? () => onOpenReport(report) : undefined}
+              />
+            </Box>
           );
         })}
 
@@ -62,14 +86,17 @@ export default function NotificationSheet({
         )}
 
         {hasMore && (
-          <Button
-            className="sheet-load-more-btn"
-            onClick={onLoadMore}
-            disabled={isLoading}
-            variant="outlined"
+          <Box
+            ref={loadMoreSentinelRef}
+            className={`sheet-load-more-sentinel${isLoading && isExpanded ? ' is-loading' : ''}`}
           >
-            {isLoading ? 'Cargando...' : 'Cargar 5 más'}
-          </Button>
+            {isLoading && isExpanded && (
+              <Box className="sheet-load-more-indicator" role="status" aria-label="Cargando reportes">
+                <CircularProgress size={26} thickness={4} />
+                <Typography variant="caption">Cargando reportes</Typography>
+              </Box>
+            )}
+          </Box>
         )}
 
         <Box className="sheet-action-container">

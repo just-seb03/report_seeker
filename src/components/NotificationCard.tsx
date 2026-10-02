@@ -45,36 +45,36 @@ export default function NotificationCard({
     return () => { isActive = false; };
   }, [expanded, issueId]);
 
-  const handleCardClick = () => {
-    if (expanded) {
-      onOpenReport?.();
-    } else {
-      setExpanded(true);
-    }
+  const handleHeaderClick = () => {
+    setExpanded((current) => !current);
     if (!isRead) setIsRead(true);
   };
 
-  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const activateWithKeyboard = (event: KeyboardEvent<HTMLDivElement>, action: () => void) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
-    handleCardClick();
+    action();
+  };
+
+  const handleExpandedContentClick = () => {
+    if (!expanded) return;
+    onOpenReport?.();
   };
 
   // Determinamos las clases CSS a inyectar en el contenedor principal
   const cardClass = `card-paper ${isRead ? 'read' : 'unread'} ${isHighPriority ? 'high-priority' : ''}`;
 
   return (
-    <Box
-      className={cardClass}
-      onClick={handleCardClick}
-      onKeyDown={handleCardKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-expanded={expanded}
-      aria-label={expanded ? `Abrir reporte: ${titulo}` : `Expandir notificación: ${titulo}`}
-      sx={{ cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
-    >
-      <Box sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center' }}>
+    <Box className={cardClass}>
+      <Box
+        onClick={handleHeaderClick}
+        onKeyDown={(event) => activateWithKeyboard(event, handleHeaderClick)}
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        aria-label={`${expanded ? 'Contraer' : 'Expandir'} notificación: ${titulo}`}
+        sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
+      >
         {isHighPriority ? (
           <ErrorOutlinedIcon className={!isRead ? "icon-error" : "icon-info"} sx={{ mr: 2, flexShrink: 0 }} />
         ) : (
@@ -100,7 +100,19 @@ export default function NotificationCard({
       </Box>
 
       <Collapse in={expanded} timeout={250} unmountOnExit>
-        <Box sx={{ p: 2, pt: 0 }}>
+        <Box
+          onClick={handleExpandedContentClick}
+          onKeyDown={(event) => activateWithKeyboard(event, handleExpandedContentClick)}
+          role={onOpenReport ? 'button' : undefined}
+          tabIndex={onOpenReport ? 0 : undefined}
+          aria-label={onOpenReport ? `Abrir reporte completo: ${titulo}` : undefined}
+          sx={{
+            p: 2,
+            pt: 0,
+            cursor: onOpenReport ? 'pointer' : 'default',
+            '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: -2 },
+          }}
+        >
           <Box className="card-placeholder">
             {image ? (
               <img className="card-report-image" src={image} alt={`Evidencia del reporte: ${titulo}`} />

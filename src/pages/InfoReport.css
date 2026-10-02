@@ -39,21 +39,6 @@
 }
 .info-report-photo-button:disabled { cursor: default; }
 .info-report-photo-button > img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.info-report-photo-hint {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border-radius: 6px;
-  background: rgb(17 17 17 / 78%);
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 700;
-}
-.info-report-photo-hint svg { font-size: 16px; }
 .info-report-details { margin-top: 18px; }
 .info-report-title-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #e0e0e0; }
 .info-report-title-row h2 { margin: 0; overflow-wrap: anywhere; font-size: 21px; font-weight: 800; line-height: 1.3; }

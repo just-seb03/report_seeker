@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import { Capacitor } from '@capacitor/core';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { Directory, Filesystem } from '@capacitor/filesystem';
@@ -84,7 +83,6 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
           ) : (
             <span>{isLoadingImage ? 'Cargando fotografía...' : 'Este reporte no tiene fotografía'}</span>
           )}
-          {image && <span className="info-report-photo-hint"><OpenInFullOutlinedIcon /> Ver completa</span>}
         </button>
 
         <section className="info-report-details" aria-label="Información del reporte">

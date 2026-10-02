@@ -59,6 +59,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
   const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
+  const isLoadingMoreNotifications = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const transitionTimer = useRef<number | null>(null);
 
@@ -84,8 +85,10 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   }, []);
 
   const handleLoadMoreNotifications = async () => {
-    if (!hasMoreNotifications || isLoadingNotifications || lastNotificationId === undefined) return;
+    if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
 
+    const loadingStartedAt = performance.now();
+    isLoadingMoreNotifications.current = true;
     setIsLoadingNotifications(true);
     try {
       const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
@@ -99,6 +102,11 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     } catch (error) {
       console.error('No se pudieron cargar más reportes', error);
     } finally {
+      const remainingIndicatorTime = 350 - (performance.now() - loadingStartedAt);
+      if (remainingIndicatorTime > 0) {
+        await new Promise<void>((resolve) => window.setTimeout(resolve, remainingIndicatorTime));
+      }
+      isLoadingMoreNotifications.current = false;
       setIsLoadingNotifications(false);
     }
   };
