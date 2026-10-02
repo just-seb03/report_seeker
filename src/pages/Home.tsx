@@ -1,15 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
-import HomeHeader from '../components/HomeHeader';
-import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
+import React from 'react';
+import { Box } from '@mui/material';
 import BottomNav from '../components/BottomNav';
 import ReportCancelDialog from '../components/ReportCancelDialog';
 import Configuration from './Configuration';
 import InfoReport from './InfoReport';
-import Report, { type ReportPhoto } from './Report';
+import Report from './Report';
 import Profile from './profile';
-import { getIssueReportsPage, type IssueReport } from '../database';
+import HomeScene from '../components/HomeScene';
+import { useHome, type NavigationView } from '../control/useHome';
 import './Home.css';
 
 interface HomeProps {
@@ -17,271 +15,42 @@ interface HomeProps {
   onToggleManualTheme: () => void;
 }
 
-type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration';
-type TransitionDirection = 'forward' | 'backward';
-const viewOrder: NavigationView[] = ['report', 'home', 'info-report', 'profile', 'configuration'];
-const notificationPageSize = 5;
-
-const READ_NOTIFICATIONS_STORAGE_KEY = 'report_seeker_read_notifications';
-
-function getInitialReadNotificationIds(): Set<number> {
-  try {
-    const raw = localStorage.getItem(READ_NOTIFICATIONS_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        return new Set(parsed);
-      }
-    }
-  } catch (error) {
-    console.error('No se pudieron leer las notificaciones vistas del almacenamiento', error);
-  }
-  return new Set<number>();
-}
-
-function saveReadNotificationIds(ids: Set<number>) {
-  try {
-    localStorage.setItem(READ_NOTIFICATIONS_STORAGE_KEY, JSON.stringify(Array.from(ids)));
-  } catch (error) {
-    console.error('No se pudieron guardar las notificaciones vistas en el almacenamiento', error);
-  }
-}
-
-function toNotification(report: IssueReport, readIds: Set<number>): Notificacion {
-  const capturedAt = new Date(report.capturedAt.includes('T')
-    ? report.capturedAt
-    : `${report.capturedAt.replace(' ', 'T')}Z`);
-
-  return {
-    id: report.issueId,
-    issueId: report.issueId,
-    titulo: report.title,
-    detalle: report.description,
-    ubicacion: report.location,
-    fecha: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
-    unread: !readIds.has(report.issueId),
-    prioridad: report.priority,
-    reporte: report,
-  };
-}
-
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
-  const [readNotificationIds, setReadNotificationIds] = useState<Set<number>>(getInitialReadNotificationIds);
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
-  const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
-  const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
-  const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [activeView, setActiveView] = useState<NavigationView>('home');
-  const [selectedReport, setSelectedReport] = useState<IssueReport | null>(null);
-  const [reportPhoto, setReportPhoto] = useState<ReportPhoto | null>(null);
-  const [reportIsComplete, setReportIsComplete] = useState(false);
-  const [isNavEntering, setIsNavEntering] = useState(false);
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [pendingView, setPendingView] = useState<NavigationView | null>(null);
-  const [previousView, setPreviousView] = useState<NavigationView | null>(null);
-  const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStart = useRef<number | null>(null);
-  const isLoadingMoreNotifications = useRef(false);
-  const listRef = useRef<HTMLDivElement>(null);
-  const transitionTimer = useRef<number | null>(null);
-
-  useEffect(() => () => {
-    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
-  }, []);
-
-  const handleMarkAsRead = (id: number) => {
-    setReadNotificationIds((prev) => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
-      saveReadNotificationIds(next);
-      return next;
-    });
-    setNotificaciones((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
-    );
-  };
-
-  useEffect(() => {
-    let isActive = true;
-    getIssueReportsPage(notificationPageSize)
-      .then((page) => {
-        if (!isActive) return;
-        setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
-        setLastNotificationId(page.items[page.items.length - 1]?.issueId);
-        setHasMoreNotifications(page.hasMore);
-      })
-      .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error))
-      .finally(() => {
-        if (isActive) setIsLoadingNotifications(false);
-      });
-
-    return () => { isActive = false; };
-  }, []);
-
-  const handleLoadMoreNotifications = async () => {
-    if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
-
-    const loadingStartedAt = performance.now();
-    isLoadingMoreNotifications.current = true;
-    setIsLoadingNotifications(true);
-    try {
-      const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
-      const notifications = page.items.map((item) => toNotification(item, readNotificationIds));
-      setNotificaciones((current) => {
-        const existingIds = new Set(current.map((notification) => notification.issueId));
-        return [...current, ...notifications.filter((notification) => !existingIds.has(notification.issueId))];
-      });
-      setLastNotificationId(page.items[page.items.length - 1]?.issueId ?? lastNotificationId);
-      setHasMoreNotifications(page.hasMore);
-    } catch (error) {
-      console.error('No se pudieron cargar más reportes', error);
-    } finally {
-      const remainingIndicatorTime = 350 - (performance.now() - loadingStartedAt);
-      if (remainingIndicatorTime > 0) {
-        await new Promise<void>((resolve) => window.setTimeout(resolve, remainingIndicatorTime));
-      }
-      isLoadingMoreNotifications.current = false;
-      setIsLoadingNotifications(false);
-    }
-  };
-
-  const handleCollapse = () => {
-    setIsExpanded(false);
-    if (listRef.current) listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    touchStart.current = clientY;
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
-    if (touchStart.current === null) return;
-    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : (e as React.MouseEvent).clientY;
-    const deltaY = touchStart.current - clientY;
-
-    if (!isExpanded && deltaY > 40) {
-      setIsExpanded(true);
-    } else if (isExpanded && deltaY < -40 && listRef.current && listRef.current.scrollTop <= 0) {
-      setIsExpanded(false); 
-    }
-
-    touchStart.current = null;
-  };
-
-  const navigateTo = (nextView: NavigationView) => {
-    if (nextView === activeView) return;
-    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
-
-    const direction = viewOrder.indexOf(nextView) > viewOrder.indexOf(activeView) ? 'forward' : 'backward';
-    setTransitionDirection(direction);
-    setPreviousView(activeView);
-    setActiveView(nextView);
-    setPullDistance(0);
-    transitionTimer.current = window.setTimeout(() => {
-      setPreviousView(null);
-      if (nextView !== 'report') {
-        setReportPhoto(null);
-        setReportIsComplete(false);
-      }
-      transitionTimer.current = null;
-    }, 380);
-  };
-
-  const requestNavigation = (nextView: NavigationView) => {
-    if (nextView === activeView) return;
-    if (activeView === 'report' && !reportIsComplete) {
-      setPendingView(nextView);
-      setCancelDialogOpen(true);
-      return;
-    }
-    navigateTo(nextView);
-  };
-
-  const handleHomeClick = () => requestNavigation('home');
-  const handleReportComplete = () => {
-    setIsNavEntering(true);
-    navigateTo('home');
-  };
-
-  const handleOpenReport = (report: IssueReport) => {
-    handleMarkAsRead(report.issueId);
-    setSelectedReport(report);
-    navigateTo('info-report');
-  };
-
-  const handleOpenConfiguration = () => navigateTo('configuration');
-
-  const captureReportPhoto = async (): Promise<ReportPhoto | null> => {
-    try {
-      const capturedPhoto = await Camera.getPhoto({
-        quality: 90,
-        allowEditing: false,
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
-      });
-      if (!capturedPhoto.webPath) throw new Error('La cámara no devolvió una ruta para la fotografía.');
-
-      const response = await fetch(capturedPhoto.webPath);
-      if (!response.ok) throw new Error('No se pudo leer la fotografía capturada.');
-      const blob = await response.blob();
-      if (blob.size === 0) throw new Error('La fotografía capturada está vacía.');
-
-      return { blob, webPath: capturedPhoto.webPath };
-    } catch (error) {
-      console.error('No se pudo capturar la fotografía del reporte.', error);
-      return null;
-    }
-  };
-
-  const handleReportClick = async () => {
-    if (activeView === 'report') return;
-    const photo = await captureReportPhoto();
-    if (!photo) return;
-
-    setReportIsComplete(false);
-    setReportPhoto(photo);
-    navigateTo('report');
-  };
-  const handleRetakeReportPhoto = async () => {
-    const photo = await captureReportPhoto();
-    if (photo) setReportPhoto(photo);
-    return photo;
-  };
-
-  const handleCancelReport = () => {
-    setCancelDialogOpen(false);
-    setPendingView(null);
-  };
-
-  const handleExitReport = () => {
-    const destination = pendingView;
-    setCancelDialogOpen(false);
-    setPendingView(null);
-    if (destination) navigateTo(destination);
-  };
-
-  const handleReportCreated = (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
-    setReportIsComplete(true);
-    const notification = toNotification({
-      issueId: report.issueId,
-      title: report.title,
-      description: report.description,
-      location: report.location,
-      priority: report.priority,
-      capturedAt: new Date().toISOString(),
-    }, readNotificationIds);
-    setNotificaciones((current) => [
-      notification,
-      ...current.filter((item) => item.issueId !== report.issueId),
-    ]);
-  };
-
-
-  const hasUnreadNotifications = notificaciones.some((item) => item.unread);
+  const {
+    notificaciones,
+    hasMoreNotifications,
+    isLoadingNotifications,
+    isExpanded,
+    activeView,
+    selectedReport,
+    reportPhoto,
+    reportIsComplete,
+    isNavEntering,
+    cancelDialogOpen,
+    previousView,
+    transitionDirection,
+    pullDistance,
+    listRef,
+    hasUnreadNotifications,
+    setIsNavEntering,
+    setPullDistance,
+    handleMarkAsRead,
+    handleLoadMoreNotifications,
+    handleCollapse,
+    handleTouchStart,
+    handleTouchEnd,
+    navigateTo,
+    requestNavigation,
+    handleHomeClick,
+    handleReportComplete,
+    handleOpenReport,
+    handleOpenConfiguration,
+    handleReportClick,
+    handleRetakeReportPhoto,
+    handleCancelReport,
+    handleExitReport,
+    handleReportCreated,
+  } = useHome();
 
   const renderView = (view: NavigationView) => {
     if (view === 'configuration') return <Configuration onBack={() => navigateTo('profile')} />;
@@ -307,53 +76,24 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     if (view === 'profile') return <Profile onSettingsClick={handleOpenConfiguration} />;
 
     return (
-      <>
-        <Box
-          className="home-scene"
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleTouchStart}
-          onMouseUp={handleTouchEnd}
-          onMouseLeave={handleTouchEnd}
-          sx={{
-            transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
-            transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
-          }}
-        >
-          <HomeHeader
-            isExpanded={isExpanded}
-            hasNotifications={hasUnreadNotifications}
-            onSwipeDown={onToggleManualTheme}
-            onSwipeProgress={setPullDistance}
-          />
-
-          <NotificationSheet
-            isExpanded={isExpanded}
-            listRef={listRef}
-            notificaciones={notificaciones}
-            hasMore={hasMoreNotifications}
-            isLoading={isLoadingNotifications}
-            onOpenReport={handleOpenReport}
-            onLoadMore={handleLoadMoreNotifications}
-            onCollapse={handleCollapse}
-            onMarkAsRead={handleMarkAsRead}
-          />
-
-          <Box className="home-gradient-overlay" />
-        </Box>
-
-        <Typography
-          aria-hidden={pullDistance < 8}
-          className="theme-swipe-feedback"
-          sx={{
-            opacity: Math.min(pullDistance / 36, 1),
-            transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
-            transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
-          }}
-        >
-          Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
-        </Typography>
-      </>
+      <HomeScene
+        isDarkMode={isDarkMode}
+        pullDistance={pullDistance}
+        isExpanded={isExpanded}
+        hasUnreadNotifications={hasUnreadNotifications}
+        notificaciones={notificaciones}
+        hasMoreNotifications={hasMoreNotifications}
+        isLoadingNotifications={isLoadingNotifications}
+        listRef={listRef}
+        onToggleManualTheme={onToggleManualTheme}
+        onSwipeProgress={setPullDistance}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onOpenReport={handleOpenReport}
+        onLoadMore={handleLoadMoreNotifications}
+        onCollapse={handleCollapse}
+        onMarkAsRead={handleMarkAsRead}
+      />
     );
   };
 

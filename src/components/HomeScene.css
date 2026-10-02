@@ -1,0 +1,44 @@
+.home-scene {
+  position: absolute;
+  inset: 0;
+  transform-origin: top center;
+  will-change: transform;
+}
+
+.theme-swipe-feedback {
+  position: absolute;
+  z-index: 20;
+  top: max(12px, env(safe-area-inset-top));
+  left: 16px;
+  right: 16px;
+  color: #202020;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.35 !important;
+  text-align: center;
+  pointer-events: none;
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.7);
+}
+
+.home-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(to bottom, transparent, #f5f5f5 75%);
+  pointer-events: none;
+  z-index: 2;
+  transition: background 0.25s ease;
+}
+
+body.dark .home-gradient-overlay,
+html.dark .home-gradient-overlay {
+  background: linear-gradient(to bottom, transparent, #121212 75%);
+}
+
+body.dark .theme-swipe-feedback,
+html.dark .theme-swipe-feedback {
+  color: #f5f5f5;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+}
