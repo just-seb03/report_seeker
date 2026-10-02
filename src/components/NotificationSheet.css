@@ -36,6 +36,28 @@
   margin-top: 16px;
 }
 
+.sheet-load-more-btn {
+  align-self: center;
+  min-height: 44px;
+  border-color: #777777 !important;
+  color: #333333 !important;
+}
+
+.sheet-empty-message {
+  padding: 24px 0;
+  color: #777777;
+  text-align: center;
+}
+
+body.dark .sheet-load-more-btn {
+  border-color: #aaaaaa !important;
+  color: #ffffff !important;
+}
+
+body.dark .sheet-empty-message {
+  color: #aaaaaa;
+}
+
 .sheet-collapse-btn {
   color: #9e9e9e !important;
   padding: 8px;

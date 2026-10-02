@@ -146,6 +146,11 @@ export interface IssueReport {
   capturedAt: string;
 }
 
+export interface IssueReportPage {
+  items: IssueReport[];
+  hasMore: boolean;
+}
+
 export function initializeDatabase(): Promise<SQLiteDBConnection> {
   if (!Capacitor.isNativePlatform()) {
     return Promise.reject(new Error('SQLite requiere ejecutar la app en Android o iOS.'));
@@ -184,14 +189,25 @@ export async function saveIssueReport(report: {
   return issueId;
 }
 
-export async function getIssueReports(): Promise<IssueReport[]> {
-  if (!Capacitor.isNativePlatform()) return getIssueReportsOnWeb();
+export async function getIssueReportsPage(limit: number, beforeIssueId?: number): Promise<IssueReportPage> {
+  if (!Capacitor.isNativePlatform()) return getIssueReportsPageOnWeb(limit, beforeIssueId);
 
   const connection = await initializeDatabase();
-  const result = await connection.query(
-    'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura FROM issues_riesgos ORDER BY issue_id DESC;',
-  );
-  return (result.values ?? []).map(mapIssueReport);
+  const result = beforeIssueId === undefined
+    ? await connection.query(
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura FROM issues_riesgos ORDER BY issue_id DESC LIMIT ?;',
+      [limit + 1],
+    )
+    : await connection.query(
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura FROM issues_riesgos WHERE issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
+      [beforeIssueId, limit + 1],
+    );
+  const reports = result.values ?? [];
+
+  return {
+    items: reports.slice(0, limit).map(mapIssueReport),
+    hasMore: reports.length > limit,
+  };
 }
 
 export async function getIssueReportImage(issueId: number): Promise<string | null> {
@@ -283,7 +299,7 @@ function getIssueReportImageOnWeb(issueId: number): Promise<Blob | string | null
   });
 }
 
-function getIssueReportsOnWeb(): Promise<IssueReport[]> {
+function getIssueReportsPageOnWeb(limit: number, beforeIssueId?: number): Promise<IssueReportPage> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(databaseName, 2);
 
@@ -296,14 +312,25 @@ function getIssueReportsOnWeb(): Promise<IssueReport[]> {
     request.onsuccess = () => {
       const database = request.result;
       const transaction = database.transaction(webObjectStore, 'readonly');
-      const getRequest = transaction.objectStore(webObjectStore).getAll();
-      getRequest.onsuccess = () => {
-        database.close();
-        resolve(getRequest.result.map(mapIssueReport).sort((a, b) => b.issueId - a.issueId));
+      const store = transaction.objectStore(webObjectStore);
+      const range = beforeIssueId === undefined ? undefined : IDBKeyRange.upperBound(beforeIssueId, true);
+      const cursorRequest = store.openCursor(range, 'prev');
+      const reports: Record<string, unknown>[] = [];
+
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (!cursor || reports.length === limit + 1) {
+          database.close();
+          resolve({ items: reports.slice(0, limit).map(mapIssueReport), hasMore: reports.length > limit });
+          return;
+        }
+
+        reports.push(cursor.value as Record<string, unknown>);
+        cursor.continue();
       };
-      getRequest.onerror = () => {
+      cursorRequest.onerror = () => {
         database.close();
-        reject(getRequest.error ?? new Error('No se pudieron consultar los reportes.'));
+        reject(cursorRequest.error ?? new Error('No se pudieron consultar los reportes.'));
       };
     };
   });

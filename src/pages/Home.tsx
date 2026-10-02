@@ -6,7 +6,7 @@ import NotificationSheet, { type Notificacion } from '../components/Notification
 import BottomNav from '../components/BottomNav';
 import Report from './Report';
 import Profile from './profile';
-import { getIssueReports, type IssueReport } from '../database';
+import { getIssueReportsPage, type IssueReport } from '../database';
 import './Home.css';
 
 interface HomeProps {
@@ -18,6 +18,7 @@ type NavigationView = 'home' | 'report' | 'profile';
 type TransitionDirection = 'forward' | 'backward';
 type CapturedReportPhoto = { blob: Blob; webPath: string };
 const viewOrder: NavigationView[] = ['report', 'home', 'profile'];
+const notificationPageSize = 5;
 
 function toNotification(report: IssueReport): Notificacion {
   const capturedAt = new Date(report.capturedAt.includes('T')
@@ -42,6 +43,9 @@ function toNotification(report: IssueReport): Notificacion {
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
+  const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
   const [reportPhoto, setReportPhoto] = useState<CapturedReportPhoto | null>(null);
@@ -58,14 +62,40 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
   useEffect(() => {
     let isActive = true;
-    getIssueReports()
-      .then((reports) => {
-        if (isActive) setNotificaciones(reports.map(toNotification));
+    getIssueReportsPage(notificationPageSize)
+      .then((page) => {
+        if (!isActive) return;
+        setNotificaciones(page.items.map(toNotification));
+        setLastNotificationId(page.items[page.items.length - 1]?.issueId);
+        setHasMoreNotifications(page.hasMore);
       })
-      .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error));
+      .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error))
+      .finally(() => {
+        if (isActive) setIsLoadingNotifications(false);
+      });
 
     return () => { isActive = false; };
   }, []);
+
+  const handleLoadMoreNotifications = async () => {
+    if (!hasMoreNotifications || isLoadingNotifications || lastNotificationId === undefined) return;
+
+    setIsLoadingNotifications(true);
+    try {
+      const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
+      const notifications = page.items.map(toNotification);
+      setNotificaciones((current) => {
+        const existingIds = new Set(current.map((notification) => notification.issueId));
+        return [...current, ...notifications.filter((notification) => !existingIds.has(notification.issueId))];
+      });
+      setLastNotificationId(page.items[page.items.length - 1]?.issueId ?? lastNotificationId);
+      setHasMoreNotifications(page.hasMore);
+    } catch (error) {
+      console.error('No se pudieron cargar más reportes', error);
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
 
   const handleCollapse = () => {
     setIsExpanded(false);
@@ -185,6 +215,9 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
             isExpanded={isExpanded}
             listRef={listRef}
             notificaciones={notificaciones}
+            hasMore={hasMoreNotifications}
+            isLoading={isLoadingNotifications}
+            onLoadMore={handleLoadMoreNotifications}
             onCollapse={handleCollapse}
           />
 
