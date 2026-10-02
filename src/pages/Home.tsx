@@ -49,6 +49,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [selectedReport, setSelectedReport] = useState<IssueReport | null>(null);
   const [reportPhoto, setReportPhoto] = useState<ReportPhoto | null>(null);
   const [reportIsComplete, setReportIsComplete] = useState(false);
+  const [isNavEntering, setIsNavEntering] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [pendingView, setPendingView] = useState<NavigationView | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
@@ -161,6 +162,11 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const handleHomeClick = () => requestNavigation('home');
+  const handleReportComplete = () => {
+    setIsNavEntering(true);
+    navigateTo('home');
+  };
+
   const handleOpenReport = (report: IssueReport) => {
     setSelectedReport(report);
     navigateTo('info-report');
@@ -246,7 +252,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         <Report
           photo={reportPhoto}
           onRetakePhoto={handleRetakeReportPhoto}
-          onComplete={() => navigateTo('home')}
+          onComplete={handleReportComplete}
           onReportCreated={handleReportCreated}
         />
       ) : null;
@@ -322,14 +328,21 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         </Box>
       </Box>
 
-      <Box className="home-bottom-nav">
-        <BottomNav
-          activeView={activeView === 'report' ? 'report' : activeView === 'profile' ? 'profile' : 'home'}
-          onHomeClick={handleHomeClick}
-          onReportClick={handleReportClick}
-          onProfileClick={() => requestNavigation('profile')}
-        />
-      </Box>
+      {!(activeView === 'report' && reportIsComplete) && (
+        <Box
+          className={`home-bottom-nav${isNavEntering ? ' nav-entering' : ''}`}
+          onAnimationEnd={(event) => {
+            if (event.target === event.currentTarget) setIsNavEntering(false);
+          }}
+        >
+          <BottomNav
+            activeView={activeView === 'report' ? 'report' : activeView === 'profile' ? 'profile' : 'home'}
+            onHomeClick={handleHomeClick}
+            onReportClick={handleReportClick}
+            onProfileClick={() => requestNavigation('profile')}
+          />
+        </Box>
+      )}
       <ReportCancelDialog
         open={cancelDialogOpen}
         onCancel={handleCancelReport}
