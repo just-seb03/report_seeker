@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
+import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
 import { Capacitor } from '@capacitor/core';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { Directory, Filesystem } from '@capacitor/filesystem';
@@ -31,6 +35,9 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
   const [isLoadingImage, setIsLoadingImage] = useState(true);
   const [isOpeningImage, setIsOpeningImage] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const priorityClass = ['grave', 'alta'].includes(report.priority.toLowerCase())
+    ? 'is-high'
+    : ['leve', 'baja'].includes(report.priority.toLowerCase()) ? 'is-low' : 'is-medium';
 
   useEffect(() => {
     let isActive = true;
@@ -71,48 +78,57 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
   return (
     <main className="info-report-screen">
       <header className="info-report-header">
-        <IconButton className="info-report-back" aria-label="Volver a Inicio" onClick={onBack}>
+        <IconButton className="info-report-back" aria-label="Volver" onClick={onBack}>
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box className="info-report-heading">
-          <Typography component="span">Detalle del reporte</Typography>
+          <Typography component="span">Reporte de riesgo</Typography>
           <Typography component="h1">{report.title}</Typography>
         </Box>
       </header>
 
       <div className="info-report-content">
         <button
-          className="info-report-photo-button"
+          className={`info-report-photo-button${isLoadingImage ? ' is-loading' : ''}`}
           type="button"
           onClick={handleOpenFullImage}
           disabled={!image || isOpeningImage}
           aria-label="Abrir fotografía completa"
+          aria-busy={isLoadingImage || isOpeningImage}
         >
           {image ? (
             <img src={image} alt={`Fotografía del riesgo: ${report.title}`} />
           ) : (
-            <span>{isLoadingImage ? 'Cargando fotografía...' : 'Este reporte no tiene fotografía'}</span>
+            <span className="info-report-photo-empty">
+              {isLoadingImage ? 'Cargando fotografía...' : 'Este reporte no tiene fotografía'}
+            </span>
           )}
         </button>
 
         <section className="info-report-details" aria-label="Información del reporte">
           <div className="info-report-detail-grid">
-            <div className="info-report-detail-row">
-              <Typography component="h3">Ubicación</Typography>
-              <p>{report.location || 'Ubicación no especificada'}</p>
+            <div className="info-report-fact">
+              <span className="info-report-fact-icon" aria-hidden="true"><LocationOnOutlinedIcon /></span>
+              <div className="info-report-fact-copy">
+                <Typography component="h3">Ubicación</Typography>
+                <p>{report.location || 'Ubicación no especificada'}</p>
+              </div>
             </div>
-            <div className="info-report-detail-row">
-              <Typography component="h3">Gravedad</Typography>
-              <p>{report.priority}</p>
+            <div className={`info-report-fact info-report-severity ${priorityClass}`}>
+              <span className="info-report-fact-icon" aria-hidden="true"><PriorityHighRoundedIcon /></span>
+              <div className="info-report-fact-copy">
+                <Typography component="h3">Gravedad</Typography>
+                <p>{report.priority}</p>
+              </div>
             </div>
           </div>
-          <div className="info-report-detail-row">
-            <Typography component="h3">Descripción</Typography>
+          <div className="info-report-description">
+            <Typography component="h2">Descripción</Typography>
             <p>{report.description || 'Sin descripción'}</p>
           </div>
-          <div className="info-report-metadata">
-            <span className="info-report-uid">UID-{report.issueId}</span>
-            <span>{formatReportDate(report.capturedAt)}</span>
+          <div className="info-report-metadata" aria-label="Identificación y fecha del reporte">
+            <span><TagOutlinedIcon aria-hidden="true" /> UID-{report.issueId}</span>
+            <span><CalendarMonthOutlinedIcon aria-hidden="true" /> {formatReportDate(report.capturedAt)}</span>
           </div>
         </section>
       </div>
