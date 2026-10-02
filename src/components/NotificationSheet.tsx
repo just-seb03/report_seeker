@@ -10,7 +10,6 @@ export interface Notificacion {
   titulo: string;
   detalle: string;
   ubicacion?: string;
-  fechaPublicacion?: string;
   fecha?: string;
   unread?: boolean;
   prioridad?: string;
@@ -76,11 +75,10 @@ export default function NotificationSheet({
                 titulo={noti.titulo}
                 detalle={noti.detalle}
                 ubicacion={noti.ubicacion}
-                fechaPublicacion={noti.fechaPublicacion}
+                fecha={noti.fecha}
                 currentTime={currentTime}
                 unread={noti.unread}
                 prioridad={noti.prioridad}
-                fecha={noti.fecha}
                 issueId={noti.issueId}
                 onOpenReport={report ? () => onOpenReport(report) : undefined}
               />

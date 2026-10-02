@@ -9,13 +9,13 @@ import { getIssueReportImage } from '../database';
 import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
-  titulo: string; detalle: string; ubicacion?: string; fechaPublicacion?: string; currentTime: number;
-  unread?: boolean; prioridad?: string; fecha?: string; issueId?: number;
+  titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
+  unread?: boolean; prioridad?: string; issueId?: number;
   onOpenReport?: () => void;
 }
 
-function formatRelativeTime(fechaPublicacion: string, currentTime: number): string {
-  const publishedAt = Date.parse(fechaPublicacion);
+function formatRelativeTime(fecha: string, currentTime: number): string {
+  const publishedAt = Date.parse(fecha);
   if (Number.isNaN(publishedAt)) return 'ahora';
 
   const elapsedMinutes = Math.floor(Math.max(0, currentTime - publishedAt) / 60_000);
@@ -36,8 +36,13 @@ function formatRelativeTime(fechaPublicacion: string, currentTime: number): stri
   return relativeTime.format(-Math.floor(elapsedMonths / 12), 'year');
 }
 
+function formatPublicationDate(fecha?: string): string {
+  if (!fecha || Number.isNaN(Date.parse(fecha))) return 'Fecha desconocida';
+  return new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
+}
+
 export default function NotificationCard({ 
-  titulo, detalle, ubicacion, fechaPublicacion, currentTime, unread = false, prioridad = 'Normal', fecha = '30 Sept 2026', issueId, onOpenReport,
+  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, onOpenReport,
 }: NotificationCardProps) {
   
   const [expanded, setExpanded] = useState(false);
@@ -45,7 +50,7 @@ export default function NotificationCard({
   const [image, setImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
-  const relativeTime = fechaPublicacion ? formatRelativeTime(fechaPublicacion, currentTime) : 'ahora';
+  const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
 
   useEffect(() => {
     if (!expanded || issueId === undefined || image !== null) return;
@@ -161,7 +166,7 @@ export default function NotificationCard({
             <Typography variant="body2" className={isHighPriority ? "text-error" : "text-warning"}>
               Prioridad: {prioridad}
             </Typography>
-            <Typography variant="caption" className="card-text-muted">{fecha}</Typography>
+            <Typography variant="caption" className="card-text-muted">{formatPublicationDate(fecha)}</Typography>
           </Box>
 
         </Box>

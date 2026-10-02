@@ -25,9 +25,6 @@ function toNotification(report: IssueReport): Notificacion {
   const capturedAt = new Date(report.capturedAt.includes('T')
     ? report.capturedAt
     : `${report.capturedAt.replace(' ', 'T')}Z`);
-  const dateLabel = Number.isNaN(capturedAt.getTime())
-    ? 'Fecha desconocida'
-    : new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(capturedAt);
 
   return {
     id: report.issueId,
@@ -35,8 +32,7 @@ function toNotification(report: IssueReport): Notificacion {
     titulo: `Nuevo reporte: ${report.title}`,
     detalle: `UID-${report.issueId} · ${report.description}`,
     ubicacion: report.location,
-    fechaPublicacion: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
-    fecha: dateLabel,
+    fecha: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
     unread: true,
     prioridad: report.priority,
     reporte: report,
