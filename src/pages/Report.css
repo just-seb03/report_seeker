@@ -23,6 +23,121 @@
 .report-field { margin-top: 22px; text-align: center; }
 .report-label { display: block; margin-bottom: 10px; color: #333333; font-size: 13px; font-weight: 700; text-align: center; }
 
+.report-step-transition { animation: report-step-enter 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.report-step-title { margin: 28px 0 0; color: inherit; font-size: 23px; font-weight: 800; line-height: 1.25; text-align: center; }
+.report-photo-step { display: flex; flex-direction: column; }
+.report-photo-confirmation {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: min(46dvh, 420px);
+  min-height: 190px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #eeeeee;
+}
+.report-photo-confirmation img { display: block; width: 100%; height: 100%; object-fit: contain; animation: report-photo-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.report-step-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.report-step-button {
+  display: block;
+  width: 100%;
+  min-height: 50px;
+  margin-top: 24px;
+  padding: 12px 18px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+}
+.report-step-actions .report-step-button { margin-top: 0; }
+.report-step-button.is-primary { border-color: #111111; background: #111111; color: #ffffff; }
+.report-step-button:active:not(:disabled) { transform: scale(0.98); }
+.report-step-button:disabled { cursor: wait; opacity: 0.6; }
+.report-severity-step,
+.report-text-step { display: flex; min-height: min(66vh, 560px); flex-direction: column; justify-content: center; }
+.report-severity-step .report-step-title,
+.report-text-step .report-step-title { margin: 0 0 28px; }
+.report-severity-step .report-severity-pill { flex: 0 0 auto; }
+.report-severity-step .report-step-button,
+.report-text-step .report-step-button { margin-top: 28px; }
+.report-step-form { width: 100%; }
+.report-step-form .report-description { min-height: 160px; text-align: left; }
+.report-ready-step { display: flex; min-height: calc(100dvh - 190px); align-items: center; justify-content: center; text-align: center; }
+.report-ready-step h1 { margin: 0; font-size: 24px; font-weight: 800; line-height: 1.3; }
+.report-ready-step.is-exiting { animation: report-ready-exit 420ms cubic-bezier(0.4, 0, 1, 1) both; }
+
+.report-summary-step { padding-bottom: 16px; }
+.report-summary-step > .report-step-title { margin: 0 0 20px; }
+.report-summary-photo-button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111111;
+  text-align: left;
+  cursor: pointer;
+}
+.report-summary-photo-button img { display: block; width: 100%; height: 150px; object-fit: cover; background: #f5f5f5; }
+.report-summary-photo-button > span { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; font-size: 13px; font-weight: 700; }
+.report-summary-photo-button svg { color: #757575; font-size: 18px; }
+.report-summary-fields { margin-top: 10px; border-top: 1px solid #e0e0e0; }
+.report-summary-row {
+  display: flex;
+  width: 100%;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 4px;
+  border: 0;
+  border-bottom: 1px solid #e0e0e0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.report-summary-copy { display: grid; min-width: 0; gap: 3px; }
+.report-summary-label { color: #757575; font-size: 11px; font-weight: 700; }
+.report-summary-value { overflow-wrap: anywhere; color: #111111; font-size: 13px; line-height: 1.4; }
+.report-summary-edit-icon { flex: 0 0 auto; color: #757575; font-size: 18px !important; }
+.report-summary-row:hover .report-summary-edit-icon,
+.report-summary-photo-button:hover svg { color: #111111; }
+.report-summary-step > .report-step-button { margin-top: 20px; }
+
+.report-cancel-dialog .MuiDialog-paper { margin: 20px; border-radius: 12px; background: #ffffff; color: #111111; box-shadow: 0 18px 50px rgb(0 0 0 / 22%); }
+.report-cancel-dialog .MuiDialogTitle-root { display: flex; align-items: center; gap: 12px; padding: 22px 22px 10px; font-size: 18px; font-weight: 800; line-height: 1.3; }
+.report-cancel-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #f5f5f5; color: #111111; }
+.report-cancel-icon svg { font-size: 24px; }
+.report-cancel-dialog .MuiDialogContent-root { padding: 0 22px 8px 76px; }
+.report-cancel-description { color: #757575; font-size: 13px; line-height: 1.5; }
+.report-cancel-dialog .MuiDialogActions-root { gap: 8px; padding: 14px 18px 18px; }
+.report-cancel-actions button { min-width: 92px; border-radius: 7px; font: inherit; font-size: 13px; font-weight: 700; text-transform: none; }
+.report-cancel-keep { color: #424242 !important; }
+.report-cancel-exit { background: #111111 !important; color: #ffffff !important; }
+
+@keyframes report-step-enter {
+  from { opacity: 0; transform: translateY(22px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes report-photo-enter {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes report-ready-exit {
+  to { opacity: 0; transform: translateY(-18px) scale(0.96); }
+}
+
 .report-title-input {
   display: block;
   width: 100%;
@@ -60,16 +175,6 @@
 
 .report-location-input::placeholder { color: #888888; }
 .report-location-input:focus { border-color: #999999; box-shadow: 0 0 0 3px rgb(0 0 0 / 8%); }
-
-.report-photo {
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid #e0e0e0;
-  border-radius: 16px;
-  background: #eeeeee;
-}
-
-.report-image-preview { display: block; width: 100%; max-height: 260px; object-fit: contain; }
 
 .report-description {
   display: block;
@@ -164,8 +269,8 @@
 .report-severity-pill[data-level="1"] .report-severity-segment:nth-child(2),
 .report-severity-pill[data-level="2"] .report-severity-segment:nth-child(3) { transform: scale(1.015); }
 
-.report-severity-value { margin: 5px 0 0; color: #4f8063; font-size: 14px; font-weight: 700; text-align: center; }
-.report-severity-value.severity-1 { color: #9a7926; }
+.report-severity-value { margin: 5px 0 0; color: #616161; font-size: 14px; font-weight: 700; text-align: center; }
+.report-severity-value.severity-1 { color: #8a6d1d; }
 .report-severity-value.severity-2 { color: #ad514b; }
 
 .report-submit {
@@ -205,19 +310,29 @@ body.dark .report-title-input::placeholder { color: #aaaaaa; }
 body.dark .report-location-input::placeholder { color: #aaaaaa; }
 body.dark .report-title-input:focus { border-color: #ffffff; box-shadow: 0 0 0 3px rgb(255 255 255 / 12%); }
 body.dark .report-location-input:focus { border-color: #ffffff; box-shadow: 0 0 0 3px rgb(255 255 255 / 12%); }
-body.dark .report-upload { border-color: #555555; background: #1e1e1e; }
-body.dark .report-upload:hover { border-color: #aaaaaa; background: #222222; }
-body.dark .report-upload-icon { background: #29382e; color: #a8d5b5; }
-body.dark .report-upload-title,
+body.dark .report-photo-confirmation { border-color: #333333; background: #161616; }
+body.dark .report-step-title,
 body.dark .report-label { color: #ffffff; }
-body.dark .report-upload-hint { color: #aeb8b1; }
-body.dark .report-upload.has-image { border-color: #333333; background: #161616; }
+body.dark .report-step-button { border-color: #555555; background: #1e1e1e; color: #ffffff; }
+body.dark .report-step-button.is-primary { border-color: #ffffff; background: #ffffff; color: #111111; }
+body.dark .report-summary-photo-button { border-color: #333333; background: #1e1e1e; color: #ffffff; }
+body.dark .report-summary-photo-button img { background: #2c2c2c; }
+body.dark .report-summary-fields,
+body.dark .report-summary-row { border-color: #333333; }
+body.dark .report-summary-label,
+body.dark .report-summary-edit-icon { color: #aaaaaa; }
+body.dark .report-summary-value { color: #ffffff; }
+body.dark .report-summary-row:hover .report-summary-edit-icon,
+body.dark .report-summary-photo-button:hover svg { color: #ffffff; }
+body.dark .report-cancel-dialog .MuiDialog-paper { background: #1e1e1e; color: #ffffff; }
+body.dark .report-cancel-icon { background: #2c2c2c; color: #ffffff; }
+body.dark .report-cancel-description { color: #aaaaaa; }
+body.dark .report-cancel-keep { color: #ffffff !important; }
+body.dark .report-cancel-exit { background: #ffffff !important; color: #111111 !important; }
 body.dark .report-description { border-color: #333333; background: #1e1e1e; color: #ffffff; }
 body.dark .report-description::placeholder { color: #aaaaaa; }
 body.dark .report-description:focus { border-color: #ffffff; box-shadow: 0 0 0 3px rgb(255 255 255 / 12%); }
-body.dark .report-remove-image { border-color: #39443d; background: #202722; color: #c1c9c3; }
-body.dark .report-remove-image:hover { border-color: #607968; background: #29382e; color: #c9ebd2; }
-body.dark .report-severity-value { color: #a8d5b5; }
+body.dark .report-severity-value { color: #bdbdbd; }
 body.dark .report-severity-value.severity-1 { color: #efd77c; }
 body.dark .report-severity-value.severity-2 { color: #e99c94; }
 body.dark .report-severity-pill { border-color: #333333; background: linear-gradient(145deg, #292929, #1c1c1c); box-shadow: inset 0 2px 5px rgb(0 0 0 / 36%), inset 0 -1px 1px rgb(255 255 255 / 6%), 0 7px 18px rgb(0 0 0 / 30%); }
@@ -232,10 +347,14 @@ body.dark .report-submit:hover { background: #8fbd9d; }
 body.dark .report-submit-message { color: #aeb8b1; }
 
 @media (prefers-reduced-motion: reduce) {
+  .report-step-transition,
+  .report-photo-confirmation img,
+  .report-ready-step.is-exiting { animation-duration: 1ms; }
   .report-title-input,
   .report-location-input,
-  .report-upload,
-  .report-remove-image,
+  .report-step-transition,
+  .report-photo-confirmation img,
+  .report-step-button,
   .report-description,
   .report-severity-pill,
   .report-severity-segment,

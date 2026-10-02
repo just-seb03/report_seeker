@@ -4,7 +4,8 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
-import Report from './Report';
+import ReportCancelDialog from '../components/ReportCancelDialog';
+import Report, { type ReportPhoto } from './Report';
 import Profile from './profile';
 import { getIssueReportsPage, type IssueReport } from '../database';
 import './Home.css';
@@ -16,7 +17,6 @@ interface HomeProps {
 
 type NavigationView = 'home' | 'report' | 'profile';
 type TransitionDirection = 'forward' | 'backward';
-type CapturedReportPhoto = { blob: Blob; webPath: string };
 const viewOrder: NavigationView[] = ['report', 'home', 'profile'];
 const notificationPageSize = 5;
 
@@ -48,7 +48,10 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
-  const [reportPhoto, setReportPhoto] = useState<CapturedReportPhoto | null>(null);
+  const [reportPhoto, setReportPhoto] = useState<ReportPhoto | null>(null);
+  const [reportIsComplete, setReportIsComplete] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [pendingView, setPendingView] = useState<NavigationView | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
   const [pullDistance, setPullDistance] = useState(0);
@@ -132,15 +135,26 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     setPullDistance(0);
     transitionTimer.current = window.setTimeout(() => {
       setPreviousView(null);
-      if (nextView !== 'report') setReportPhoto(null);
+      if (nextView !== 'report') {
+        setReportPhoto(null);
+        setReportIsComplete(false);
+      }
       transitionTimer.current = null;
     }, 380);
   };
 
-  const handleHomeClick = () => navigateTo('home');
-  const handleReportClick = async () => {
-    if (activeView === 'report') return;
+  const requestNavigation = (nextView: NavigationView) => {
+    if (nextView === activeView) return;
+    if (activeView === 'report' && !reportIsComplete) {
+      setPendingView(nextView);
+      setCancelDialogOpen(true);
+      return;
+    }
+    navigateTo(nextView);
+  };
 
+  const handleHomeClick = () => requestNavigation('home');
+  const captureReportPhoto = async (): Promise<ReportPhoto | null> => {
     try {
       const capturedPhoto = await Camera.getPhoto({
         quality: 90,
@@ -155,15 +169,42 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       const blob = await response.blob();
       if (blob.size === 0) throw new Error('La fotografía capturada está vacía.');
 
-      setReportPhoto({ blob, webPath: capturedPhoto.webPath });
-      navigateTo('report');
+      return { blob, webPath: capturedPhoto.webPath };
     } catch (error) {
       console.error('No se pudo capturar la fotografía del reporte.', error);
+      return null;
     }
   };
-  const handleProfileClick = () => navigateTo('profile');
+
+  const handleReportClick = async () => {
+    if (activeView === 'report') return;
+    const photo = await captureReportPhoto();
+    if (!photo) return;
+
+    setReportIsComplete(false);
+    setReportPhoto(photo);
+    navigateTo('report');
+  };
+  const handleRetakeReportPhoto = async () => {
+    const photo = await captureReportPhoto();
+    if (photo) setReportPhoto(photo);
+    return photo;
+  };
+
+  const handleCancelReport = () => {
+    setCancelDialogOpen(false);
+    setPendingView(null);
+  };
+
+  const handleExitReport = () => {
+    const destination = pendingView;
+    setCancelDialogOpen(false);
+    setPendingView(null);
+    if (destination) navigateTo(destination);
+  };
 
   const handleReportCreated = (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
+    setReportIsComplete(true);
     const notification = toNotification({
       issueId: report.issueId,
       title: report.title,
@@ -176,15 +217,15 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       notification,
       ...current.filter((item) => item.issueId !== report.issueId),
     ]);
-    navigateTo('home');
   };
 
   const renderView = (view: NavigationView) => {
     if (view === 'report') {
       return reportPhoto ? (
         <Report
-          photo={reportPhoto.blob}
-          photoPreviewUrl={reportPhoto.webPath}
+          photo={reportPhoto}
+          onRetakePhoto={handleRetakeReportPhoto}
+          onComplete={() => navigateTo('home')}
           onReportCreated={handleReportCreated}
         />
       ) : null;
@@ -264,9 +305,14 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           activeView={activeView}
           onHomeClick={handleHomeClick}
           onReportClick={handleReportClick}
-          onProfileClick={handleProfileClick}
+          onProfileClick={() => requestNavigation('profile')}
         />
       </Box>
+      <ReportCancelDialog
+        open={cancelDialogOpen}
+        onCancel={handleCancelReport}
+        onExit={handleExitReport}
+      />
     </Box>
   );
 }
