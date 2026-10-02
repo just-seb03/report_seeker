@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Box, Button, Typography, Collapse } from '@mui/material';
+import { useEffect, useState, type KeyboardEvent } from 'react';
+import { Box, Typography, Collapse } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import { getIssueReportImage } from '../database';
 import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
@@ -46,15 +45,36 @@ export default function NotificationCard({
     return () => { isActive = false; };
   }, [expanded, issueId]);
 
+  const handleCardClick = () => {
+    if (expanded) {
+      onOpenReport?.();
+    } else {
+      setExpanded(true);
+    }
+    if (!isRead) setIsRead(true);
+  };
+
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    handleCardClick();
+  };
+
   // Determinamos las clases CSS a inyectar en el contenedor principal
   const cardClass = `card-paper ${isRead ? 'read' : 'unread'} ${isHighPriority ? 'high-priority' : ''}`;
 
   return (
-    <Box className={cardClass}>
-      <Box 
-        onClick={() => { setExpanded(!expanded); if (!isRead) setIsRead(true); }}
-        sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
-      >
+    <Box
+      className={cardClass}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-expanded={expanded}
+      aria-label={expanded ? `Abrir reporte: ${titulo}` : `Expandir notificación: ${titulo}`}
+      sx={{ cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
+    >
+      <Box sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center' }}>
         {isHighPriority ? (
           <ErrorOutlinedIcon className={!isRead ? "icon-error" : "icon-info"} sx={{ mr: 2, flexShrink: 0 }} />
         ) : (
@@ -110,17 +130,6 @@ export default function NotificationCard({
             <Typography variant="caption" className="card-text-muted">{fecha}</Typography>
           </Box>
 
-          {onOpenReport && (
-            <Button
-              className="card-report-open-button"
-              variant="outlined"
-              size="small"
-              startIcon={<OpenInFullOutlinedIcon />}
-              onClick={onOpenReport}
-            >
-              Ver reporte completo
-            </Button>
-          )}
         </Box>
       </Collapse>
     </Box>
