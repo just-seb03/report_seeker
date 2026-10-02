@@ -16,9 +16,9 @@
 }
 .card-text-muted { color: #9e9e9e; }
 .card-detail {
-  white-space: nowrap; overflow: hidden; color: #9e9e9e;
-  -webkit-mask-image: linear-gradient(to right, black 80%, transparent 100%);
-  mask-image: linear-gradient(to right, black 80%, transparent 100%);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  color: #9e9e9e;
 }
 
 .icon-error { color: #d32f2f; }
