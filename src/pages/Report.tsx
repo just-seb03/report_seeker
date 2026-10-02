@@ -1,53 +1,24 @@
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
-import { AddPhotoAlternateOutlined, DeleteOutlined } from '@mui/icons-material';
+import { useRef, useState, type FormEvent } from 'react';
 import { saveIssueReport } from '../database';
 import './Report.css';
 
 const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
 
 interface ReportProps {
+  photo: Blob;
+  photoPreviewUrl: string;
   onReportCreated: (report: { issueId: number; title: string; description: string; location: string; priority: string }) => void;
 }
 
-export default function Report({ onReportCreated }: ReportProps) {
+export default function Report({ photo, photoPreviewUrl, onReportCreated }: ReportProps) {
   const [reportUid, setReportUid] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [severity, setSeverity] = useState(0);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [submitMessage, setSubmitMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const severityDragActive = useRef(false);
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const previewUrlRef = useRef<string | null>(null);
-
-  useEffect(() => () => {
-    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-  }, []);
-
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const image = event.target.files?.[0];
-    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-
-    const previewUrl = image ? URL.createObjectURL(image) : null;
-    previewUrlRef.current = previewUrl;
-    setImagePreview(previewUrl);
-    setImageFile(image ?? null);
-    setSubmitMessage('');
-    setReportUid(null);
-  };
-
-  const handleRemoveImage = () => {
-    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-    previewUrlRef.current = null;
-    setImagePreview(null);
-    setImageFile(null);
-    setSubmitMessage('');
-    setReportUid(null);
-    if (imageInputRef.current) imageInputRef.current.value = '';
-  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -60,7 +31,7 @@ export default function Report({ onReportCreated }: ReportProps) {
         description: description.trim(),
         location: location.trim(),
         priority: severityOptions[severity],
-        image: imageFile,
+        image: photo,
       });
 
       onReportCreated({
@@ -208,34 +179,10 @@ export default function Report({ onReportCreated }: ReportProps) {
           </section>
 
           <section className="report-field">
-            <label className={`report-upload${imagePreview ? ' has-image' : ''}`} htmlFor="report-image">
-              {imagePreview ? (
-                <img className="report-image-preview" src={imagePreview} alt="Vista previa de la evidencia" />
-              ) : (
-                <>
-                  <span className="report-upload-icon"><AddPhotoAlternateOutlined /></span>
-                  <span className="report-upload-title">Fotografía</span>
-                  <span className="report-upload-hint">Toca para añadir una imagen</span>
-                </>
-              )}
-              <input
-                ref={imageInputRef}
-                id="report-image"
-                className="report-file-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                aria-label="Añadir fotografía"
-                onChange={handleImageChange}
-              />
-            </label>
-
-            {imagePreview && (
-              <button className="report-remove-image" type="button" onClick={handleRemoveImage}>
-                <DeleteOutlined />
-                Quitar imagen
-              </button>
-            )}
+            <p className="report-label">Fotografía capturada</p>
+            <figure className="report-photo">
+              <img className="report-image-preview" src={photoPreviewUrl} alt="Fotografía del reporte" />
+            </figure>
           </section>
 
           <button className="report-submit" type="submit" disabled={isSaving}>

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import HomeHeader from '../components/HomeHeader';
 import NotificationSheet, { type Notificacion } from '../components/NotificationSheet';
 import BottomNav from '../components/BottomNav';
@@ -15,6 +16,7 @@ interface HomeProps {
 
 type NavigationView = 'home' | 'report' | 'profile';
 type TransitionDirection = 'forward' | 'backward';
+type CapturedReportPhoto = { blob: Blob; webPath: string };
 const viewOrder: NavigationView[] = ['report', 'home', 'profile'];
 
 function toNotification(report: IssueReport): Notificacion {
@@ -42,6 +44,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
+  const [reportPhoto, setReportPhoto] = useState<CapturedReportPhoto | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
   const [pullDistance, setPullDistance] = useState(0);
@@ -99,12 +102,35 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     setPullDistance(0);
     transitionTimer.current = window.setTimeout(() => {
       setPreviousView(null);
+      if (nextView !== 'report') setReportPhoto(null);
       transitionTimer.current = null;
     }, 380);
   };
 
   const handleHomeClick = () => navigateTo('home');
-  const handleReportClick = () => navigateTo('report');
+  const handleReportClick = async () => {
+    if (activeView === 'report') return;
+
+    try {
+      const capturedPhoto = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera,
+      });
+      if (!capturedPhoto.webPath) throw new Error('La cámara no devolvió una ruta para la fotografía.');
+
+      const response = await fetch(capturedPhoto.webPath);
+      if (!response.ok) throw new Error('No se pudo leer la fotografía capturada.');
+      const blob = await response.blob();
+      if (blob.size === 0) throw new Error('La fotografía capturada está vacía.');
+
+      setReportPhoto({ blob, webPath: capturedPhoto.webPath });
+      navigateTo('report');
+    } catch (error) {
+      console.error('No se pudo capturar la fotografía del reporte.', error);
+    }
+  };
   const handleProfileClick = () => navigateTo('profile');
 
   const handleReportCreated = (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
@@ -124,7 +150,15 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const renderView = (view: NavigationView) => {
-    if (view === 'report') return <Report onReportCreated={handleReportCreated} />;
+    if (view === 'report') {
+      return reportPhoto ? (
+        <Report
+          photo={reportPhoto.blob}
+          photoPreviewUrl={reportPhoto.webPath}
+          onReportCreated={handleReportCreated}
+        />
+      ) : null;
+    }
     if (view === 'profile') return <Profile />;
 
     return (
