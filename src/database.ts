@@ -137,6 +137,15 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
 
 let databasePromise: Promise<SQLiteDBConnection> | null = null;
 
+export interface IssueReport {
+  issueId: number;
+  title: string;
+  description: string;
+  location: string;
+  priority: string;
+  capturedAt: string;
+}
+
 export function initializeDatabase(): Promise<SQLiteDBConnection> {
   if (!Capacitor.isNativePlatform()) {
     return Promise.reject(new Error('SQLite requiere ejecutar la app en Android o iOS.'));
@@ -175,6 +184,16 @@ export async function saveIssueReport(report: {
   return issueId;
 }
 
+export async function getIssueReports(): Promise<IssueReport[]> {
+  if (!Capacitor.isNativePlatform()) return getIssueReportsOnWeb();
+
+  const connection = await initializeDatabase();
+  const result = await connection.query(
+    'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura FROM issues_riesgos ORDER BY issue_id DESC;',
+  );
+  return (result.values ?? []).map(mapIssueReport);
+}
+
 export async function getIssueReportImage(issueId: number): Promise<string | null> {
   if (!Capacitor.isNativePlatform()) {
     const image = await getIssueReportImageOnWeb(issueId);
@@ -198,10 +217,12 @@ function saveIssueReportOnWeb(report: {
   image: Blob | null;
 }): Promise<number> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(databaseName, 1);
+    const request = indexedDB.open(databaseName, 2);
 
     request.onupgradeneeded = () => {
-      request.result.createObjectStore(webObjectStore, { keyPath: 'issue_id', autoIncrement: true });
+      if (!request.result.objectStoreNames.contains(webObjectStore)) {
+        request.result.createObjectStore(webObjectStore, { keyPath: 'issue_id', autoIncrement: true });
+      }
     };
     request.onerror = () => reject(request.error ?? new Error('No se pudo abrir el almacenamiento web.'));
     request.onsuccess = () => {
@@ -236,7 +257,7 @@ function saveIssueReportOnWeb(report: {
 
 function getIssueReportImageOnWeb(issueId: number): Promise<Blob | string | null> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(databaseName, 1);
+    const request = indexedDB.open(databaseName, 2);
 
     request.onerror = () => reject(request.error ?? new Error('No se pudo abrir el almacenamiento web.'));
     request.onsuccess = () => {
@@ -260,6 +281,43 @@ function getIssueReportImageOnWeb(issueId: number): Promise<Blob | string | null
       };
     };
   });
+}
+
+function getIssueReportsOnWeb(): Promise<IssueReport[]> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 2);
+
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(webObjectStore)) {
+        request.result.createObjectStore(webObjectStore, { keyPath: 'issue_id', autoIncrement: true });
+      }
+    };
+    request.onerror = () => reject(request.error ?? new Error('No se pudieron consultar los reportes.'));
+    request.onsuccess = () => {
+      const database = request.result;
+      const transaction = database.transaction(webObjectStore, 'readonly');
+      const getRequest = transaction.objectStore(webObjectStore).getAll();
+      getRequest.onsuccess = () => {
+        database.close();
+        resolve(getRequest.result.map(mapIssueReport).sort((a, b) => b.issueId - a.issueId));
+      };
+      getRequest.onerror = () => {
+        database.close();
+        reject(getRequest.error ?? new Error('No se pudieron consultar los reportes.'));
+      };
+    };
+  });
+}
+
+function mapIssueReport(report: Record<string, unknown>): IssueReport {
+  return {
+    issueId: Number(report.issue_id),
+    title: String(report.titulo ?? ''),
+    description: String(report.descripcion ?? ''),
+    location: String(report.ubicacion ?? ''),
+    priority: String(report.prioridad ?? 'Normal'),
+    capturedAt: String(report.fecha_captura ?? ''),
+  };
 }
 
 function blobToDataUrl(blob: Blob): Promise<string> {

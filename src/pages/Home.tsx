@@ -5,6 +5,7 @@ import NotificationSheet, { type Notificacion } from '../components/Notification
 import BottomNav from '../components/BottomNav';
 import Report from './Report';
 import Profile from './profile';
+import { getIssueReports, type IssueReport } from '../database';
 import './Home.css';
 
 interface HomeProps {
@@ -16,13 +17,29 @@ type NavigationView = 'home' | 'report' | 'profile';
 type TransitionDirection = 'forward' | 'backward';
 const viewOrder: NavigationView[] = ['report', 'home', 'profile'];
 
-const notificacionesData: Notificacion[] = [
-  { id: 1, titulo: 'Sincronización pausada', detalle: 'Esperando red para subir 3 reportes.', tiempo: 'hace 2 min', unread: true, prioridad: 'Alta' },
-  { id: 2, titulo: 'Alerta de clima', detalle: 'Vientos fuertes previstos en el sector norte.', tiempo: 'hace 5 min', unread: true, prioridad: 'Alta' },
-];
+function toNotification(report: IssueReport): Notificacion {
+  const capturedAt = new Date(report.capturedAt.includes('T')
+    ? report.capturedAt
+    : `${report.capturedAt.replace(' ', 'T')}Z`);
+  const dateLabel = Number.isNaN(capturedAt.getTime())
+    ? 'Fecha desconocida'
+    : new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(capturedAt);
+
+  return {
+    id: report.issueId,
+    issueId: report.issueId,
+    titulo: `Nuevo reporte: ${report.title}`,
+    detalle: `UID-${report.issueId} · ${report.description}`,
+    ubicacion: report.location,
+    tiempo: dateLabel,
+    fecha: dateLabel,
+    unread: true,
+    prioridad: report.priority,
+  };
+}
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
-  const [notificaciones, setNotificaciones] = useState(notificacionesData);
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
@@ -34,6 +51,17 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
   useEffect(() => () => {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+    getIssueReports()
+      .then((reports) => {
+        if (isActive) setNotificaciones(reports.map(toNotification));
+      })
+      .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error));
+
+    return () => { isActive = false; };
   }, []);
 
   const handleCollapse = () => {
@@ -80,18 +108,18 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const handleProfileClick = () => navigateTo('profile');
 
   const handleReportCreated = (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
-    const now = new Date();
-    setNotificaciones((current) => [{
-      id: now.getTime(),
+    const notification = toNotification({
       issueId: report.issueId,
-      titulo: `Nuevo reporte: ${report.title}`,
-      detalle: `UID-${report.issueId} · ${report.description}`,
-      ubicacion: report.location,
-      tiempo: 'ahora',
-      unread: true,
-      prioridad: report.priority,
-      fecha: new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(now),
-    }, ...current]);
+      title: report.title,
+      description: report.description,
+      location: report.location,
+      priority: report.priority,
+      capturedAt: new Date().toISOString(),
+    });
+    setNotificaciones((current) => [
+      notification,
+      ...current.filter((item) => item.issueId !== report.issueId),
+    ]);
     navigateTo('home');
   };
 
