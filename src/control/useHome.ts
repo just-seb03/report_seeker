@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { getIssueReportsPage, type IssueReport } from '../database';
 import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
 import { captureReportPhoto } from './cameraControl';
@@ -37,7 +37,7 @@ export function useHome() {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
   }, []);
 
-  const handleMarkAsRead = (id: number) => {
+  const handleMarkAsRead = useCallback((id: number) => {
     setReadNotificationIds((prev) => {
       if (prev.has(id)) return prev;
       const next = new Set(prev);
@@ -48,7 +48,7 @@ export function useHome() {
     setNotificaciones((prev) =>
       prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
     );
-  };
+  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -67,7 +67,7 @@ export function useHome() {
     return () => { isActive = false; };
   }, []);
 
-  const handleLoadMoreNotifications = async () => {
+  const handleLoadMoreNotifications = useCallback(async () => {
     if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
 
     const loadingStartedAt = performance.now();
@@ -92,19 +92,19 @@ export function useHome() {
       isLoadingMoreNotifications.current = false;
       setIsLoadingNotifications(false);
     }
-  };
+  }, [hasMoreNotifications, isLoadingNotifications, lastNotificationId, readNotificationIds]);
 
-  const handleCollapse = () => {
+  const handleCollapse = useCallback(() => {
     setIsExpanded(false);
     if (listRef.current) listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  }, []);
 
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+  const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
     touchStart.current = clientY;
-  };
+  }, []);
 
-  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     if (touchStart.current === null) return;
     const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : (e as React.MouseEvent).clientY;
     const deltaY = touchStart.current - clientY;
@@ -116,9 +116,9 @@ export function useHome() {
     }
 
     touchStart.current = null;
-  };
+  }, [isExpanded]);
 
-  const navigateTo = (nextView: NavigationView) => {
+  const navigateTo = useCallback((nextView: NavigationView) => {
     if (nextView === activeView) return;
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
 
@@ -135,9 +135,9 @@ export function useHome() {
       }
       transitionTimer.current = null;
     }, 380);
-  };
+  }, [activeView]);
 
-  const requestNavigation = (nextView: NavigationView) => {
+  const requestNavigation = useCallback((nextView: NavigationView) => {
     if (nextView === activeView) return;
     if (activeView === 'report' && !reportIsComplete) {
       setPendingView(nextView);
@@ -145,23 +145,23 @@ export function useHome() {
       return;
     }
     navigateTo(nextView);
-  };
+  }, [activeView, reportIsComplete, navigateTo]);
 
-  const handleHomeClick = () => requestNavigation('home');
-  const handleReportComplete = () => {
+  const handleHomeClick = useCallback(() => requestNavigation('home'), [requestNavigation]);
+  const handleReportComplete = useCallback(() => {
     setIsNavEntering(true);
     navigateTo('home');
-  };
+  }, [navigateTo]);
 
-  const handleOpenReport = (report: IssueReport) => {
+  const handleOpenReport = useCallback((report: IssueReport) => {
     handleMarkAsRead(report.issueId);
     setSelectedReport(report);
     navigateTo('info-report');
-  };
+  }, [handleMarkAsRead, navigateTo]);
 
-  const handleOpenConfiguration = () => navigateTo('configuration');
+  const handleOpenConfiguration = useCallback(() => navigateTo('configuration'), [navigateTo]);
 
-  const handleReportClick = async () => {
+  const handleReportClick = useCallback(async () => {
     if (activeView === 'report') return;
     const photo = await captureReportPhoto();
     if (!photo) return;
@@ -169,27 +169,27 @@ export function useHome() {
     setReportIsComplete(false);
     setReportPhoto(photo);
     navigateTo('report');
-  };
+  }, [activeView, navigateTo]);
 
-  const handleRetakeReportPhoto = async () => {
+  const handleRetakeReportPhoto = useCallback(async () => {
     const photo = await captureReportPhoto();
     if (photo) setReportPhoto(photo);
     return photo;
-  };
+  }, []);
 
-  const handleCancelReport = () => {
+  const handleCancelReport = useCallback(() => {
     setCancelDialogOpen(false);
     setPendingView(null);
-  };
+  }, []);
 
-  const handleExitReport = () => {
+  const handleExitReport = useCallback(() => {
     const destination = pendingView;
     setCancelDialogOpen(false);
     setPendingView(null);
     if (destination) navigateTo(destination);
-  };
+  }, [pendingView, navigateTo]);
 
-  const handleReportCreated = (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
+  const handleReportCreated = useCallback((report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
     setReportIsComplete(true);
     const notification = toNotification({
       issueId: report.issueId,
@@ -203,7 +203,7 @@ export function useHome() {
       notification,
       ...current.filter((item) => item.issueId !== report.issueId),
     ]);
-  };
+  }, [readNotificationIds]);
 
   const hasUnreadNotifications = notificaciones.some((item) => item.unread);
 
