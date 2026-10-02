@@ -12,6 +12,7 @@ interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
   unread?: boolean; prioridad?: string; issueId?: number;
   onOpenReport?: () => void;
+  onMarkAsRead?: () => void;
 }
 
 function formatRelativeTime(fecha: string, currentTime: number): string {
@@ -42,11 +43,11 @@ function formatPublicationDate(fecha?: string): string {
 }
 
 export default function NotificationCard({ 
-  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, onOpenReport,
+  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
   
   const [expanded, setExpanded] = useState(false);
-  const [isRead, setIsRead] = useState(!unread);
+  const isRead = !unread;
   const [image, setImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
@@ -76,7 +77,9 @@ export default function NotificationCard({
     setImage(null);
     setImageLoading(isOpening && issueId !== undefined);
     setExpanded(isOpening);
-    if (!isRead) setIsRead(true);
+    if (unread) {
+      onMarkAsRead?.();
+    }
   };
 
   const activateWithKeyboard = (event: KeyboardEvent<HTMLDivElement>, action: () => void) => {

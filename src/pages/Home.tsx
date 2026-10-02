@@ -22,7 +22,32 @@ type TransitionDirection = 'forward' | 'backward';
 const viewOrder: NavigationView[] = ['report', 'home', 'info-report', 'profile', 'configuration'];
 const notificationPageSize = 5;
 
-function toNotification(report: IssueReport): Notificacion {
+const READ_NOTIFICATIONS_STORAGE_KEY = 'report_seeker_read_notifications';
+
+function getInitialReadNotificationIds(): Set<number> {
+  try {
+    const raw = localStorage.getItem(READ_NOTIFICATIONS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return new Set(parsed);
+      }
+    }
+  } catch (error) {
+    console.error('No se pudieron leer las notificaciones vistas del almacenamiento', error);
+  }
+  return new Set<number>();
+}
+
+function saveReadNotificationIds(ids: Set<number>) {
+  try {
+    localStorage.setItem(READ_NOTIFICATIONS_STORAGE_KEY, JSON.stringify(Array.from(ids)));
+  } catch (error) {
+    console.error('No se pudieron guardar las notificaciones vistas en el almacenamiento', error);
+  }
+}
+
+function toNotification(report: IssueReport, readIds: Set<number>): Notificacion {
   const capturedAt = new Date(report.capturedAt.includes('T')
     ? report.capturedAt
     : `${report.capturedAt.replace(' ', 'T')}Z`);
@@ -34,13 +59,14 @@ function toNotification(report: IssueReport): Notificacion {
     detalle: report.description,
     ubicacion: report.location,
     fecha: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
-    unread: true,
+    unread: !readIds.has(report.issueId),
     prioridad: report.priority,
     reporte: report,
   };
 }
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
+  const [readNotificationIds, setReadNotificationIds] = useState<Set<number>>(getInitialReadNotificationIds);
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
   const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
@@ -65,12 +91,25 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
   }, []);
 
+  const handleMarkAsRead = (id: number) => {
+    setReadNotificationIds((prev) => {
+      if (prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.add(id);
+      saveReadNotificationIds(next);
+      return next;
+    });
+    setNotificaciones((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
+    );
+  };
+
   useEffect(() => {
     let isActive = true;
     getIssueReportsPage(notificationPageSize)
       .then((page) => {
         if (!isActive) return;
-        setNotificaciones(page.items.map(toNotification));
+        setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
         setLastNotificationId(page.items[page.items.length - 1]?.issueId);
         setHasMoreNotifications(page.hasMore);
       })
@@ -90,7 +129,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     setIsLoadingNotifications(true);
     try {
       const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
-      const notifications = page.items.map(toNotification);
+      const notifications = page.items.map((item) => toNotification(item, readNotificationIds));
       setNotificaciones((current) => {
         const existingIds = new Set(current.map((notification) => notification.issueId));
         return [...current, ...notifications.filter((notification) => !existingIds.has(notification.issueId))];
@@ -169,6 +208,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   };
 
   const handleOpenReport = (report: IssueReport) => {
+    handleMarkAsRead(report.issueId);
     setSelectedReport(report);
     navigateTo('info-report');
   };
@@ -233,12 +273,15 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       location: report.location,
       priority: report.priority,
       capturedAt: new Date().toISOString(),
-    });
+    }, readNotificationIds);
     setNotificaciones((current) => [
       notification,
       ...current.filter((item) => item.issueId !== report.issueId),
     ]);
   };
+
+
+  const hasUnreadNotifications = notificaciones.some((item) => item.unread);
 
   const renderView = (view: NavigationView) => {
     if (view === 'configuration') return <Configuration onBack={() => navigateTo('profile')} />;
@@ -279,7 +322,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         >
           <HomeHeader
             isExpanded={isExpanded}
-            hasNotifications={notificaciones.length > 0}
+            hasNotifications={hasUnreadNotifications}
             onSwipeDown={onToggleManualTheme}
             onSwipeProgress={setPullDistance}
           />
@@ -293,6 +336,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
             onOpenReport={handleOpenReport}
             onLoadMore={handleLoadMoreNotifications}
             onCollapse={handleCollapse}
+            onMarkAsRead={handleMarkAsRead}
           />
 
           <Box className="home-gradient-overlay" />

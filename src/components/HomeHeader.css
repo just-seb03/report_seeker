@@ -35,11 +35,34 @@
   animation: lightPulse 0.5s ease;
 }
 
+.header-title-container {
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+}
+
 .header-title {
   text-align: center;
-  margin-bottom: 24px;
   color: #000000;
-  transition: color 0.25s ease, text-shadow 0.25s ease;
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), 
+              transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), 
+              filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              color 0.25s ease, 
+              text-shadow 0.25s ease;
+  grid-area: 1 / 1;
+}
+
+.header-title.text-exit {
+  opacity: 0;
+  transform: translateY(-16px) scale(0.96);
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.header-title.text-enter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0px);
 }
 
 .header-title-button.manual-light .header-title {

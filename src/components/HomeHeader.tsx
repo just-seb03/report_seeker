@@ -67,17 +67,25 @@ export default function HomeHeader({
         transition: 'all 0.5s cubic-bezier(0.32, 0.72, 0, 1)',
       }}
     > 
-      <Typography variant="h3" component="h1" className="header-title">
-        {hasNotifications ? (
-          <>
-            Hay<br />Nuevos<br />Reportes
-          </>
-        ) : (
-          <>
-            Todo<br />Está en<br />Orden
-          </>
-        )}
-      </Typography>
+      <Box className="header-title-container">
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          className={`header-title ${hasNotifications ? 'text-enter' : 'text-exit'}`}
+          aria-hidden={!hasNotifications}
+        >
+          Hay<br />Nuevos<br />Reportes
+        </Typography>
+
+        <Typography 
+          variant="h3" 
+          component="h1" 
+          className={`header-title ${!hasNotifications ? 'text-enter' : 'text-exit'}`}
+          aria-hidden={hasNotifications}
+        >
+          Todo<br />Está en<br />Orden
+        </Typography>
+      </Box>
       
       <KeyboardArrowDownIcon className="header-icon" sx={{ fontSize: 48, pointerEvents: 'none' }} />
     </Box>

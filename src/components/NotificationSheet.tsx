@@ -26,10 +26,11 @@ interface NotificationSheetProps {
   onOpenReport: (report: IssueReport) => void;
   onLoadMore: () => void;
   onCollapse: () => void; 
+  onMarkAsRead?: (id: number) => void;
 }
 
 export default function NotificationSheet({
-  isExpanded, listRef, notificaciones, hasMore, isLoading, onOpenReport, onLoadMore, onCollapse,
+  isExpanded, listRef, notificaciones, hasMore, isLoading, onOpenReport, onLoadMore, onCollapse, onMarkAsRead,
 }: NotificationSheetProps) {
   const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(() => Date.now());
@@ -81,6 +82,7 @@ export default function NotificationSheet({
                 prioridad={noti.prioridad}
                 issueId={noti.issueId}
                 onOpenReport={report ? () => onOpenReport(report) : undefined}
+                onMarkAsRead={() => onMarkAsRead?.(noti.id)}
               />
             </Box>
           );
