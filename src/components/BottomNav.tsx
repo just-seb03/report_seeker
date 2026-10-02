@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
@@ -6,26 +5,24 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import './BottomNav.css';
 
 type BottomNavProps = {
+  activeView: 'home' | 'report' | 'profile';
   onHomeClick?: () => void;
   onReportClick?: () => void;
   onProfileClick?: () => void;
 };
 
-export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }: BottomNavProps) {
-  const [value, setValue] = useState(1);
+export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick }: BottomNavProps) {
+  const value = activeView === 'report' ? 0 : activeView === 'profile' ? 2 : 1;
 
   const handleHomeClick = () => {
-    setValue(1);
     onHomeClick?.();
   };
 
   const handleReportClick = () => {
-    setValue(0);
     onReportClick?.();
   };
 
   const handleProfileClick = () => {
-    setValue(2);
     onProfileClick?.();
   };
 
@@ -50,9 +47,9 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             component="button"
             type="button"
             onClick={handleReportClick}
-            className={`nav-item ${value === 0 ? 'active' : ''}`}
+            className={`nav-item ${activeView === 'report' ? 'active' : ''}`}
             aria-label="Reportar"
-            aria-pressed={value === 0}
+            aria-pressed={activeView === 'report'}
           >
             <Box className="nav-icon-wrap">
               <AssignmentOutlinedIcon className="nav-icon" sx={{ fontSize: 28 }} />
@@ -64,9 +61,9 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             component="button"
             type="button"
             onClick={handleHomeClick}
-            className={`nav-item ${value === 1 ? 'active' : ''}`}
+            className={`nav-item ${activeView === 'home' ? 'active' : ''}`}
             aria-label="Inicio"
-            aria-pressed={value === 1}
+            aria-pressed={activeView === 'home'}
           >
             <Box className="nav-icon-wrap">
               <HomeIcon className="nav-icon" sx={{ fontSize: 26 }} />
@@ -78,9 +75,9 @@ export default function BottomNav({ onHomeClick, onReportClick, onProfileClick }
             component="button"
             type="button"
             onClick={handleProfileClick}
-            className={`nav-item ${value === 2 ? 'active' : ''}`}
+            className={`nav-item ${activeView === 'profile' ? 'active' : ''}`}
             aria-label="Perfil"
-            aria-pressed={value === 2}
+            aria-pressed={activeView === 'profile'}
           >
             <Box className="nav-icon-wrap">
               <PersonIcon className="nav-icon" sx={{ fontSize: 26 }} />

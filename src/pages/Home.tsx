@@ -166,6 +166,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
       <Box className="home-bottom-nav">
         <BottomNav
+          activeView={activeView}
           onHomeClick={handleHomeClick}
           onReportClick={handleReportClick}
           onProfileClick={handleProfileClick}
