@@ -48,6 +48,7 @@ export default function NotificationCard({
   const relativeTime = fechaPublicacion ? formatRelativeTime(fechaPublicacion, currentTime) : 'ahora';
 
   useEffect(() => {
+    if (!expanded || issueId === undefined || image !== null) return;
     if (!expanded || issueId === undefined) return;
 
     let isActive = true;
@@ -61,7 +62,7 @@ export default function NotificationCard({
       });
 
     return () => { isActive = false; };
-  }, [expanded, issueId]);
+  }, [expanded, image, issueId]);
 
   const handleHeaderClick = () => {
     const isOpening = !expanded;
