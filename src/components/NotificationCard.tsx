@@ -113,7 +113,7 @@ export default function NotificationCard({
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
             <Typography variant="subtitle2" className="card-title">{titulo}</Typography>
-            <Typography variant="caption" className="card-text-muted" sx={{ flexShrink: 0 }}>{relativeTime}</Typography>
+            <Typography variant="caption" className="card-text-muted card-relative-time" sx={{ flexShrink: 0 }}>{relativeTime}</Typography>
           </Box>
         </Box>
 
