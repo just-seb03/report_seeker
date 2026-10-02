@@ -29,8 +29,8 @@ function toNotification(report: IssueReport): Notificacion {
   return {
     id: report.issueId,
     issueId: report.issueId,
-    titulo: `Nuevo reporte: ${report.title}`,
-    detalle: `UID-${report.issueId} · ${report.description}`,
+    titulo: report.title,
+    detalle: report.description,
     ubicacion: report.location,
     fecha: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
     unread: true,

@@ -113,7 +113,6 @@ export default function NotificationCard({
             <Typography variant="subtitle2" className="card-title">{titulo}</Typography>
             <Typography variant="caption" className="card-text-muted" sx={{ flexShrink: 0 }}>{relativeTime}</Typography>
           </Box>
-          <Typography variant="body2" className="card-detail">{detalle}</Typography>
         </Box>
 
         <ExpandMoreIcon 
@@ -152,19 +151,27 @@ export default function NotificationCard({
               </Box>
             )}
           </Box>
-          <Typography variant="subtitle1" className="card-title" sx={{ mb: 1 }}>{titulo}</Typography>
-          <Typography variant="body2" className="card-text-muted" sx={{ mb: 2 }}>{detalle}</Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 2 }}>
-            <LocationOnOutlinedIcon className="card-text-muted" fontSize="small" />
-            <Typography variant="body2" className="card-text-muted">
-              {ubicacion || 'Ubicación no especificada'}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 1.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, minWidth: 0, flex: 1 }}>
+              <LocationOnOutlinedIcon className="card-text-muted" fontSize="small" sx={{ flexShrink: 0 }} />
+              <Typography variant="body2" className="card-text-muted" sx={{ overflowWrap: 'anywhere' }}>
+                {ubicacion || 'Ubicación no especificada'}
+              </Typography>
+            </Box>
+            <Typography
+              variant="body2"
+              className={isHighPriority ? 'text-error' : 'text-warning'}
+              sx={{ flexShrink: 0, textAlign: 'right' }}
+            >
+              Prioridad: {prioridad}
             </Typography>
           </Box>
-          
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-            <Typography variant="body2" className={isHighPriority ? "text-error" : "text-warning"}>
-              Prioridad: {prioridad}
+
+          <Typography variant="body2" className="card-text-muted" sx={{ mb: 2, overflowWrap: 'anywhere' }}>{detalle}</Typography>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
+            <Typography variant="caption" className="card-text-muted">
+              {issueId === undefined ? '' : `UID-${issueId}`}
             </Typography>
             <Typography variant="caption" className="card-text-muted">{formatPublicationDate(fecha)}</Typography>
           </Box>
