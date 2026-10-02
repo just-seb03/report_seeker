@@ -7,9 +7,15 @@ interface HomeHeaderProps {
   isExpanded: boolean;
   onSwipeDown: () => void;
   onSwipeProgress: (distance: number) => void;
+  hasNotifications?: boolean;
 }
 
-export default function HomeHeader({ isExpanded, onSwipeDown, onSwipeProgress }: HomeHeaderProps) {
+export default function HomeHeader({ 
+  isExpanded, 
+  onSwipeDown, 
+  onSwipeProgress,
+  hasNotifications = true,
+}: HomeHeaderProps) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -62,7 +68,15 @@ export default function HomeHeader({ isExpanded, onSwipeDown, onSwipeProgress }:
       }}
     > 
       <Typography variant="h3" component="h1" className="header-title">
-        Hay<br />Nuevos<br />Reportes
+        {hasNotifications ? (
+          <>
+            Hay<br />Nuevos<br />Reportes
+          </>
+        ) : (
+          <>
+            Todo<br />Está en<br />Orden
+          </>
+        )}
       </Typography>
       
       <KeyboardArrowDownIcon className="header-icon" sx={{ fontSize: 48, pointerEvents: 'none' }} />

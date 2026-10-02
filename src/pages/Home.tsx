@@ -279,6 +279,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         >
           <HomeHeader
             isExpanded={isExpanded}
+            hasNotifications={notificaciones.length > 0}
             onSwipeDown={onToggleManualTheme}
             onSwipeProgress={setPullDistance}
           />
