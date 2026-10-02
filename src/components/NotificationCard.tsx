@@ -25,11 +25,7 @@ export default function NotificationCard({
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
 
   useEffect(() => {
-    if (!expanded || issueId === undefined) {
-      setImage(null);
-      setImageLoading(false);
-      return;
-    }
+    if (!expanded || issueId === undefined || image !== null) return;
 
     let isActive = true;
     setImageLoading(true);
@@ -43,7 +39,7 @@ export default function NotificationCard({
       });
 
     return () => { isActive = false; };
-  }, [expanded, issueId]);
+  }, [expanded, image, issueId]);
 
   const handleHeaderClick = () => {
     setExpanded((current) => !current);
