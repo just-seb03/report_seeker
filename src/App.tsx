@@ -1,3 +1,25 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : App.tsx                                                       *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   App -- Componente principal de la aplicación, provee el contexto global y manejo de       *
+ *        temas.                                                                               *
+ *   handleToggleManualTheme -- Alterna manualmente el tema visual (claro/oscuro) de la        *
+ *        interfaz.                                                                            *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useEffect, useMemo, useState } from 'react';
 import { ThemeProvider, createTheme, CssBaseline, useMediaQuery } from '@mui/material';
 import Home from './pages/Home';

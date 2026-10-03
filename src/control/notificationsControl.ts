@@ -1,3 +1,27 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : notificationsControl.ts                                       *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   getInitialReadNotificationIds -- Recupera la lista de IDs de notificaciones previamente   *
+ *        leídas desde LocalStorage.                                                           *
+ *   saveReadNotificationIds -- Persiste los IDs de las notificaciones marcadas como leídas en *
+ *        LocalStorage.                                                                        *
+ *   toNotification -- Transforma el modelo nativo IssueReport en la estructura de interfaz    *
+ *        Notificacion.                                                                        *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { type IssueReport } from '../database';
 import { type Notificacion } from '../components/NotificationSheet';
 

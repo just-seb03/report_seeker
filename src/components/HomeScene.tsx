@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : HomeScene.tsx                                                 *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   HomeScene -- Componente contenedor visual que muestra el encabezado y la lista de         *
+ *        notificaciones en el inicio.                                                         *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import HomeHeader from './HomeHeader';
@@ -13,7 +33,7 @@ interface HomeSceneProps {
   notificaciones: Notificacion[];
   hasMoreNotifications: boolean;
   isLoadingNotifications: boolean;
-  listRef: React.RefObject<HTMLDivElement>;
+  listRef: React.RefObject<HTMLDivElement | null>;
   onToggleManualTheme: () => void;
   onSwipeProgress: (progress: number) => void;
   onTouchStart: (e: React.TouchEvent | React.MouseEvent) => void;

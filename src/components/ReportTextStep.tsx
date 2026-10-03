@@ -1,3 +1,25 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : ReportTextStep.tsx                                            *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 01 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   ReportTextStep -- Componente genérico de paso que captura texto (título, descripción,     *
+ *        ubicación).                                                                          *
+ *   handleSubmit -- Procesa y valida la información capturada, procediendo a guardar el       *
+ *        reporte en la base de datos.                                                         *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import type { FormEvent } from 'react';
 
 type ReportTextStepProps = {

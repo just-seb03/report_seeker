@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : ReportSummaryStep.tsx                                         *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 01 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   ReportSummaryStep -- Componente del paso de resumen, permite revisar todos los datos      *
+ *        antes de enviar.                                                                     *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
 export type EditableReportStep = 'photo' | 'severity' | 'description' | 'location' | 'title';

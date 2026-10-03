@@ -1,3 +1,28 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : HomeHeader.tsx                                                *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   HomeHeader -- Componente de cabecera en el inicio, maneja la interacción de gestos y el   *
+ *        estado del tema.                                                                     *
+ *   handlePointerDown -- Maneja el inicio de un evento de puntero (toque o clic) para         *
+ *        interactuar.                                                                         *
+ *   handlePointerMove -- Calcula la distancia de arrastre del puntero para efectos visuales.  *
+ *   handlePointerUp -- Finaliza la interacción del puntero, aplicando cambios si se superó el *
+ *        umbral.                                                                              *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';

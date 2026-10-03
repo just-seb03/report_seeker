@@ -1,3 +1,40 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : database.ts                                                   *
+ *                                                                                             *
+ *              Programador : Maximiliano Cantuarias, Cristian Vega                             *
+ *                                                                                             *
+ *          Fecha de Inicio : 01 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [CV]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   openDatabase -- Inicializa y abre la conexión con la base de datos local Capacitor        *
+ *        SQLite.                                                                              *
+ *   initializeDatabase -- Ejecuta las sentencias DDL para crear las tablas necesarias de la   *
+ *        aplicación.                                                                          *
+ *   saveIssueReport -- Guarda la información capturada de un nuevo reporte en la base de      *
+ *        datos.                                                                               *
+ *   getIssueReportsPage -- Recupera una lista paginada de reportes ordenados de forma         *
+ *        descendente.                                                                         *
+ *   getIssueReportImage -- Carga el blob de la imagen específica de un reporte almacenado.    *
+ *   saveIssueReportOnWeb -- Alternativa web (IndexedDB/LocalStorage) para guardar el reporte  *
+ *        (mocking fallback).                                                                  *
+ *   getIssueReportImageOnWeb -- Alternativa web para recuperar la imagen guardada de un       *
+ *        reporte.                                                                             *
+ *   getIssueReportsPageOnWeb -- Alternativa web para obtener el historial paginado de         *
+ *        reportes.                                                                            *
+ *   mapIssueReport -- Convierte los datos en crudo de la tabla (fila DB) a un objeto          *
+ *        IssueReport tipado.                                                                  *
+ *   blobToDataUrl -- Transforma un Blob crudo en un string Base64 Data URL para visualización *
+ *        en el navegador.                                                                     *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { Capacitor } from '@capacitor/core';
 import {
   CapacitorSQLite,

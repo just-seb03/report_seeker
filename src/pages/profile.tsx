@@ -1,3 +1,22 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : profile.tsx                                                   *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias                   *
+ *                                                                                             *
+ *          Fecha de Inicio : 01 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   Profile -- Componente visual del perfil que muestra datos estáticos del usuario actual.   *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import EmailOutlined from '@mui/icons-material/EmailOutlined';

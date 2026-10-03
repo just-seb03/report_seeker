@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : NotificationSheet.tsx                                         *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega    *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   NotificationSheet -- Componente desplegable que lista y pagina las notificaciones         *
+ *        recientes.                                                                           *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useEffect, useRef, useState } from 'react';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -25,7 +45,7 @@ interface NotificationSheetProps {
   isLoading: boolean;
   onOpenReport: (report: IssueReport) => void;
   onLoadMore: () => void;
-  onCollapse: () => void; 
+  onCollapse: () => void;
   onMarkAsRead?: (id: number) => void;
 }
 
@@ -60,10 +80,10 @@ export default function NotificationSheet({
     <Box
       ref={listRef}
       // Alternamos la clase en lugar de reescribir CSS en línea
-      className={`sheet-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`} 
+      className={`sheet-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
     >
       <Box className="sheet-content">
-        
+
         {notificaciones.map((noti, index) => {
           const report = noti.reporte;
           return (

@@ -1,3 +1,31 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : useReport.ts                                                  *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   useReport -- Custom hook encargado del manejo de estados durante el flujo de creación de  *
+ *        un nuevo reporte.                                                                    *
+ *   continueTo -- Avanza al siguiente paso específico durante la captura de información de un *
+ *        riesgo.                                                                              *
+ *   editSummaryStep -- Permite regresar al resumen desde cualquier paso al editar la          *
+ *        información ingresada.                                                               *
+ *   handleRetakePhoto -- Inicia nuevamente la captura de cámara si el usuario desea cambiar   *
+ *        la fotografía.                                                                       *
+ *   handleSubmit -- Procesa y valida la información capturada, procediendo a guardar el       *
+ *        reporte en la base de datos.                                                         *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useState } from 'react';
 import { saveIssueReport } from '../database';
 import { type ReportPhoto } from '../pages/Report';

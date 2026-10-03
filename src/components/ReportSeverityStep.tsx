@@ -1,3 +1,30 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : ReportSeverityStep.tsx                                        *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 01 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   ReportSeverityStep -- Componente del paso para seleccionar el nivel de gravedad de un     *
+ *        riesgo.                                                                              *
+ *   updateFromPointer -- Actualiza la gravedad seleccionada basándose en la posición del      *
+ *        puntero del usuario.                                                                 *
+ *   handleKeyDown -- Permite la selección de gravedad utilizando el teclado (flechas) por     *
+ *        accesibilidad.                                                                       *
+ *   handlePointerDown -- Maneja el inicio de un evento de puntero (toque o clic) para         *
+ *        interactuar.                                                                         *
+ *   handlePointerMove -- Calcula la distancia de arrastre del puntero para efectos visuales.  *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
 
 type ReportSeverityStepProps = {

@@ -1,4 +1,25 @@
-import React from 'react';
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : Home.tsx                                                      *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega    *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   Home -- Contenedor principal de la pantalla de inicio; enruta componentes utilizando el   *
+ *        hook useHome.                                                                        *
+ *   renderView -- Devuelve el JSX correspondiente al componente que está actualmente visible  *
+ *        (Home, Report, etc.).                                                                *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { Box } from '@mui/material';
 import BottomNav from '../components/BottomNav';
 import ReportCancelDialog from '../components/ReportCancelDialog';

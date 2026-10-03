@@ -1,3 +1,32 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : NotificationCard.tsx                                          *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega    *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   formatRelativeTime -- Formatea un timestamp a un texto relativo (ej: hace 2 horas).       *
+ *   formatPublicationDate -- Formatea la fecha de publicación con la estructura local (día,   *
+ *        mes, hora).                                                                          *
+ *   NotificationCard -- Componente visual para mostrar los detalles de un reporte de riesgo   *
+ *        en la lista.                                                                         *
+ *   handleHeaderClick -- Maneja el clic en la cabecera de la notificación para expandir o     *
+ *        abrir el reporte.                                                                    *
+ *   activateWithKeyboard -- Permite la interacción de teclado para la accesibilidad en la     *
+ *        tarjeta.                                                                             *
+ *   handleExpandedContentClick -- Maneja el clic sobre el contenido desplegado en la          *
+ *        notificación.                                                                        *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useEffect, useState, type KeyboardEvent } from 'react';
 import { Box, Typography, Collapse } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -42,10 +71,10 @@ function formatPublicationDate(fecha?: string): string {
   return new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
 }
 
-export default function NotificationCard({ 
+export default function NotificationCard({
   titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
-  
+
   const [expanded, setExpanded] = useState(false);
   const isRead = !unread;
   const [image, setImage] = useState<string | null>(null);
@@ -112,7 +141,7 @@ export default function NotificationCard({
         ) : (
           <InfoOutlinedIcon className="icon-info" sx={{ mr: 2, flexShrink: 0 }} />
         )}
-        
+
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
             <Typography variant="subtitle2" className="card-title">{titulo}</Typography>
@@ -120,13 +149,13 @@ export default function NotificationCard({
           </Box>
         </Box>
 
-        <ExpandMoreIcon 
+        <ExpandMoreIcon
           className="card-text-muted"
-          sx={{ 
+          sx={{
             position: 'absolute', right: 16, top: '50%', marginTop: '-12px',
             transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease' 
-          }} 
+            transition: 'transform 0.2s ease'
+          }}
         />
       </Box>
 

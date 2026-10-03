@@ -1,3 +1,28 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : useInfoReport.ts                                              *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   getImageData -- Extrae la información MIME y Base64 desde el DataURL de una imagen.       *
+ *   formatReportDate -- Convierte la fecha de un reporte a un string formateado localmente    *
+ *        para el usuario.                                                                     *
+ *   useInfoReport -- Custom hook que administra el estado y acciones al visualizar los        *
+ *        detalles de un reporte.                                                              *
+ *   handleOpenFullImage -- Abre la fotografía a pantalla completa (nativo Android o modal     *
+ *        web).                                                                                *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useState, useEffect } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { FileOpener } from '@capacitor-community/file-opener';

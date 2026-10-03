@@ -1,3 +1,25 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : BottomNav.tsx                                                 *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias                   *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   BottomNav -- Renderiza la barra de navegación inferior de la aplicación.                  *
+ *   handleHomeClick -- Navega hacia la pantalla de inicio principal.                          *
+ *   handleReportClick -- Inicia el flujo de creación de un nuevo reporte fotográfico.         *
+ *   handleProfileClick -- Navega hacia la pantalla del perfil del usuario.                    *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
@@ -33,8 +55,8 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
         <Box className="nav-pill-bg" />
 
         {/* Capa 2: La "isla líquida" que viaja animada al botón seleccionado */}
-        <Box 
-          className="indicator-wrapper" 
+        <Box
+          className="indicator-wrapper"
           style={{ transform: `translateX(${value * 100}%)` }}
         >
           <Box className="nav-indicator" />
@@ -42,7 +64,7 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
 
         {/* Capa 3: Contenedor de botones reales */}
         <Box className="nav-pill-content">
-          
+
           <Box
             component="button"
             type="button"

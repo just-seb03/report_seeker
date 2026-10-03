@@ -1,3 +1,25 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : main.tsx                                                      *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Cristian Vega                            *
+ *                                                                                             *
+ *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   applyDarkMode -- Aplica clases y atributos al DOM para forzar el esquema de colores       *
+ *        (oscuro/claro).                                                                      *
+ *   initTheme -- Inicializa el tema visual preferido (dark mode o system) durante el inicio   *
+ *        de la app.                                                                           *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 // src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';

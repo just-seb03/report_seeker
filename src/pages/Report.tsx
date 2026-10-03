@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : Report.tsx                                                    *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega    *
+ *                                                                                             *
+ *          Fecha de Inicio : 01 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   Report -- Contenedor principal del flujo de captura de reporte, que delega estado en      *
+ *        useReport.                                                                           *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import ReportPhotoStep from '../components/ReportPhotoStep';
 import ReportReadyStep from '../components/ReportReadyStep';
 import ReportSeverityStep from '../components/ReportSeverityStep';

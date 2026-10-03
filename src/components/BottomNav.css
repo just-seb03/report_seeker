@@ -1,8 +1,33 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : BottomNav.css                                                 *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias                   *
+ *                                                                                             *
+ *          Fecha de Inicio : 30 de Septiembre de 2026                                      *
+ *                                                                                             *
+ *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   Archivo de estilos CSS. No contiene funciones lógicas.                                    *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 /* src/components/BottomNav.css */
 
 .nav-wrapper {
-  position: fixed; bottom: 24px; left: 0; right: 0;
-  display: flex; justify-content: center; z-index: 50; padding: 0 16px;
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 50;
+  padding: 0 16px;
 
   /* Variables de paleta centralizadas */
   --nav-bg: #ffffff;
@@ -15,33 +40,44 @@
 
 .nav-container {
   position: relative;
-  width: 100%; max-width: 360px; height: 72px;
+  width: 100%;
+  max-width: 360px;
+  height: 72px;
   filter: drop-shadow(0px 10px 20px rgba(0, 0, 0, 0.08));
   transition: filter 0.3s ease;
 }
 
 /* --- CAPA 1: EL FONDO SÓLIDO --- */
 .nav-pill-bg {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: var(--nav-bg); 
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--nav-bg);
   border-radius: 36px;
   transition: background-color 0.3s ease;
 }
 
 /* --- CAPA 2: EL INDICADOR "LÍQUIDO" QUE SE MUEVE --- */
 .indicator-wrapper {
-  position: absolute; top: 0; left: 0;
-  width: 33.3333%; height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 33.3333%;
+  height: 100%;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
 }
 
 .nav-indicator {
   position: absolute;
-  top: -22px; /* Altura de la burbuja flotante */
+  top: -22px;
+  /* Altura de la burbuja flotante */
   left: 50%;
   transform: translateX(-50%);
-  width: 64px; height: 64px;
+  width: 64px;
+  height: 64px;
   background-color: var(--nav-bg);
   border-radius: 50%;
   transition: background-color 0.3s ease;
@@ -52,12 +88,15 @@
 .nav-indicator::after {
   content: '';
   position: absolute;
-  top: 22px; /* Se ancla exactamente a la línea superior de la barra principal (22 - 22 = 0) */
-  width: 22px; height: 22px;
+  top: 22px;
+  /* Se ancla exactamente a la línea superior de la barra principal (22 - 22 = 0) */
+  width: 22px;
+  height: 22px;
 }
 
 .nav-indicator::before {
-  left: -21px; /* Solapa 1px con el círculo central para que no hayan fisuras visuales */
+  left: -21px;
+  /* Solapa 1px con el círculo central para que no hayan fisuras visuales */
   background: radial-gradient(circle at 0% 0%, transparent 21px, var(--nav-bg) 21.5px);
 }
 
@@ -68,17 +107,31 @@
 
 /* --- CAPA 3: EL CONTENIDO --- */
 .nav-pill-content {
-  position: relative; z-index: 2;
-  display: flex; justify-content: space-between; align-items: center;
-  width: 100%; height: 100%;
-  padding: 0; /* SIN PADDING HORIZONTAL: Esto arregla por completo el desfase que tenías */
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  /* SIN PADDING HORIZONTAL: Esto arregla por completo el desfase que tenías */
 }
 
 .nav-item {
-  appearance: none; border: 0; background: transparent; font: inherit;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  cursor: pointer; flex: 1; height: 100%; padding: 0;
-  color: var(--nav-text); 
+  appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+  height: 100%;
+  padding: 0;
+  color: var(--nav-text);
   transition: color 0.4s ease;
   -webkit-tap-highlight-color: transparent;
   position: relative;
@@ -87,15 +140,18 @@
 .nav-icon-wrap {
   position: absolute;
   top: 12px;
-  width: 48px; height: 48px; 
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 50%; 
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
   color: inherit;
   background: transparent;
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
 }
 
-.nav-item-text { 
+.nav-item-text {
   position: absolute;
   bottom: 10px;
   font-size: 0.65rem;
@@ -105,29 +161,30 @@
 }
 
 /* --- ESTADOS ACTIVOS (ANIMACIONES) --- */
-.nav-item.active { 
-  color: var(--nav-active-text); 
+.nav-item.active {
+  color: var(--nav-active-text);
 }
 
 /* El ícono se dispara hacia arriba (Alineación matemática perfecta con la burbuja) */
-.nav-item.active .nav-icon-wrap { 
+.nav-item.active .nav-icon-wrap {
   transform: translateY(-26px);
   background: var(--nav-active-icon-bg);
   color: var(--nav-active-icon);
   box-shadow: 0 6px 14px var(--nav-shadow);
 }
 
-.nav-item.active .nav-item-text { 
+.nav-item.active .nav-item-text {
   font-weight: 700;
   transform: translateY(2px);
 }
 
 /* Efecto de presión sutil en toda el área */
-.nav-item:active .nav-icon-wrap { 
-  transform: scale(0.9) translateY(0); 
+.nav-item:active .nav-icon-wrap {
+  transform: scale(0.9) translateY(0);
 }
-.nav-item.active:active .nav-icon-wrap { 
-  transform: scale(0.9) translateY(-26px); 
+
+.nav-item.active:active .nav-icon-wrap {
+  transform: scale(0.9) translateY(-26px);
 }
 
 /* --- MODO OSCURO AUTOMÁTICO --- */
