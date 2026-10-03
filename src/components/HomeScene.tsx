@@ -79,6 +79,7 @@ export default function HomeScene({
         <HomeHeader
           isExpanded={isExpanded}
           hasNotifications={hasUnreadNotifications}
+          isLoading={isLoadingNotifications}
           onSwipeDown={onToggleManualTheme}
           onSwipeProgress={onSwipeProgress}
         />

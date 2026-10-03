@@ -33,6 +33,7 @@ interface HomeHeaderProps {
   onSwipeDown: () => void;
   onSwipeProgress: (distance: number) => void;
   hasNotifications?: boolean;
+  isLoading?: boolean;
 }
 
 export default function HomeHeader({ 
@@ -40,6 +41,7 @@ export default function HomeHeader({
   onSwipeDown, 
   onSwipeProgress,
   hasNotifications = true,
+  isLoading = false,
 }: HomeHeaderProps) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
 
@@ -92,7 +94,7 @@ export default function HomeHeader({
         transition: 'all 0.5s cubic-bezier(0.32, 0.72, 0, 1)',
       }}
     > 
-      <Box className="header-title-container">
+      <Box className="header-title-container" sx={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
         <Typography 
           variant="h3" 
           component="h1" 

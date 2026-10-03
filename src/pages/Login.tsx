@@ -6,20 +6,21 @@
  *                                                                                             *
  *                  Archivo : Login.tsx                                                        *
  *                                                                                             *
- *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega       *
+ *              Programador : Sebastian Arredondo                                              *
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026    [SA]                                        *
+ *     Última Actualización : 03 de Octubre de 2026    [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Login -- Página principal de acceso, maneja la validación e integración con Firebase.     *
+ *   Login -- Orquestador de la pantalla de bienvenida y flujo de ingreso de credenciales.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useState } from 'react';
-import { loginWithFirebase, seedTrabajadores, type Trabajador } from '../control/authControl';
-import LoginForm from '../components/LoginForm';
+import { type Trabajador } from '../control/authControl';
+import { useIntroFlow } from '../control/useIntroFlow';
+import PinPad from '../components/PinPad';
+import LoginErrorDialog from '../components/LoginErrorDialog';
 import './Login.css';
 
 interface LoginProps {
@@ -27,51 +28,59 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleLogin = async (workerId: string, pin: string) => {
-    setError('');
-
-    const numId = parseInt(workerId, 10);
-    if (isNaN(numId)) {
-      setError('El ID debe ser numérico.');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      let user = await loginWithFirebase(numId, pin);
-
-      // Semilla para desarrollo: si no entra a la primera, poblar bd y probar otra vez
-      if (!user && numId === 10482) {
-        await seedTrabajadores();
-        user = await loginWithFirebase(numId, pin);
-      }
-
-      if (user) {
-        onLoginSuccess(user);
-      } else {
-        setError('ID de trabajador o PIN incorrectos.');
-      }
-    } catch (err) {
-      setError('Error de conexión al validar credenciales.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    step,
+    workerId,
+    pin,
+    isErrorDialogVisible,
+    errorMessage,
+    handleIdKeyPress,
+    handlePinKeyPress,
+    closeErrorDialog
+  } = useIntroFlow(onLoginSuccess);
 
   return (
-    <main className="login-screen">
+    <main className={`login-screen ${step === 'loading' || step === 'done' || step === 'black_screen' ? 'is-loading' : ''}`}>
       <section className="login-content">
-        <h1>Iniciar Sesión</h1>
+        
+        {/* Paso: Bienvenida */}
+        <div className={`intro-step intro-welcome ${step === 'welcome' ? 'active' : 'exit'}`}>
+          <h1>Bienvenido</h1>
+        </div>
 
-        <LoginForm
-          isLoading={isLoading}
-          error={error}
-          onSubmit={handleLogin}
-        />
+        {/* Paso: Ingreso de ID */}
+        <div className={`intro-step intro-id ${step === 'id_input' ? 'active' : ''} ${step === 'welcome' ? 'hidden' : ''} ${step === 'id_out' || step === 'pin_input' || step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
+          <PinPad
+            title="Ingrese su ID de trabajador"
+            subtitle="5 dígitos"
+            maxLength={5}
+            currentValue={workerId}
+            onKeyPress={handleIdKeyPress}
+          />
+        </div>
+
+        {/* Paso: Ingreso de PIN */}
+        <div className={`intro-step intro-pin ${step === 'pin_input' ? 'active' : ''} ${step === 'welcome' || step === 'id_input' || step === 'id_out' ? 'hidden' : ''} ${step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
+          <PinPad
+            title="Ingrese su PIN"
+            subtitle={workerId}
+            maxLength={4}
+            currentValue={pin}
+            onKeyPress={handlePinKeyPress}
+          />
+        </div>
+
       </section>
+
+      {/* Pantalla negra de carga que cubre todo y se desvanece suavemente */}
+      <div className={`intro-cache-loader ${step === 'loading' || step === 'black_screen' ? 'active' : ''} ${step === 'done' || step === 'welcome' || step === 'id_input' ? 'exit-done' : ''}`}>
+      </div>
+
+      <LoginErrorDialog
+        open={isErrorDialogVisible}
+        message={errorMessage}
+        onClose={closeErrorDialog}
+      />
     </main>
   );
 }

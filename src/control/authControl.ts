@@ -88,5 +88,6 @@ export function getCurrentUser(): Trabajador | null {
 
 export function logout() {
   localStorage.removeItem('logged_in_user');
+  sessionStorage.setItem('skip_welcome', 'true');
   window.dispatchEvent(new CustomEvent('user_logout'));
 }

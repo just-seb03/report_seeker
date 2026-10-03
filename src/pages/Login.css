@@ -6,83 +6,111 @@
  *                                                                                             *
  *                  Archivo : Login.css                                                        *
  *                                                                                             *
- *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega       *
+ *              Programador : Sebastian Arredondo                                              *
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026  [SA]                                          *
+ *     Última Actualización : 03 de Octubre de 2026  [SA]                                      *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Archivo de estilos CSS para la página principal de Login usando Material Design 3.        *
+ *   Archivo de estilos CSS para la coreografía de animaciones de la pantalla de bienvenida.   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 .login-screen {
   position: absolute;
   inset: 0;
   z-index: 5;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
-  background-color: #f0f2f5;
-  /* Material 3 Light Surface Container */
+  background-color: #f5f5f5; /* Light Surface Container */
   color: #1a1c1e;
   transition: background-color 0.4s cubic-bezier(0.2, 0, 0, 1), color 0.4s ease;
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-content {
-  width: min(90%, 420px);
-  padding: 48px 32px;
-  background: #ffffff;
-  border-radius: 28px;
-  /* Material 3 standard large border radius */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
-  /* Subtle M3 Elevation */
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  font-family: 'Roboto', 'Inter', inherit;
-  animation: login-content-enter 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
-}
-
-.login-content h1 {
-  margin: 0 0 32px 0;
-  font-size: 32px;
-  font-weight: 500;
-  /* Medium weight for M3 headings */
-  letter-spacing: -0.02em;
-  color: #1a1c1e;
-  /* On-surface */
-  text-align: center;
 }
 
 body.dark .login-screen {
-  background-color: #121416;
-  /* M3 Dark Surface Container */
+  background-color: #121212; /* Dark Surface Container */
   color: #e2e2e5;
 }
 
-body.dark .login-content {
-  background: #1a1c1e;
-  /* M3 Surface container high */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+.login-content {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto', 'Inter', inherit;
 }
 
-body.dark .login-content h1 {
-  color: #e2e2e5;
+/* Animaciones y Estados de los Pasos */
+.intro-step {
+  position: absolute;
+  width: 100%;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes login-content-enter {
-  from {
-    opacity: 0;
-    transform: translateY(24px) scale(0.98);
-  }
+.intro-step.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100px) scale(0.95);
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.intro-step.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.intro-step.exit-up {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-80px) scale(0.95);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Título de Bienvenida */
+.intro-welcome h1 {
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.intro-welcome.exit {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pantalla final de carga */
+.intro-cache-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background-color: #121212; /* Color negro/oscuro de la paleta */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.intro-cache-loader.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.intro-cache-loader.exit-done {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
 }

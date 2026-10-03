@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : LoginForm.css                                                    *
+ *                  Archivo : PinPad.css                                                       *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                              *
  *                                                                                             *
@@ -14,10 +14,10 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Archivo de estilos CSS para el teclado numérico de la pantalla de login.                  *
+ *   Archivo de estilos para el componente PinPad interactivo.                                 *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-.keypad-container {
+.pinpad-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,7 +26,7 @@
   margin: 0 auto;
 }
 
-.keypad-header {
+.pinpad-header {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,68 +34,54 @@
   text-align: center;
 }
 
-.keypad-header h2 {
+.pinpad-title {
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 500;
   margin: 0 0 8px 0;
   color: #1a1c1e;
+  letter-spacing: -0.01em;
 }
 
-.keypad-subtitle {
+.pinpad-subtitle {
   font-size: 16px;
   color: #74777f;
-  margin: 0 0 24px 0;
-  letter-spacing: 1px;
+  margin: 0 0 32px 0;
 }
 
-.keypad-dots-container {
+.pinpad-dots-container {
   display: flex;
   gap: 16px;
   justify-content: center;
 }
 
-.keypad-dot {
+.pinpad-dot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
   border: 1.5px solid #74777f;
   background-color: transparent;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bounce effect */
 }
 
-.keypad-dot.filled {
+.pinpad-dot.filled {
   background-color: #0b57d0;
   border-color: #0b57d0;
-  transform: scale(1.1);
+  transform: scale(1.15);
 }
 
-.keypad-error-placeholder {
-  height: 24px;
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-}
-
-.keypad-error-msg {
-  color: #ba1a1a;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-/* Keypad Grid */
-.keypad-grid {
+.pinpad-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px 24px;
+  gap: 16px 32px;
   width: 100%;
 }
 
-.keypad-btn {
+.pinpad-btn {
   background: transparent;
   border: none;
   border-radius: 50%;
-  height: 72px;
-  width: 72px;
+  height: 76px;
+  width: 76px;
   font-size: 32px;
   font-weight: 300;
   color: #1a1c1e;
@@ -105,102 +91,29 @@
   justify-content: center;
   align-items: center;
   margin: 0 auto;
-  transition: background-color 0.15s ease;
+  transition: transform 0.1s cubic-bezier(0, 0.5, 0.5, 1), background-color 0.2s;
   -webkit-tap-highlight-color: transparent;
+  will-change: transform;
 }
 
-.keypad-btn:active:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.1);
+.pinpad-btn:active {
+  background-color: rgba(0, 0, 0, 0.08);
+  transform: scale(0.92);
 }
 
-.keypad-btn.empty {
+.pinpad-btn.empty {
   visibility: hidden;
 }
 
-.keypad-btn.backspace {
+.pinpad-btn.backspace {
   color: #1a1c1e;
 }
 
-/* Loader */
-.keypad-loader {
-  margin-top: 32px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #0b57d0;
-  font-weight: 500;
-  animation: fade-in 0.3s ease;
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(11, 87, 208, 0.3);
-  border-top-color: #0b57d0;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-/* Shake Animation for Error */
-.shake {
-  animation: shake-anim 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-}
-
-@keyframes shake-anim {
-  10%, 90% { transform: translate3d(-2px, 0, 0); }
-  20%, 80% { transform: translate3d(3px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
-  40%, 60% { transform: translate3d(5px, 0, 0); }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Dark Mode */
-body.dark .keypad-header h2 {
-  color: #e2e2e5;
-}
-
-body.dark .keypad-subtitle {
-  color: #c4c6d0;
-}
-
-body.dark .keypad-dot {
-  border-color: #8e9099;
-}
-
-body.dark .keypad-dot.filled {
-  background-color: #a8c7fa;
-  border-color: #a8c7fa;
-}
-
-body.dark .keypad-error-msg {
-  color: #ffb4ab;
-}
-
-body.dark .keypad-btn {
-  color: #e2e2e5;
-}
-
-body.dark .keypad-btn.backspace {
-  color: #e2e2e5;
-}
-
-body.dark .keypad-btn:active:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-body.dark .keypad-loader {
-  color: #a8c7fa;
-}
-
-body.dark .spinner {
-  border-color: rgba(168, 199, 250, 0.3);
-  border-top-color: #a8c7fa;
-}
+/* Modo oscuro */
+body.dark .pinpad-title { color: #e2e2e5; }
+body.dark .pinpad-subtitle { color: #c4c6d0; }
+body.dark .pinpad-dot { border-color: #8e9099; }
+body.dark .pinpad-dot.filled { background-color: #a8c7fa; border-color: #a8c7fa; }
+body.dark .pinpad-btn { color: #e2e2e5; }
+body.dark .pinpad-btn.backspace { color: #e2e2e5; }
+body.dark .pinpad-btn:active { background-color: rgba(255, 255, 255, 0.1); }
