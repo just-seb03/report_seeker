@@ -63,14 +63,6 @@
   top: 2px;
 }
 
-.card-detail {
-  white-space: normal;
-  overflow-wrap: anywhere;
-  color: #616161;
-  font-weight: 500;
-  line-height: 1.45;
-}
-
 .card-description {
   color: #5f5f5f;
   font-weight: 600;
@@ -154,10 +146,6 @@ body.dark .card-title {
 body.dark .card-text-muted,
 body.dark .icon-info {
   color: #aaaaaa;
-}
-
-body.dark .card-detail {
-  color: #c4c4c4;
 }
 
 body.dark .card-description {

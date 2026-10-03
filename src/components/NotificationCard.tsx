@@ -86,7 +86,6 @@ export default function NotificationCard({
 
   useEffect(() => {
     if (!expanded || issueId === undefined || image !== null) return;
-    if (!expanded || issueId === undefined) return;
 
     let isActive = true;
     getIssueReportImage(issueId)
@@ -103,8 +102,7 @@ export default function NotificationCard({
 
   const handleHeaderClick = () => {
     const isOpening = !expanded;
-    setImage(null);
-    setImageLoading(isOpening && issueId !== undefined);
+    if (isOpening) setImageLoading(issueId !== undefined);
     setExpanded(isOpening);
     if (unread) {
       onMarkAsRead?.();
@@ -159,7 +157,15 @@ export default function NotificationCard({
         />
       </Box>
 
-      <Collapse in={expanded} timeout={250} unmountOnExit>
+      <Collapse
+        in={expanded}
+        timeout={250}
+        unmountOnExit
+        onExited={() => {
+          setImage(null);
+          setImageLoading(false);
+        }}
+      >
         <Box
           onClick={handleExpandedContentClick}
           onKeyDown={(event) => activateWithKeyboard(event, handleExpandedContentClick)}
