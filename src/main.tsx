@@ -10,7 +10,7 @@
  *                                                                                             *
  *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
  *                                                                                             *
- *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
@@ -27,12 +27,7 @@ import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import { DarkMode } from '@aparajita/capacitor-dark-mode';
 import { initializeDatabase } from './database';
-import { analyticsPromise } from './firebase';
 import './index.css';
-
-void analyticsPromise.catch((error: unknown) => {
-  console.error('No se pudo inicializar Firebase Analytics', error);
-});
 
 const applyDarkMode = (dark: boolean) => {
   document.documentElement.classList.toggle('dark', dark);

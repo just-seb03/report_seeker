@@ -10,7 +10,7 @@
  *                                                                                             *
  *          Fecha de Inicio : 01 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
@@ -23,6 +23,7 @@ import ReportReadyStep from '../components/ReportReadyStep';
 import ReportSeverityStep from '../components/ReportSeverityStep';
 import ReportSummaryStep from '../components/ReportSummaryStep';
 import ReportTextStep from '../components/ReportTextStep';
+import ReportProgressBar from '../components/ReportProgressBar';
 import { useReport } from '../control/useReport';
 import './Report.css';
 
@@ -128,6 +129,7 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'ready' && <ReportReadyStep onComplete={onComplete} />}
         </div>
       </div>
+      <ReportProgressBar currentStep={step} />
     </main>
   );
 }
