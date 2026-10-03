@@ -24,6 +24,7 @@ import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification 
 import { captureReportPhoto } from './cameraControl';
 import { useHardwareBackButton } from './backButtonControl';
 import { deletePhotoFile } from './imageCleanupControl';
+import { sendReportNotification } from './systemNotificationsControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
@@ -221,6 +222,10 @@ export function useHome() {
 
   const handleReportCreated = useCallback((report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
     setReportIsComplete(true);
+    
+    // Lanzar notificación push local con la imagen actual antes de que se limpie
+    sendReportNotification(report.title, report.description, reportPhoto?.blob);
+    
     const notification = toNotification({
       issueId: report.issueId,
       title: report.title,
@@ -233,7 +238,7 @@ export function useHome() {
       notification,
       ...current.filter((item) => item.issueId !== report.issueId),
     ]);
-  }, [readNotificationIds]);
+  }, [readNotificationIds, reportPhoto]);
 
   const hasUnreadNotifications = notificaciones.some((item) => item.unread);
 

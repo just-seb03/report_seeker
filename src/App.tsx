@@ -21,6 +21,8 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useEffect, useMemo, useState } from 'react';
+import { App as CapacitorApp } from '@capacitor/app';
+import { resetPushNotificationCount } from './control/systemNotificationsControl';
 import { ThemeProvider, createTheme, CssBaseline, useMediaQuery } from '@mui/material';
 import Home from './pages/Home';
 
@@ -36,6 +38,16 @@ function App() {
 
   const effectiveDarkMode =
     manualThemeMode === 'system' ? prefersDarkMode : manualThemeMode === 'dark';
+
+  useEffect(() => {
+    resetPushNotificationCount();
+    const sub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) resetPushNotificationCount();
+    });
+    return () => {
+      sub.then(listener => listener.remove());
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', effectiveDarkMode);
