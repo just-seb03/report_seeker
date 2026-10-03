@@ -15,11 +15,12 @@
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
  *   captureReportPhoto -- Utiliza el hardware de la cámara para capturar y leer una           *
- *        fotografía como un Blob.                                                             *
+ *        fotografía como un Blob, comprimiéndola a WebP y reteniendo el path del archivo.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { type ReportPhoto } from '../pages/Report';
+import { compressImageToWebp } from './imageCompressionControl';
 
 export async function captureReportPhoto(): Promise<ReportPhoto | null> {
   try {
@@ -31,12 +32,9 @@ export async function captureReportPhoto(): Promise<ReportPhoto | null> {
     });
     if (!capturedPhoto.webPath) throw new Error('La cámara no devolvió una ruta para la fotografía.');
 
-    const response = await fetch(capturedPhoto.webPath);
-    if (!response.ok) throw new Error('No se pudo leer la fotografía capturada.');
-    const blob = await response.blob();
-    if (blob.size === 0) throw new Error('La fotografía capturada está vacía.');
+    const compressedBlob = await compressImageToWebp(capturedPhoto.webPath);
 
-    return { blob, webPath: capturedPhoto.webPath };
+    return { blob: compressedBlob, webPath: capturedPhoto.webPath, path: capturedPhoto.path };
   } catch (error) {
     console.error('No se pudo capturar la fotografía del reporte.', error);
     return null;

@@ -26,7 +26,7 @@ import ReportTextStep from '../components/ReportTextStep';
 import { useReport } from '../control/useReport';
 import './Report.css';
 
-export type ReportPhoto = { blob: Blob; webPath: string };
+export type ReportPhoto = { blob: Blob; webPath: string; path?: string };
 
 interface ReportProps {
   photo: ReportPhoto;

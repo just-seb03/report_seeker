@@ -23,6 +23,7 @@ import { getIssueReportsPage, type IssueReport } from '../database';
 import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
 import { captureReportPhoto } from './cameraControl';
 import { useHardwareBackButton } from './backButtonControl';
+import { deletePhotoFile } from './imageCleanupControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
@@ -151,7 +152,10 @@ export function useHome() {
     transitionTimer.current = window.setTimeout(() => {
       setPreviousView(null);
       if (nextView !== 'report') {
-        setReportPhoto(null);
+        setReportPhoto((current) => {
+          if (current?.path) deletePhotoFile(current.path);
+          return null;
+        });
         setReportIsComplete(false);
       }
       transitionTimer.current = null;
@@ -194,7 +198,12 @@ export function useHome() {
 
   const handleRetakeReportPhoto = useCallback(async () => {
     const photo = await captureReportPhoto();
-    if (photo) setReportPhoto(photo);
+    if (photo) {
+      setReportPhoto((current) => {
+        if (current?.path) deletePhotoFile(current.path);
+        return photo;
+      });
+    }
     return photo;
   }, []);
 
