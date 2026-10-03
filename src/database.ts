@@ -6,11 +6,11 @@
  *                                                                                             *
  *                  Archivo : database.ts                                                   *
  *                                                                                             *
- *              Programador : Maximiliano Cantuarias, Cristian Vega                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega                        *
  *                                                                                             *
  *          Fecha de Inicio : 01 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización : 02 de Octubre de 2026 [CV]                                    *
+ *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *

@@ -10,7 +10,7 @@
  *                                                                                             *
  *          Fecha de Inicio : 01 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
@@ -30,13 +30,13 @@ interface ProfileProps {
 }
 
 export default function Profile({ onSettingsClick }: ProfileProps) {
-    const user = getCurrentUser();
-    const profileName = user?.nombre || 'Usuario Desconocido';
-    
-    const profileDetails = [
-        { label: 'Correo', value: user?.email || 'Sin correo', Icon: EmailOutlined },
-        { label: 'ID de usuario', value: user?.trabajador_id.toString() || 'No asignado', Icon: BadgeOutlined },
-    ];
+	const user = getCurrentUser();
+	const profileName = user?.nombre || 'Usuario Desconocido';
+
+	const profileDetails = [
+		{ label: 'Correo', value: user?.email || 'Sin correo', Icon: EmailOutlined },
+		{ label: 'ID de usuario', value: user?.trabajador_id.toString() || 'No asignado', Icon: BadgeOutlined },
+	];
 
 	return (
 		<main className="profile-screen">
@@ -46,22 +46,22 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 					<AccountCircleOutlined />
 				</div>
 				<h1 id="profile-title">{profileName}</h1>
-				
-                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                    <button className="profile-settings" type="button" onClick={onSettingsClick}>
-                        <SettingsOutlined />
-                        Configuración
-                    </button>
-                    <button 
-                        className="profile-settings" 
-                        type="button" 
-                        onClick={() => logout()}
-                        style={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
-                    >
-                        <LogoutOutlined />
-                        Cerrar Sesión
-                    </button>
-                </div>
+
+				<div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+					<button className="profile-settings" type="button" onClick={onSettingsClick}>
+						<SettingsOutlined />
+						Configuración
+					</button>
+					<button
+						className="profile-settings"
+						type="button"
+						onClick={() => logout()}
+						style={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
+					>
+						<LogoutOutlined />
+						Cerrar Sesión
+					</button>
+				</div>
 
 				<section className="profile-info" aria-label="Información del usuario">
 					{profileDetails.map(({ label, value, Icon }) => (

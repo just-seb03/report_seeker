@@ -6,7 +6,7 @@
  *                                                                                             *
  *                  Archivo : LoginForm.css                                                    *
  *                                                                                             *
- *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega       *
+ *              Programador : Sebastian Arredondo      *
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
@@ -33,15 +33,18 @@
 .login-input-group label {
   font-size: 14px;
   font-weight: 500;
-  color: #44474e; /* M3 On-surface variant */
+  color: #44474e;
+  /* M3 On-surface variant */
   margin-bottom: 8px;
   transition: color 0.2s ease;
 }
 
 .login-input-group input {
   padding: 16px 16px;
-  border: 1px solid #74777f; /* M3 Outline */
-  border-radius: 4px; /* M3 Outlined text field radius */
+  border: 1px solid #74777f;
+  /* M3 Outline */
+  border-radius: 4px;
+  /* M3 Outlined text field radius */
   background: transparent;
   color: #1a1c1e;
   font-family: inherit;
@@ -51,17 +54,21 @@
 }
 
 .login-input-group input:focus {
-  border-color: #0b57d0; /* M3 Primary color */
+  border-color: #0b57d0;
+  /* M3 Primary color */
   border-width: 2px;
-  padding: 15px 15px; /* Adjust padding to prevent layout shift due to thicker border */
+  padding: 15px 15px;
+  /* Adjust padding to prevent layout shift due to thicker border */
 }
 
 .login-input-group:focus-within label {
-  color: #0b57d0; /* M3 Primary focus */
+  color: #0b57d0;
+  /* M3 Primary focus */
 }
 
 .login-input-group input:disabled {
-  opacity: 0.38; /* M3 Disabled state */
+  opacity: 0.38;
+  /* M3 Disabled state */
   border-color: #1a1c1e;
   background-color: rgba(26, 28, 30, 0.04);
 }
@@ -71,9 +78,12 @@
   padding: 0;
   height: 48px;
   border: none;
-  border-radius: 24px; /* M3 fully rounded button */
-  background: #0b57d0; /* M3 Primary */
-  color: #ffffff; /* M3 On-primary */
+  border-radius: 24px;
+  /* M3 fully rounded button */
+  background: #0b57d0;
+  /* M3 Primary */
+  color: #ffffff;
+  /* M3 On-primary */
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
@@ -83,22 +93,26 @@
   justify-content: center;
   align-items: center;
   transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.3); /* M3 Button elevation */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  /* M3 Button elevation */
 }
 
 .login-submit-btn:hover:not(:disabled) {
-  background: #0842a0; /* M3 Primary hovered */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  background: #0842a0;
+  /* M3 Primary hovered */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .login-submit-btn:active:not(:disabled) {
   transform: scale(0.98);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .login-submit-btn:disabled {
-  background: rgba(26, 28, 30, 0.12); /* M3 Disabled surface */
-  color: rgba(26, 28, 30, 0.38); /* M3 Disabled content */
+  background: rgba(26, 28, 30, 0.12);
+  /* M3 Disabled surface */
+  color: rgba(26, 28, 30, 0.38);
+  /* M3 Disabled content */
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -106,13 +120,15 @@
 .login-error-alert {
   padding: 16px;
   border-radius: 12px;
-  background-color: #ba1a1a; /* M3 Error container */
-  color: #ffffff; /* M3 On-error */
+  background-color: #ba1a1a;
+  /* M3 Error container */
+  color: #ffffff;
+  /* M3 On-error */
   font-size: 14px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .login-spinner {
@@ -125,21 +141,27 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Dark Mode Support */
 body.dark .login-input-group label {
-  color: #c4c6d0; /* M3 Dark on-surface variant */
+  color: #c4c6d0;
+  /* M3 Dark on-surface variant */
 }
 
 body.dark .login-input-group input {
-  color: #e2e2e5; /* M3 Dark on-surface */
-  border-color: #8e9099; /* M3 Dark outline */
+  color: #e2e2e5;
+  /* M3 Dark on-surface */
+  border-color: #8e9099;
+  /* M3 Dark outline */
 }
 
 body.dark .login-input-group input:focus {
-  border-color: #a8c7fa; /* M3 Dark primary */
+  border-color: #a8c7fa;
+  /* M3 Dark primary */
 }
 
 body.dark .login-input-group:focus-within label {
@@ -152,8 +174,10 @@ body.dark .login-input-group input:disabled {
 }
 
 body.dark .login-submit-btn {
-  background: #a8c7fa; /* M3 Dark primary */
-  color: #062e6f; /* M3 Dark on-primary */
+  background: #a8c7fa;
+  /* M3 Dark primary */
+  color: #062e6f;
+  /* M3 Dark on-primary */
 }
 
 body.dark .login-submit-btn:hover:not(:disabled) {
@@ -166,8 +190,10 @@ body.dark .login-submit-btn:disabled {
 }
 
 body.dark .login-error-alert {
-  background-color: #ffb4ab; /* M3 Dark error container */
-  color: #690005; /* M3 Dark on-error container */
+  background-color: #ffb4ab;
+  /* M3 Dark error container */
+  color: #690005;
+  /* M3 Dark on-error container */
 }
 
 body.dark .login-spinner {

@@ -10,7 +10,7 @@
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026                                            *
+ *     Última Actualización : 03 de Octubre de 2026    [SA]                                        *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
@@ -32,7 +32,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
   const handleLogin = async (workerId: string, pin: string) => {
     setError('');
-    
+
     const numId = parseInt(workerId, 10);
     if (isNaN(numId)) {
       setError('El ID debe ser numérico.');
@@ -42,11 +42,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     setIsLoading(true);
     try {
       let user = await loginWithFirebase(numId, pin);
-      
+
       // Semilla para desarrollo: si no entra a la primera, poblar bd y probar otra vez
       if (!user && numId === 10482) {
-         await seedTrabajadores();
-         user = await loginWithFirebase(numId, pin);
+        await seedTrabajadores();
+        user = await loginWithFirebase(numId, pin);
       }
 
       if (user) {
@@ -65,11 +65,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     <main className="login-screen">
       <section className="login-content">
         <h1>Iniciar Sesión</h1>
-        
-        <LoginForm 
-          isLoading={isLoading} 
-          error={error} 
-          onSubmit={handleLogin} 
+
+        <LoginForm
+          isLoading={isLoading}
+          error={error}
+          onSubmit={handleLogin}
         />
       </section>
     </main>

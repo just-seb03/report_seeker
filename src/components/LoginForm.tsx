@@ -6,7 +6,7 @@
  *                                                                                             *
  *                  Archivo : LoginForm.tsx                                                    *
  *                                                                                             *
- *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega       *
+ *              Programador : Sebastian Arredondo       *
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
@@ -39,7 +39,7 @@ export default function LoginForm({ isLoading, error, onSubmit }: LoginFormProps
   return (
     <form className="login-form" onSubmit={handleSubmit}>
       {error && <div className="login-error-alert">{error}</div>}
-      
+
       <div className="login-input-group">
         <label htmlFor="workerId">ID de Trabajador (5 dígitos)</label>
         <input
@@ -70,8 +70,8 @@ export default function LoginForm({ isLoading, error, onSubmit }: LoginFormProps
         />
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         className="login-submit-btn"
         disabled={isLoading || workerId.trim() === '' || pin.trim() === ''}
       >
