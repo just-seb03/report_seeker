@@ -27,7 +27,12 @@ import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import { DarkMode } from '@aparajita/capacitor-dark-mode';
 import { initializeDatabase } from './database';
+import { analyticsPromise } from './firebase';
 import './index.css';
+
+void analyticsPromise.catch((error: unknown) => {
+  console.error('No se pudo inicializar Firebase Analytics', error);
+});
 
 const applyDarkMode = (dark: boolean) => {
   document.documentElement.classList.toggle('dark', dark);
