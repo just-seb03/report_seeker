@@ -220,6 +220,11 @@ export function startListeningForNewReports() {
                             }
                         ]
                     });
+
+                    // 4. Avisar a la interfaz gráfica (React) que debe refrescar su lista
+                    window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+
+                    console.log(`✅ [Sincronizador] Reporte descargado y guardado #${cloudId}`);
                 } catch (e) {
                     console.error(`[Sincronizador] Error al procesar el reporte entrante ${cloudId}:`, e);
                 }

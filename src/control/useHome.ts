@@ -75,20 +75,31 @@ export function useHome() {
 
   useEffect(() => {
     let isActive = true;
-    getIssueReportsPage(notificationPageSize)
-      .then((page) => {
-        if (!isActive) return;
-        setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
-        setLastNotificationId(page.items[page.items.length - 1]?.issueId);
-        setHasMoreNotifications(page.hasMore);
-      })
-      .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error))
-      .finally(() => {
-        if (isActive) setIsLoadingNotifications(false);
-      });
 
-    return () => { isActive = false; };
-  }, []);
+    const loadInitialReports = () => {
+      getIssueReportsPage(notificationPageSize)
+        .then((page) => {
+          if (!isActive) return;
+          setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
+          setLastNotificationId(page.items[page.items.length - 1]?.issueId);
+          setHasMoreNotifications(page.hasMore);
+        })
+        .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error))
+        .finally(() => {
+          if (isActive) setIsLoadingNotifications(false);
+        });
+    };
+
+    loadInitialReports();
+
+    // Escuchar el evento que dispara el sincronizador cuando entra un reporte nuevo
+    window.addEventListener('reportes_actualizados', loadInitialReports);
+
+    return () => {
+      isActive = false;
+      window.removeEventListener('reportes_actualizados', loadInitialReports);
+    };
+  }, [readNotificationIds]);
 
   const handleLoadMoreNotifications = useCallback(async () => {
     if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
