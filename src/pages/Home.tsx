@@ -74,7 +74,15 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   } = useHome();
 
   const renderView = (view: NavigationView) => {
-    if (view === 'configuration') return <Configuration onBack={() => navigateTo('profile')} />;
+    if (view === 'configuration') {
+      return (
+        <Configuration 
+          onBack={() => navigateTo('profile')} 
+          isDarkMode={isDarkMode}
+          onToggleTheme={onToggleManualTheme}
+        />
+      );
+    }
     if (view === 'info-report') {
       return selectedReport ? (
         <InfoReport
