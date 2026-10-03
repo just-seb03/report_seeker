@@ -60,8 +60,15 @@ const initTheme = async () => {
 
 void initTheme();
 
+import { startListeningForNewReports, initPushNotifications } from './control/sincronizador';
+
 if (Capacitor.isNativePlatform()) {
-  void initializeDatabase().catch((error: unknown) => {
+  void initializeDatabase().then(() => {
+    // Iniciamos el radar (listener) cuando la BD nativa ya está lista
+    startListeningForNewReports();
+    // Preparamos el teléfono para recibir Push Notifications con la app cerrada
+    initPushNotifications();
+  }).catch((error: unknown) => {
     console.error('No se pudo inicializar la base de datos SQLite', error);
   });
 }

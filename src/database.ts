@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS niveles_escalamiento (
 
 CREATE TABLE IF NOT EXISTS issues_riesgos (
   issue_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  firebase_id TEXT UNIQUE,
   titulo TEXT NOT NULL,
   descripcion TEXT,
   fotografia_url TEXT,
@@ -85,6 +86,7 @@ CREATE TABLE IF NOT EXISTS issues_riesgos (
   trabajador_id INTEGER,
   ubicacion TEXT,
   estado TEXT DEFAULT 'capturado',
+  estado_sync TEXT DEFAULT 'pendiente',
   prioridad TEXT,
   FOREIGN KEY (trabajador_id) REFERENCES trabajadores(trabajador_id)
 );

@@ -28,6 +28,7 @@
 
 import { useState } from 'react';
 import { saveIssueReport } from '../database';
+import { syncPendingReports } from './sincronizador';
 import { type ReportPhoto } from '../pages/Report';
 import { type EditableReportStep } from '../components/ReportSummaryStep';
 
@@ -88,6 +89,9 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
         priority: severityOptions[severity],
         image: currentPhoto.blob,
       });
+
+      // Disparar sincronización con Firebase en segundo plano
+      syncPendingReports().catch(e => console.error("Error lanzando sync", e));
 
       onReportCreated({
         issueId,
