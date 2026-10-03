@@ -48,11 +48,10 @@ const sqlite = new SQLiteConnection(CapacitorSQLite);
 
 const schema = `
 CREATE TABLE IF NOT EXISTS trabajadores (
-  trabajador_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  trabajador_id INTEGER PRIMARY KEY,
   nombre TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  cargo TEXT,
-  unidad_organizacional TEXT,
+  pin TEXT NOT NULL,
   estado TEXT DEFAULT 'activo'
 );
 
@@ -84,6 +83,7 @@ CREATE TABLE IF NOT EXISTS issues_riesgos (
   fotografia_url TEXT,
   fecha_captura DATETIME DEFAULT CURRENT_TIMESTAMP,
   trabajador_id INTEGER,
+  trabajador_nombre TEXT,
   ubicacion TEXT,
   estado TEXT DEFAULT 'capturado',
   estado_sync TEXT DEFAULT 'pendiente',
@@ -183,6 +183,7 @@ export interface IssueReport {
   location: string;
   priority: string;
   capturedAt: string;
+  workerName?: string;
 }
 
 export interface IssueReportPage {
@@ -205,12 +206,23 @@ export function initializeDatabase(): Promise<SQLiteDBConnection> {
   return databasePromise;
 }
 
+export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; nombre: string; email: string; pin: string }) {
+  if (!Capacitor.isNativePlatform()) return;
+  const connection = await initializeDatabase();
+  await connection.run(
+    'INSERT OR REPLACE INTO trabajadores (trabajador_id, nombre, email, pin) VALUES (?, ?, ?, ?);',
+    [t.trabajador_id, t.nombre, t.email, t.pin]
+  );
+}
+
 export async function saveIssueReport(report: {
   title: string;
   description: string;
   location: string;
   priority: string;
   image: Blob | null;
+  trabajador_id?: number;
+  trabajador_nombre?: string;
 }): Promise<number> {
   if (!Capacitor.isNativePlatform()) {
     return saveIssueReportOnWeb(report);
@@ -219,8 +231,8 @@ export async function saveIssueReport(report: {
   const connection = await initializeDatabase();
   const imageData = report.image ? await blobToDataUrl(report.image) : null;
   const result = await connection.run(
-    'INSERT INTO issues_riesgos (titulo, descripcion, ubicacion, prioridad, fotografia_url) VALUES (?, ?, ?, ?, ?);',
-    [report.title, report.description, report.location, report.priority, imageData],
+    'INSERT INTO issues_riesgos (titulo, descripcion, ubicacion, prioridad, fotografia_url, trabajador_id, trabajador_nombre) VALUES (?, ?, ?, ?, ?, ?, ?);',
+    [report.title, report.description, report.location, report.priority, imageData, report.trabajador_id ?? null, report.trabajador_nombre ?? null],
   );
   const issueId = result.changes?.lastId;
 
@@ -234,11 +246,11 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   const connection = await initializeDatabase();
   const result = beforeIssueId === undefined
     ? await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura FROM issues_riesgos ORDER BY issue_id DESC LIMIT ?;',
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos ORDER BY issue_id DESC LIMIT ?;',
       [limit + 1],
     )
     : await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura FROM issues_riesgos WHERE issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
       [beforeIssueId, limit + 1],
     );
   const reports = result.values ?? [];
@@ -270,6 +282,8 @@ function saveIssueReportOnWeb(report: {
   location: string;
   priority: string;
   image: Blob | null;
+  trabajador_id?: number;
+  trabajador_nombre?: string;
 }): Promise<number> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(databaseName, 2);
@@ -291,6 +305,8 @@ function saveIssueReportOnWeb(report: {
         fotografia: report.image,
         fecha_captura: new Date().toISOString(),
         estado: 'capturado',
+        trabajador_id: report.trabajador_id ?? null,
+        trabajador_nombre: report.trabajador_nombre ?? null
       });
       let issueId: number | undefined;
 
@@ -383,6 +399,7 @@ function mapIssueReport(report: Record<string, unknown>): IssueReport {
     location: String(report.ubicacion ?? ''),
     priority: String(report.prioridad ?? 'Normal'),
     capturedAt: String(report.fecha_captura ?? ''),
+    workerName: report.trabajador_nombre ? String(report.trabajador_nombre) : undefined,
   };
 }
 

@@ -38,6 +38,7 @@ export interface IssueReportFirebase {
   estado: string;
   prioridad: string;
   trabajador_id: number;
+  trabajador_nombre?: string;
   fotografiaBase64: string | null;
 }
 
@@ -98,6 +99,7 @@ export async function syncPendingReports() {
                 estado: reporteLocal.estado,
                 prioridad: reporteLocal.prioridad,
                 trabajador_id: reporteLocal.trabajador_id,
+                trabajador_nombre: reporteLocal.trabajador_nombre || 'Trabajador Desconocido',
                 fotografiaBase64: base64String
             };
 
@@ -195,8 +197,8 @@ export function startListeningForNewReports() {
                 try {
                     // 2. Insertamos en nuestro SQLite (Convertimos undefined a null para que SQLite no colapse)
                     await sqlite.run(
-                        `INSERT INTO issues_riesgos (firebase_id, titulo, descripcion, ubicacion, prioridad, estado, fotografia_url, estado_sync, trabajador_id) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, 'sincronizado', ?)`,
+                        `INSERT INTO issues_riesgos (firebase_id, titulo, descripcion, ubicacion, prioridad, estado, fotografia_url, estado_sync, trabajador_id, trabajador_nombre) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, 'sincronizado', ?, ?)`,
                         [
                             cloudId, 
                             data.titulo || 'Sin título', 
@@ -205,7 +207,8 @@ export function startListeningForNewReports() {
                             data.prioridad || 'Normal', 
                             data.estado || 'capturado', 
                             data.fotografiaBase64 || null, 
-                            data.trabajador_id || null
+                            data.trabajador_id || null,
+                            data.trabajador_nombre || null
                         ]
                     );
 

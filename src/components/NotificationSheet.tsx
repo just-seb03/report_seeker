@@ -34,6 +34,7 @@ export interface Notificacion {
   unread?: boolean;
   prioridad?: string;
   issueId?: number;
+  workerName?: string;
   reporte?: IssueReport;
 }
 
@@ -101,6 +102,7 @@ export default function NotificationSheet({
                 unread={noti.unread}
                 prioridad={noti.prioridad}
                 issueId={noti.issueId}
+                workerName={noti.workerName}
                 onOpenReport={report ? () => onOpenReport(report) : undefined}
                 onMarkAsRead={() => onMarkAsRead?.(noti.id)}
               />

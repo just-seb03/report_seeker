@@ -21,7 +21,7 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
-import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Box, Dialog, IconButton, Typography } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
@@ -95,7 +95,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
             <p>{report.description || 'Sin descripción'}</p>
           </div>
           <div className="info-report-metadata" aria-label="Identificación y fecha del reporte">
-            <span><TagOutlinedIcon aria-hidden="true" /> UID-{report.issueId}</span>
+            <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || 'Trabajador Desconocido'}</span>
             <span><CalendarMonthOutlinedIcon aria-hidden="true" /> {formatReportDate(report.capturedAt)}</span>
           </div>
         </section>

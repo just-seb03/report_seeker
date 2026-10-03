@@ -39,7 +39,7 @@ import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
-  unread?: boolean; prioridad?: string; issueId?: number;
+  unread?: boolean; prioridad?: string; issueId?: number; workerName?: string;
   onOpenReport?: () => void;
   onMarkAsRead?: () => void;
 }
@@ -72,7 +72,7 @@ function formatPublicationDate(fecha?: string): string {
 }
 
 export default function NotificationCard({
-  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, onOpenReport, onMarkAsRead,
+  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, workerName, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
 
   const [expanded, setExpanded] = useState(false);
@@ -205,7 +205,7 @@ export default function NotificationCard({
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
             <Typography variant="caption" className="card-text-muted">
-              {issueId === undefined ? '' : `UID-${issueId}`}
+              {workerName ? `Por ${workerName}` : 'Por Trabajador Desconocido'}
             </Typography>
             <Typography variant="caption" className="card-text-muted">{formatPublicationDate(fecha)}</Typography>
           </Box>

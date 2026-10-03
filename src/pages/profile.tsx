@@ -20,22 +20,24 @@
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import EmailOutlined from '@mui/icons-material/EmailOutlined';
-import PhoneOutlined from '@mui/icons-material/PhoneOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
+import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import './profile.css';
+import { getCurrentUser, logout } from '../control/authControl';
 
 interface ProfileProps {
 	onSettingsClick?: () => void;
 }
 
-const profileName = 'Sebastian Arredondo Vega Cantuarias';
-const profileDetails = [
-	{ label: 'Teléfono', value: '+56 9 6234 8170', Icon: PhoneOutlined },
-	{ label: 'Correo', value: 'bastian.vegag@gmail.cl', Icon: EmailOutlined },
-	{ label: 'ID de usuario', value: 'No asignado', Icon: BadgeOutlined },
-];
-
 export default function Profile({ onSettingsClick }: ProfileProps) {
+    const user = getCurrentUser();
+    const profileName = user?.nombre || 'Usuario Desconocido';
+    
+    const profileDetails = [
+        { label: 'Correo', value: user?.email || 'Sin correo', Icon: EmailOutlined },
+        { label: 'ID de usuario', value: user?.trabajador_id.toString() || 'No asignado', Icon: BadgeOutlined },
+    ];
+
 	return (
 		<main className="profile-screen">
 			<div className="profile-banner" aria-hidden="true" />
@@ -44,10 +46,23 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 					<AccountCircleOutlined />
 				</div>
 				<h1 id="profile-title">{profileName}</h1>
-				<button className="profile-settings" type="button" onClick={onSettingsClick}>
-					<SettingsOutlined />
-					Configuración
-				</button>
+				
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                    <button className="profile-settings" type="button" onClick={onSettingsClick}>
+                        <SettingsOutlined />
+                        Configuración
+                    </button>
+                    <button 
+                        className="profile-settings" 
+                        type="button" 
+                        onClick={() => logout()}
+                        style={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
+                    >
+                        <LogoutOutlined />
+                        Cerrar Sesión
+                    </button>
+                </div>
+
 				<section className="profile-info" aria-label="Información del usuario">
 					{profileDetails.map(({ label, value, Icon }) => (
 						<div className="profile-info-row" key={label}>

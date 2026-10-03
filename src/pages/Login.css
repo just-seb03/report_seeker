@@ -1,0 +1,80 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : Login.css                                                        *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo, Maximiliano Cantuarias, Cristian Vega       *
+ *                                                                                             *
+ *          Fecha de Inicio : 03 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 03 de Octubre de 2026                                            *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   Archivo de estilos CSS para la página principal de Login usando Material Design 3.        *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+.login-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-color: #f0f2f5; /* Material 3 Light Surface Container */
+  color: #1a1c1e;
+  transition: background-color 0.4s cubic-bezier(0.2, 0, 0, 1), color 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-content {
+  width: min(90%, 420px);
+  padding: 48px 32px;
+  background: #ffffff;
+  border-radius: 28px; /* Material 3 standard large border radius */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03); /* Subtle M3 Elevation */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Roboto', 'Inter', inherit;
+  animation: login-content-enter 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.login-content h1 {
+  margin: 0 0 32px 0;
+  font-size: 32px;
+  font-weight: 500; /* Medium weight for M3 headings */
+  letter-spacing: -0.02em;
+  color: #1a1c1e; /* On-surface */
+  text-align: center;
+}
+
+body.dark .login-screen {
+  background-color: #121416; /* M3 Dark Surface Container */
+  color: #e2e2e5;
+}
+
+body.dark .login-content {
+  background: #1a1c1e; /* M3 Surface container high */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+body.dark .login-content h1 {
+  color: #e2e2e5;
+}
+
+@keyframes login-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

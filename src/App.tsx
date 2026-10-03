@@ -25,6 +25,8 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { resetPushNotificationCount } from './control/systemNotificationsControl';
 import { ThemeProvider, createTheme, CssBaseline, useMediaQuery } from '@mui/material';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import { getCurrentUser, type Trabajador } from './control/authControl';
 
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/700.css';
@@ -35,6 +37,7 @@ type ManualThemeMode = 'system' | 'light' | 'dark';
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [manualThemeMode, setManualThemeMode] = useState<ManualThemeMode>('system');
+  const [currentUser, setCurrentUser] = useState<Trabajador | null>(getCurrentUser());
 
   const effectiveDarkMode =
     manualThemeMode === 'system' ? prefersDarkMode : manualThemeMode === 'dark';
@@ -44,8 +47,13 @@ function App() {
     const sub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) resetPushNotificationCount();
     });
+
+    const handleLogout = () => setCurrentUser(null);
+    window.addEventListener('user_logout', handleLogout);
+
     return () => {
       sub.then(listener => listener.remove());
+      window.removeEventListener('user_logout', handleLogout);
     };
   }, []);
 
@@ -94,10 +102,14 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Home
-        isDarkMode={effectiveDarkMode}
-        onToggleManualTheme={handleToggleManualTheme}
-      />
+      {currentUser ? (
+        <Home
+          isDarkMode={effectiveDarkMode}
+          onToggleManualTheme={handleToggleManualTheme}
+        />
+      ) : (
+        <Login onLoginSuccess={(user) => setCurrentUser(user)} />
+      )}
     </ThemeProvider>
   );
 }

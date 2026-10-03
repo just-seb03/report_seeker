@@ -64,6 +64,7 @@ export function toNotification(report: IssueReport, readIds: Set<number>): Notif
     fecha: Number.isNaN(capturedAt.getTime()) ? undefined : capturedAt.toISOString(),
     unread: !readIds.has(report.issueId),
     prioridad: report.priority,
+    workerName: report.workerName,
     reporte: report,
   };
 }

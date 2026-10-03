@@ -31,6 +31,7 @@ import { saveIssueReport } from '../database';
 import { syncPendingReports } from './sincronizador';
 import { type ReportPhoto } from '../pages/Report';
 import { type EditableReportStep } from '../components/ReportSummaryStep';
+import { getCurrentUser } from './authControl';
 
 const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
 export type ReportStep = EditableReportStep | 'summary' | 'ready';
@@ -82,12 +83,15 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
     setErrorMessage('');
 
     try {
+      const user = getCurrentUser();
       const issueId = await saveIssueReport({
         title: title.trim(),
         description: description.trim(),
         location: location.trim(),
         priority: severityOptions[severity],
         image: currentPhoto.blob,
+        trabajador_id: user?.trabajador_id,
+        trabajador_nombre: user?.nombre
       });
 
       // Disparar sincronización con Firebase en segundo plano
