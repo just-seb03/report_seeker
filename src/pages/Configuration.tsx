@@ -17,18 +17,27 @@
  *   Configuration -- Componente visual para las opciones de configuración y perfil.           *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { useState } from 'react';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { IconButton } from '@mui/material';
+import ChangePinDialog from '../components/ChangePinDialog';
+import ChangeEmailDialog from '../components/ChangeEmailDialog';
 import './Configuration.css';
 
 type ConfigurationProps = {
   onBack: () => void;
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
 };
 
-export default function Configuration({ onBack }: ConfigurationProps) {
+export default function Configuration({ onBack, isDarkMode, onToggleTheme }: ConfigurationProps) {
+  const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+
   return (
     <main className="configuration-screen">
       <IconButton className="configuration-back" aria-label="Volver a Profile" onClick={onBack}>
@@ -41,20 +50,29 @@ export default function Configuration({ onBack }: ConfigurationProps) {
         </header>
 
         <div className="configuration-actions" aria-label="Opciones de cuenta">
-          <button className="configuration-button" type="button">
+          
+          <div className="configuration-theme-toggle" onClick={onToggleTheme}>
+            <div className={`theme-toggle-pill ${isDarkMode ? 'dark-active' : 'light-active'}`}>
+              <div className="theme-toggle-thumb">
+                {isDarkMode ? <DarkModeOutlinedIcon fontSize="small" /> : <LightModeOutlinedIcon fontSize="small" />}
+              </div>
+              <span className="theme-toggle-text">{isDarkMode ? 'Modo Oscuro' : 'Modo Claro'}</span>
+            </div>
+          </div>
+
+          <button className="configuration-button" type="button" onClick={() => setIsPinDialogOpen(true)}>
             <LockOutlinedIcon aria-hidden="true" />
             <span>Cambiar PIN</span>
           </button>
-          <button className="configuration-button" type="button">
+          <button className="configuration-button" type="button" onClick={() => setIsEmailDialogOpen(true)}>
             <AlternateEmailOutlinedIcon aria-hidden="true" />
             <span>Cambiar correo de recuperación</span>
           </button>
-          <button className="configuration-button configuration-logout" type="button">
-            <LogoutOutlinedIcon aria-hidden="true" />
-            <span>Cerrar sesión</span>
-          </button>
         </div>
       </section>
+
+      {isPinDialogOpen && <ChangePinDialog onClose={() => setIsPinDialogOpen(false)} />}
+      {isEmailDialogOpen && <ChangeEmailDialog onClose={() => setIsEmailDialogOpen(false)} />}
     </main>
   );
 }
