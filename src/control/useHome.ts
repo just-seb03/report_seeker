@@ -22,6 +22,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { getIssueReportsPage, type IssueReport } from '../database';
 import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
 import { captureReportPhoto } from './cameraControl';
+import { useHardwareBackButton } from './backButtonControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
@@ -226,6 +227,45 @@ export function useHome() {
   }, [readNotificationIds]);
 
   const hasUnreadNotifications = notificaciones.some((item) => item.unread);
+
+  const handleHardwareBack = useCallback((): boolean => {
+    if (cancelDialogOpen) {
+      setCancelDialogOpen(false);
+      setPendingView(null);
+      return true;
+    }
+    if (activeView === 'info-report') {
+      navigateTo('home');
+      return true;
+    }
+    if (activeView === 'configuration') {
+      navigateTo('profile');
+      return true;
+    }
+    if (activeView === 'profile') {
+      navigateTo('home');
+      return true;
+    }
+    if (activeView === 'report') {
+      if (reportIsComplete) {
+        navigateTo('home');
+      } else {
+        setPendingView('home');
+        setCancelDialogOpen(true);
+      }
+      return true;
+    }
+    if (activeView === 'home') {
+      if (isExpanded) {
+        handleCollapse();
+        return true;
+      }
+      return false; // Permite que la app se cierre nativamente
+    }
+    return false;
+  }, [cancelDialogOpen, activeView, reportIsComplete, isExpanded, navigateTo, handleCollapse]);
+
+  useHardwareBackButton(handleHardwareBack);
 
   return {
     notificaciones,
