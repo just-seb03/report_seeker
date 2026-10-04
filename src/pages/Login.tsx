@@ -17,6 +17,7 @@
  *   Login -- Orquestador de la pantalla de bienvenida y flujo de ingreso de credenciales.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { useState } from 'react';
 import { type Trabajador } from '../control/authControl';
 import { useIntroFlow } from '../control/useIntroFlow';
 import PinPad from '../components/PinPad';
@@ -28,6 +29,11 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
+  const [recoveryWorkerId, setRecoveryWorkerId] = useState('');
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [recoveryDetailsSubmitted, setRecoveryDetailsSubmitted] = useState(false);
+
   const {
     step,
     workerId,
@@ -49,7 +55,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </div>
 
         {/* Paso: Ingreso de ID */}
-        <div className={`intro-step intro-id ${step === 'id_input' ? 'active' : ''} ${step === 'welcome' ? 'hidden' : ''} ${step === 'id_out' || step === 'pin_input' || step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
+        <div className={`intro-step intro-id ${step === 'id_input' && !isRecoveryOpen ? 'active' : ''} ${step === 'welcome' || isRecoveryOpen ? 'hidden' : ''} ${step === 'id_out' || step === 'pin_input' || step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
           <PinPad
             title="Ingrese su ID de trabajador"
             subtitle="5 dígitos"
@@ -60,7 +66,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </div>
 
         {/* Paso: Ingreso de PIN */}
-        <div className={`intro-step intro-pin ${step === 'pin_input' ? 'active' : ''} ${step === 'welcome' || step === 'id_input' || step === 'id_out' ? 'hidden' : ''} ${step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
+        <div className={`intro-step intro-pin ${step === 'pin_input' && !isRecoveryOpen ? 'active' : ''} ${step === 'welcome' || step === 'id_input' || step === 'id_out' || isRecoveryOpen ? 'hidden' : ''} ${step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
           <PinPad
             title="Ingrese su PIN"
             subtitle={workerId}
@@ -68,6 +74,70 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             currentValue={pin}
             onKeyPress={handlePinKeyPress}
           />
+          <button
+            className="recovery-link"
+            type="button"
+            onClick={() => {
+              setRecoveryWorkerId(workerId);
+              setRecoveryDetailsSubmitted(false);
+              setIsRecoveryOpen(true);
+            }}
+          >
+            Olvidé mi PIN
+          </button>
+        </div>
+
+        <div className={`intro-step recovery-step ${isRecoveryOpen ? 'active' : 'hidden'}`}>
+          <form
+            className="recovery-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setRecoveryDetailsSubmitted(true);
+            }}
+          >
+            <h2>Recuperar PIN</h2>
+            <p>Ingresa tu ID de trabajador y el correo asociado a tu cuenta.</p>
+            <label htmlFor="recovery-worker-id">ID de trabajador</label>
+            <input
+              id="recovery-worker-id"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]{5}"
+              maxLength={5}
+              autoComplete="off"
+              required
+              value={recoveryWorkerId}
+              onChange={(event) => {
+                setRecoveryWorkerId(event.target.value.replace(/\D/g, '').slice(0, 5));
+                setRecoveryDetailsSubmitted(false);
+              }}
+            />
+            <label htmlFor="recovery-email">Correo electrónico</label>
+            <input
+              id="recovery-email"
+              type="email"
+              autoComplete="email"
+              required
+              value={recoveryEmail}
+              onChange={(event) => {
+                setRecoveryEmail(event.target.value);
+                setRecoveryDetailsSubmitted(false);
+              }}
+            />
+            <button className="recovery-submit" type="submit">Continuar</button>
+            {recoveryDetailsSubmitted && (
+              <p className="recovery-notice" role="status">
+                Datos ingresados. El envío del correo se incorporará en el siguiente paso.
+              </p>
+            )}
+            <button
+              className="recovery-back"
+              type="button"
+              onClick={() => setIsRecoveryOpen(false)}
+            >
+              Volver al inicio de sesión
+            </button>
+          </form>
         </div>
 
       </section>
