@@ -23,7 +23,7 @@ import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import EmailOutlined from '@mui/icons-material/EmailOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
-import './profile.css';
+import { Box, Typography, Button, Card, List, ListItem, ListItemIcon, ListItemText, Avatar } from '@mui/material';
 import { getCurrentUser, logout, type Trabajador } from '../control/authControl';
 
 interface ProfileProps {
@@ -49,42 +49,77 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 	];
 
 	return (
-		<main className="profile-screen">
-			<div className="profile-banner" aria-hidden="true" />
-			<section className="profile-content" aria-labelledby="profile-title">
-				<div className="profile-avatar" aria-hidden="true">
-					<AccountCircleOutlined />
-				</div>
-				<h1 id="profile-title">{profileName}</h1>
+		<Box sx={{ minHeight: '100%', backgroundColor: 'background.default', pb: 12 }}>
+			<Box 
+        sx={{ 
+          height: 160, 
+          backgroundColor: 'primary.main',
+          borderBottomLeftRadius: 32,
+          borderBottomRightRadius: 32,
+          mb: -6
+        }} 
+      />
+			<Box sx={{ px: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+				<Avatar 
+          sx={{ 
+            width: 100, 
+            height: 100, 
+            backgroundColor: 'background.paper', 
+            color: 'primary.main',
+            boxShadow: 2,
+            mb: 2
+          }}
+        >
+					<AccountCircleOutlined sx={{ fontSize: 60 }} />
+				</Avatar>
+				
+        <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3 }}>
+          {profileName}
+        </Typography>
 
-				<div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-					<button className="profile-settings" type="button" onClick={onSettingsClick}>
-						<SettingsOutlined />
+				<Box sx={{ display: 'flex', gap: 2, mb: 4, width: '100%', justifyContent: 'center' }}>
+					<Button 
+            variant="contained" 
+            color="primary" 
+            startIcon={<SettingsOutlined />}
+            onClick={onSettingsClick}
+            sx={{ flex: 1, maxWidth: 200 }}
+          >
 						Configuración
-					</button>
-					<button
-						className="profile-settings"
-						type="button"
+					</Button>
+					<Button
+            variant="outlined"
+            color="error"
+            startIcon={<LogoutOutlined />}
 						onClick={() => logout()}
-						style={{ color: '#ff6b6b', borderColor: '#ff6b6b' }}
+            sx={{ flex: 1, maxWidth: 200 }}
 					>
-						<LogoutOutlined />
 						Cerrar Sesión
-					</button>
-				</div>
+					</Button>
+				</Box>
 
-				<section className="profile-info" aria-label="Información del usuario">
-					{profileDetails.map(({ label, value, Icon }) => (
-						<div className="profile-info-row" key={label}>
-							<div className="profile-info-icon" aria-hidden="true"><Icon /></div>
-							<div className="profile-info-copy">
-								<span className="profile-info-label">{label}</span>
-								<span className="profile-info-value">{value}</span>
-							</div>
-						</div>
-					))}
-				</section>
-			</section>
-		</main>
+				<Card sx={{ width: '100%' }}>
+          <List disablePadding>
+					  {profileDetails.map(({ label, value, Icon }, index) => (
+						  <ListItem 
+                key={label} 
+                divider={index < profileDetails.length - 1}
+                sx={{ py: 2 }}
+              >
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <Icon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={label} 
+                  secondary={value} 
+                  primaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
+                  secondaryTypographyProps={{ variant: 'body1', color: 'text.primary', fontWeight: 500 }}
+                />
+						  </ListItem>
+					  ))}
+          </List>
+				</Card>
+			</Box>
+		</Box>
 	);
 }

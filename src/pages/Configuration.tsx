@@ -23,10 +23,9 @@ import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlin
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import { IconButton } from '@mui/material';
+import { IconButton, Box, Typography, Button, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import ChangePinDialog from '../components/ChangePinDialog';
 import ChangeEmailDialog from '../components/ChangeEmailDialog';
-import './Configuration.css';
 
 type ConfigurationProps = {
   onBack: () => void;
@@ -60,57 +59,80 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
     return () => clearTimeout(timeout);
   }, [configMenuState, renderEmail]);
 
-  const handleOpenPin = () => {
-    setConfigMenuState('pin');
-  };
-
-  const handleClosePin = () => {
-    setConfigMenuState('none');
-  };
-
-  const handleOpenEmail = () => {
-    setConfigMenuState('email');
-  };
-
-  const handleCloseEmail = () => {
-    setConfigMenuState('none');
-  };
+  const handleOpenPin = () => setConfigMenuState('pin');
+  const handleClosePin = () => setConfigMenuState('none');
+  const handleOpenEmail = () => setConfigMenuState('email');
+  const handleCloseEmail = () => setConfigMenuState('none');
 
   return (
-    <main className="configuration-screen">
-      <IconButton className="configuration-back" aria-label="Volver a Profile" onClick={onBack}>
-        <ArrowBackRoundedIcon />
-      </IconButton>
-      <section className="configuration-content" aria-label="Configuración">
-        <header className="configuration-brand">
-          <h1><span>REPORT</span><span>SEEKER</span></h1>
-          <p>Versión 0.04a</p>
-        </header>
+    <Box sx={{ height: '100%', backgroundColor: 'background.default', display: 'flex', flexDirection: 'column' }}>
+      <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Toolbar>
+          <IconButton edge="start" onClick={onBack} aria-label="Volver a Profile" sx={{ mr: 2 }}>
+            <ArrowBackRoundedIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+            Configuración
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-        <div className="configuration-actions" aria-label="Opciones de cuenta">
-          
-          <div className="configuration-theme-toggle" onClick={onToggleTheme}>
-            <div className={`theme-toggle-pill ${isDarkMode ? 'dark-active' : 'light-active'}`}>
-              <div className="theme-toggle-thumb">
-                {isDarkMode ? <DarkModeOutlinedIcon fontSize="small" /> : <LightModeOutlinedIcon fontSize="small" />}
-              </div>
-              <span className="theme-toggle-text">{isDarkMode ? 'Modo Oscuro' : 'Modo Claro'}</span>
-            </div>
-          </div>
+      <Box sx={{ p: 3, flex: 1 }}>
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.main', letterSpacing: 2 }}>
+            REPORT<Box component="span" sx={{ color: 'text.primary' }}>SEEKER</Box>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Versión 0.04a
+          </Typography>
+        </Box>
 
-          <button className="configuration-button" type="button" onClick={handleOpenPin}>
-            <LockOutlinedIcon aria-hidden="true" />
-            <span>Cambiar PIN</span>
-          </button>
-          <button className="configuration-button" type="button" onClick={handleOpenEmail}>
-            <AlternateEmailOutlinedIcon aria-hidden="true" />
-            <span>Cambiar correo de recuperación</span>
-          </button>
-        </div>
-      </section>
+        <Paper sx={{ overflow: 'hidden' }}>
+          <List disablePadding>
+            <ListItem disablePadding divider>
+              <ListItemButton onClick={onToggleTheme} sx={{ py: 2 }}>
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  {isDarkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Tema de la Aplicación" 
+                  secondary={isDarkMode ? 'Modo Oscuro' : 'Modo Claro'} 
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding divider>
+              <ListItemButton onClick={handleOpenPin} sx={{ py: 2 }}>
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <LockOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Cambiar PIN" 
+                  secondary="Actualiza tu código de acceso"
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleOpenEmail} sx={{ py: 2 }}>
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <AlternateEmailOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Cambiar correo de recuperación" 
+                  secondary="Actualiza el email asociado a tu cuenta"
+                  primaryTypographyProps={{ fontWeight: 500 }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Paper>
+      </Box>
 
       {renderPin && <ChangePinDialog onClose={handleClosePin} isClosing={configMenuState !== 'pin'} />}
       {renderEmail && <ChangeEmailDialog onClose={handleCloseEmail} isClosing={configMenuState !== 'email'} />}
-    </main>
+    </Box>
   );
 }
