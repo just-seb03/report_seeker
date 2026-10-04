@@ -17,7 +17,7 @@
  *   Queue -- Componente que muestra la lista de reportes pendientes de sincronizar.           *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
 import { useQueue } from '../control/useQueue';
 import { type IssueReport } from '../database';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
@@ -32,14 +32,6 @@ export default function Queue({ onReportClick }: QueueProps) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', bgcolor: 'background.default', overflow: 'hidden' }}>
-      <AppBar position="static" color="transparent" elevation={1} sx={{ pt: 'env(safe-area-inset-top)', bgcolor: 'background.paper' }}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
-            Bandeja de salida
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
       <Box sx={{ flex: 1, overflowY: 'auto', pb: 12 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300, color: 'text.secondary' }}>
