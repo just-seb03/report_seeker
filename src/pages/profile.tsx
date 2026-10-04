@@ -50,16 +50,7 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 
 	return (
 		<Box sx={{ minHeight: '100%', backgroundColor: 'background.default', pb: 12 }}>
-			<Box 
-        sx={{ 
-          height: 160, 
-          backgroundColor: 'primary.main',
-          borderBottomLeftRadius: 32,
-          borderBottomRightRadius: 32,
-          mb: -6
-        }} 
-      />
-			<Box sx={{ px: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+			<Box sx={{ px: 3, pt: 14, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 				<Avatar 
           sx={{ 
             width: 100, 
