@@ -9,25 +9,28 @@ interface ViewTransitionProps {
 }
 
 export default function ViewTransition({ children, isActive, direction, isEntering }: ViewTransitionProps) {
+  let animationName = 'none';
+
+  if (isEntering) {
+    if (isActive) {
+      animationName = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
+    } else {
+      animationName = direction === 'forward' ? 'slideOutLeft' : 'slideOutRight';
+    }
+  }
+
   return (
     <Box
       sx={{
         position: 'absolute',
         inset: 0,
-        animation: isActive && isEntering
-          ? direction === 'forward'
-            ? 'slideInRight 380ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards'
-            : 'slideInLeft 380ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards'
+        animation: animationName !== 'none'
+          ? `${animationName} 380ms cubic-bezier(0.25, 1, 0.5, 1) forwards`
           : 'none',
-        transform: !isActive
-          ? direction === 'forward'
-            ? 'translateX(-30%)'
-            : 'translateX(30%)'
-          : 'translateX(0)',
-        opacity: !isActive ? 0 : 1,
-        transition: !isActive ? 'transform 380ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 380ms ease' : 'none',
         pointerEvents: isActive ? 'auto' : 'none',
-        zIndex: isActive ? 1 : 0
+        zIndex: isActive ? 1 : 0,
+        opacity: isEntering ? undefined : (isActive ? 1 : 0),
+        bgcolor: 'background.default'
       }}
       aria-hidden={!isActive}
     >
