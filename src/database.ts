@@ -246,12 +246,12 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   const connection = await initializeDatabase();
   const result = beforeIssueId === undefined
     ? await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos ORDER BY issue_id DESC LIMIT ?;',
-      [limit + 1],
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? ORDER BY issue_id DESC LIMIT ?;',
+      ['pendiente', limit + 1],
     )
     : await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
-      [beforeIssueId, limit + 1],
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? AND issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
+      ['pendiente', beforeIssueId, limit + 1],
     );
   const reports = result.values ?? [];
 
@@ -259,6 +259,17 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
     items: reports.slice(0, limit).map(mapIssueReport),
     hasMore: reports.length > limit,
   };
+}
+
+export async function getPendingIssueReports(): Promise<IssueReport[]> {
+  if (!Capacitor.isNativePlatform()) return getPendingIssueReportsOnWeb();
+
+  const connection = await initializeDatabase();
+  const result = await connection.query(
+    'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync = ? ORDER BY issue_id DESC;',
+    ['pendiente']
+  );
+  return (result.values ?? []).map(mapIssueReport);
 }
 
 export async function getIssueReportImage(issueId: number): Promise<string | null> {
@@ -380,12 +391,52 @@ function getIssueReportsPageOnWeb(limit: number, beforeIssueId?: number): Promis
           return;
         }
 
-        reports.push(cursor.value as Record<string, unknown>);
+        const report = cursor.value as Record<string, unknown>;
+        if (report.estado_sync !== 'pendiente') {
+          reports.push(report);
+        }
         cursor.continue();
       };
       cursorRequest.onerror = () => {
         database.close();
         reject(cursorRequest.error ?? new Error('No se pudieron consultar los reportes.'));
+      };
+    };
+  });
+}
+
+function getPendingIssueReportsOnWeb(): Promise<IssueReport[]> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 2);
+
+    request.onerror = () => reject(request.error ?? new Error('No se pudieron consultar los reportes pendientes.'));
+    request.onsuccess = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(webObjectStore)) {
+        database.close();
+        resolve([]);
+        return;
+      }
+
+      const transaction = database.transaction(webObjectStore, 'readonly');
+      const store = transaction.objectStore(webObjectStore);
+      const cursorRequest = store.openCursor(null, 'prev');
+      const reports: Record<string, unknown>[] = [];
+
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (!cursor) {
+          database.close();
+          resolve(reports.map(mapIssueReport));
+          return;
+        }
+
+        reports.push(cursor.value as Record<string, unknown>);
+        cursor.continue();
+      };
+      cursorRequest.onerror = () => {
+        database.close();
+        reject(cursorRequest.error ?? new Error('No se pudieron consultar los reportes pendientes.'));
       };
     };
   });

@@ -19,6 +19,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { Network } from '@capacitor/network';
 import { getIssueReportsPage, type IssueReport } from '../database';
 import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
 import { captureReportPhoto } from './cameraControl';
@@ -28,10 +29,10 @@ import { sendReportNotification } from './systemNotificationsControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
-export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration';
+export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue';
 export type TransitionDirection = 'forward' | 'backward';
 
-export const viewOrder: NavigationView[] = ['report', 'home', 'info-report', 'profile', 'configuration'];
+export const viewOrder: NavigationView[] = ['report', 'queue', 'home', 'info-report', 'profile', 'configuration'];
 const notificationPageSize = 5;
 
 export function useHome() {
@@ -185,8 +186,17 @@ export function useHome() {
   }, [activeView, reportIsComplete, navigateTo]);
 
   const handleHomeClick = useCallback(() => requestNavigation('home'), [requestNavigation]);
-  const handleReportComplete = useCallback(() => {
+  const handleReportComplete = useCallback(async () => {
     setIsNavEntering(true);
+    try {
+      const status = await Network.getStatus();
+      if (!status.connected) {
+        navigateTo('queue');
+        return;
+      }
+    } catch (e) {
+      console.error('Error verificando red', e);
+    }
     navigateTo('home');
   }, [navigateTo]);
 
@@ -268,6 +278,10 @@ export function useHome() {
       return true;
     }
     if (activeView === 'profile') {
+      navigateTo('home');
+      return true;
+    }
+    if (activeView === 'queue') {
       navigateTo('home');
       return true;
     }

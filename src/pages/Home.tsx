@@ -28,6 +28,7 @@ import Configuration from './Configuration';
 import InfoReport from './InfoReport';
 import Report from './Report';
 import Profile from './profile';
+import Queue from './Queue';
 import HomeScene from '../components/HomeScene';
 import { useHome, type NavigationView } from '../control/useHome';
 import './Home.css';
@@ -106,6 +107,9 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       ) : null;
     }
     if (view === 'profile') return <Profile onSettingsClick={handleOpenConfiguration} />;
+    if (view === 'queue') {
+      return <Queue onReportClick={handleOpenReport} />;
+    }
 
     return (
       <HomeScene
@@ -159,10 +163,16 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           }}
         >
           <BottomNav
-            activeView={activeView === 'report' ? 'report' : activeView === 'profile' || activeView === 'configuration' ? 'profile' : 'home'}
+            activeView={
+              activeView === 'report' ? 'report' : 
+              activeView === 'profile' || activeView === 'configuration' ? 'profile' : 
+              activeView === 'queue' ? 'cola' : 
+              'home'
+            }
             onHomeClick={handleHomeClick}
             onReportClick={handleReportClick}
             onProfileClick={() => requestNavigation('profile')}
+            onColaClick={() => requestNavigation('queue')}
           />
         </Box>
       )}
