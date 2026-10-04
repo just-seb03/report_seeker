@@ -62,7 +62,7 @@ export default function ReportProgressBar({ currentStep }: ReportProgressBarProp
               sx={{
                 flex: 1,
                 borderRadius: 1,
-                bgcolor: isActive ? 'text.primary' : 'action.disabledBackground',
+                bgcolor: isActive ? 'primary.main' : 'action.disabledBackground',
                 transition: 'background-color 0.4s ease, transform 0.4s ease'
               }}
             />
