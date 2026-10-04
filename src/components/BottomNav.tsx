@@ -24,17 +24,26 @@ import { Box } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import './BottomNav.css';
 
 type BottomNavProps = {
-  activeView: 'home' | 'report' | 'profile';
+  activeView: 'home' | 'report' | 'profile' | 'cola' | 'seek';
   onHomeClick?: () => void;
   onReportClick?: () => void;
   onProfileClick?: () => void;
+  onColaClick?: () => void;
+  onSeekClick?: () => void;
 };
 
-export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick }: BottomNavProps) {
-  const value = activeView === 'report' ? 0 : activeView === 'profile' ? 2 : 1;
+export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick, onColaClick, onSeekClick }: BottomNavProps) {
+  const value = 
+    activeView === 'report' ? 0 : 
+    activeView === 'cola' ? 1 : 
+    activeView === 'home' ? 2 : 
+    activeView === 'seek' ? 3 : 
+    activeView === 'profile' ? 4 : 2;
 
   const handleHomeClick = () => {
     onHomeClick?.();
@@ -54,16 +63,17 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
         {/* Capa 1: Fondo sólido principal de la barra */}
         <Box className="nav-pill-bg" />
 
-        {/* Capa 2: La "isla líquida" que viaja animada al botón seleccionado */}
-        <Box
-          className="indicator-wrapper"
-          style={{ transform: `translateX(${value * 100}%)` }}
-        >
-          <Box className="nav-indicator" />
-        </Box>
+        <Box className="nav-inner">
+          {/* Capa 2: La "isla líquida" que viaja animada al botón seleccionado */}
+          <Box
+            className="indicator-wrapper"
+            style={{ transform: `translateX(${value * 100}%)` }}
+          >
+            <Box className="nav-indicator" />
+          </Box>
 
-        {/* Capa 3: Contenedor de botones reales */}
-        <Box className="nav-pill-content">
+          {/* Capa 3: Contenedor de botones reales */}
+          <Box className="nav-pill-content">
 
           <Box
             component="button"
@@ -82,15 +92,43 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
           <Box
             component="button"
             type="button"
+            onClick={onColaClick}
+            className={`nav-item ${activeView === 'cola' ? 'active' : ''}`}
+            aria-label="Cola"
+            aria-pressed={activeView === 'cola'}
+          >
+            <Box className="nav-icon-wrap">
+              <AccessTimeOutlinedIcon className="nav-icon" sx={{ fontSize: 26 }} />
+            </Box>
+            <span className="nav-item-text">Cola</span>
+          </Box>
+
+          <Box
+            component="button"
+            type="button"
             onClick={handleHomeClick}
             className={`nav-item ${activeView === 'home' ? 'active' : ''}`}
             aria-label="Inicio"
             aria-pressed={activeView === 'home'}
           >
             <Box className="nav-icon-wrap">
-              <HomeIcon className="nav-icon" sx={{ fontSize: 26 }} />
+              <HomeIcon className="nav-icon" sx={{ fontSize: 30 }} />
             </Box>
             <span className="nav-item-text">Inicio</span>
+          </Box>
+
+          <Box
+            component="button"
+            type="button"
+            onClick={onSeekClick}
+            className={`nav-item ${activeView === 'seek' ? 'active' : ''}`}
+            aria-label="Seek AI"
+            aria-pressed={activeView === 'seek'}
+          >
+            <Box className="nav-icon-wrap">
+              <ChatOutlinedIcon className="nav-icon" sx={{ fontSize: 26 }} />
+            </Box>
+            <span className="nav-item-text">Seek AI</span>
           </Box>
 
           <Box
@@ -107,6 +145,7 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
             <span className="nav-item-text">Perfil</span>
           </Box>
 
+        </Box>
         </Box>
       </Box>
     </Box>
