@@ -18,16 +18,15 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography } from '@mui/material';
-import './SeekieAI.css';
 
 export default function SeekieAIChatArea() {
   return (
-    <Box className="seekie-chat-area">
-      <Box className="seekie-greeting">
-        <Typography variant="h5" className="seekie-greeting-title">
+    <Box sx={{ flex: 1, overflowY: 'auto', p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ textAlign: 'center', opacity: 0.8 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
           Hola, soy Seekie AI
         </Typography>
-        <Typography variant="body1" className="seekie-greeting-subtitle">
+        <Typography variant="body1" color="text.secondary">
           ¿En qué puedo ayudarte?
         </Typography>
       </Box>

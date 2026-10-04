@@ -19,6 +19,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { Box, Typography, Button, Card, CardActionArea, CardMedia, CardContent, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 
 export type EditableReportStep = 'photo' | 'severity' | 'description' | 'location' | 'title';
 
@@ -55,38 +56,53 @@ export default function ReportSummaryStep({
   const values = { title, severity, description, location };
 
   return (
-    <section className="report-summary-step" aria-labelledby="report-summary-heading">
-      <h1 className="report-step-title" id="report-summary-heading">Revisa tu reporte</h1>
-      <button
-        className="report-summary-photo-button"
-        type="button"
-        onClick={() => onEdit('photo')}
-        aria-label="Editar fotografía"
-      >
-        <img src={photoUrl} alt="Fotografía del riesgo" />
-        <span>Fotografía <EditOutlinedIcon aria-hidden="true" /></span>
-      </button>
-      <div className="report-summary-fields">
+    <Box component="section" sx={{ display: 'flex', flexDirection: 'column', pb: 2 }} aria-labelledby="report-summary-heading">
+      <Typography variant="h5" id="report-summary-heading" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, mt: 4 }}>
+        Revisa tu reporte
+      </Typography>
+      
+      <Card sx={{ mb: 3, borderRadius: 3, overflow: 'hidden' }} variant="outlined">
+        <CardActionArea onClick={() => onEdit('photo')} aria-label="Editar fotografía">
+          <CardMedia
+            component="img"
+            height="150"
+            image={photoUrl}
+            alt="Fotografía del riesgo"
+            sx={{ backgroundColor: 'action.hover', objectFit: 'cover' }}
+          />
+          <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Fotografía</Typography>
+            <EditOutlinedIcon color="action" fontSize="small" />
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <List disablePadding sx={{ borderTop: 1, borderColor: 'divider', mb: 4 }}>
         {summaryFields.map(({ step, label, valueKey }) => (
-          <button
-            className="report-summary-row"
-            key={step}
-            type="button"
-            onClick={() => onEdit(step)}
-            aria-label={`Editar ${label.toLowerCase()}`}
-          >
-            <span className="report-summary-copy">
-              <span className="report-summary-label">{label}</span>
-              <span className="report-summary-value">{values[valueKey]}</span>
-            </span>
-            <EditOutlinedIcon className="report-summary-edit-icon" aria-hidden="true" />
-          </button>
+          <ListItem key={step} disablePadding sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <ListItemButton onClick={() => onEdit(step)} aria-label={`Editar ${label.toLowerCase()}`}>
+              <ListItemText 
+                primary={<Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>{label}</Typography>}
+                secondary={<Typography variant="body2" color="text.primary" sx={{ overflowWrap: 'anywhere' }}>{values[valueKey]}</Typography>}
+              />
+              <EditOutlinedIcon color="action" fontSize="small" />
+            </ListItemButton>
+          </ListItem>
         ))}
-      </div>
-      {errorMessage && <p className="report-submit-message" role="alert">{errorMessage}</p>}
-      <button className="report-step-button is-primary" type="button" onClick={onConfirm} disabled={isSaving}>
+      </List>
+
+      {errorMessage && <Typography color="error" variant="body2" sx={{ textAlign: 'center', mb: 2 }} role="alert">{errorMessage}</Typography>}
+      
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={onConfirm} 
+        disabled={isSaving}
+        fullWidth
+        sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
+      >
         {isSaving ? 'Guardando...' : 'Confirmar reporte'}
-      </button>
-    </section>
+      </Button>
+    </Box>
   );
 }

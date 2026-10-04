@@ -21,27 +21,36 @@ import { Box, InputBase, IconButton } from '@mui/material';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import MicRoundedIcon from '@mui/icons-material/MicRounded';
 import { useState } from 'react';
-import './SeekieAI.css';
 
 export default function SeekieAIInputBox() {
   const [text, setText] = useState('');
 
   return (
-    <Box className="seekie-input-container">
-      <Box className="seekie-input-wrapper">
+    <Box sx={{ p: 2, pb: 4, bgcolor: 'background.default', borderTop: 1, borderColor: 'divider' }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          bgcolor: 'background.paper', 
+          borderRadius: 6, 
+          p: 1, 
+          pl: 2, 
+          boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+        }}
+      >
         <InputBase
-          className="seekie-input-field"
+          sx={{ flex: 1, typography: 'body1' }}
           placeholder="Escribe tu mensaje aquí..."
           value={text}
           onChange={(e) => setText(e.target.value)}
           multiline
           maxRows={4}
         />
-        <IconButton className="seekie-action-btn">
+        <IconButton sx={{ bgcolor: text.trim() ? 'primary.main' : 'action.selected', color: text.trim() ? 'primary.contrastText' : 'text.secondary', ml: 1, '&:hover': { bgcolor: text.trim() ? 'primary.dark' : 'action.hover' } }}>
           {text.trim().length > 0 ? (
-            <SendRoundedIcon className="seekie-send-icon" />
+            <SendRoundedIcon fontSize="small" />
           ) : (
-            <MicRoundedIcon className="seekie-mic-icon" />
+            <MicRoundedIcon fontSize="small" />
           )}
         </IconButton>
       </Box>

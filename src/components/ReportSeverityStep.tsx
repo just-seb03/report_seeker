@@ -25,7 +25,7 @@
  *   handlePointerMove -- Calcula la distancia de arrastre del puntero para efectos visuales.  *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useRef, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
+import { Box, Typography, Button, Slider } from '@mui/material';
 
 type ReportSeverityStepProps = {
   severity: number;
@@ -35,67 +35,67 @@ type ReportSeverityStepProps = {
 };
 
 export default function ReportSeverityStep({ severity, options, onChange, onConfirm }: ReportSeverityStepProps) {
-  const isDragging = useRef(false);
+  
+  const marks = options.map((label, index) => ({
+    value: index,
+    label: label,
+  }));
 
-  const updateFromPointer = (clientX: number, element: HTMLDivElement) => {
-    const bounds = element.getBoundingClientRect();
-    const position = Math.max(0, Math.min(0.999, (clientX - bounds.left) / bounds.width));
-    onChange(Math.floor(position * options.length));
+  const handleChange = (_event: Event, newValue: number | number[]) => {
+    onChange(newValue as number);
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    let nextSeverity = severity;
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') nextSeverity -= 1;
-    else if (event.key === 'ArrowRight' || event.key === 'ArrowUp') nextSeverity += 1;
-    else if (event.key === 'Home') nextSeverity = 0;
-    else if (event.key === 'End') nextSeverity = options.length - 1;
-    else return;
-
-    event.preventDefault();
-    onChange(Math.max(0, Math.min(options.length - 1, nextSeverity)));
-  };
-
-  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (!event.isPrimary) return;
-    isDragging.current = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    updateFromPointer(event.clientX, event.currentTarget);
-  };
-
-  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (isDragging.current) updateFromPointer(event.clientX, event.currentTarget);
-  };
+  const severityColors = ['success.main', 'warning.main', 'error.main'];
 
   return (
-    <section className="report-severity-step" aria-labelledby="report-severity-heading">
-      <h1 className="report-step-title" id="report-severity-heading">¿Define su gravedad?</h1>
-      <div
-        id="report-severity"
-        className="report-severity-pill"
-        data-level={severity}
-        style={{ '--severity-fill': `${((severity + 1) / options.length) * 100}%` } as CSSProperties}
-        role="slider"
-        tabIndex={0}
-        aria-label="Gravedad del riesgo"
-        aria-valuemin={0}
-        aria-valuemax={options.length - 1}
-        aria-valuenow={severity}
-        aria-valuetext={options[severity]}
-        onKeyDown={handleKeyDown}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={() => { isDragging.current = false; }}
-        onPointerCancel={() => { isDragging.current = false; }}
+    <Box component="section" sx={{ display: 'flex', flexDirection: 'column', minHeight: { xs: '66vh', md: 560 }, justifyContent: 'center' }} aria-labelledby="report-severity-heading">
+      <Typography variant="h5" id="report-severity-heading" sx={{ fontWeight: 800, textAlign: 'center', mb: 8 }}>
+        ¿Define su gravedad?
+      </Typography>
+      
+      <Box sx={{ px: 4, mb: 6 }}>
+        <Slider
+          aria-label="Gravedad del riesgo"
+          value={severity}
+          onChange={handleChange}
+          step={1}
+          marks={marks}
+          min={0}
+          max={options.length - 1}
+          sx={{
+            color: severityColors[severity],
+            height: 8,
+            '& .MuiSlider-markLabel': {
+              mt: 1,
+              fontWeight: 500,
+              color: 'text.secondary'
+            },
+            '& .MuiSlider-markLabelActive': {
+              color: 'text.primary',
+              fontWeight: 700
+            },
+            transition: 'color 0.3s ease'
+          }}
+        />
+      </Box>
+
+      <Typography 
+        variant="subtitle1" 
+        sx={{ textAlign: 'center', fontWeight: 'bold', color: severityColors[severity], mb: 4, transition: 'color 0.3s ease' }} 
+        aria-live="polite"
       >
-        {options.map((option, index) => (
-          <span className="report-severity-segment" key={option} aria-hidden="true">
-            {option}
-            {index < options.length - 1 && <span className="report-severity-divider" />}
-          </span>
-        ))}
-      </div>
-      <p className={`report-severity-value severity-${severity}`} aria-live="polite">{options[severity]}</p>
-      <button className="report-step-button is-primary" type="button" onClick={onConfirm}>Confirmar</button>
-    </section>
+        {options[severity]}
+      </Typography>
+
+      <Button 
+        variant="contained" 
+        color="primary" 
+        onClick={onConfirm}
+        fullWidth
+        sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
+      >
+        Confirmar
+      </Button>
+    </Box>
   );
 }
