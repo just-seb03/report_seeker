@@ -1,0 +1,148 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : SeekAI.css                                                    *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 04 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   Estilos compartidos para todos los componentes de Seek AI.                                *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+/* Top Bar */
+.seek-topbar {
+  display: flex;
+  align-items: center;
+  padding: 48px 20px 16px;
+  background-color: var(--background-paper, #ffffff);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  gap: 12px;
+}
+
+.seek-topbar-icon {
+  color: #1a73e8;
+  font-size: 24px !important;
+}
+
+.seek-topbar-title {
+  font-weight: 600 !important;
+  color: var(--text-primary, #111111);
+  font-size: 1.2rem !important;
+}
+
+body.dark .seek-topbar {
+  background-color: #1e1e1e;
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark .seek-topbar-title {
+  color: #ffffff;
+}
+
+body.dark .seek-topbar-icon {
+  color: #8ab4f8;
+}
+
+/* Chat Area */
+.seek-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.seek-greeting {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  opacity: 0;
+  animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.1s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.seek-greeting-icon {
+  font-size: 48px !important;
+  color: #1a73e8;
+  margin-bottom: 16px;
+}
+
+.seek-greeting-title {
+  font-weight: 700 !important;
+  color: var(--text-primary, #111111);
+  margin-bottom: 8px !important;
+}
+
+.seek-greeting-subtitle {
+  color: var(--text-secondary, #666666);
+}
+
+body.dark .seek-greeting-title {
+  color: #ffffff;
+}
+
+body.dark .seek-greeting-subtitle {
+  color: #aaaaaa;
+}
+
+body.dark .seek-greeting-icon {
+  color: #8ab4f8;
+}
+
+/* Input Box */
+.seek-input-container {
+  padding: 16px 20px;
+  padding-bottom: 110px; /* Space for bottom nav */
+  background: transparent;
+}
+
+.seek-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  background-color: #f1f3f4;
+  border-radius: 28px;
+  padding: 8px 12px 8px 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: background-color 0.2s;
+}
+
+.seek-input-field {
+  flex: 1;
+  font-size: 0.95rem !important;
+  padding: 8px 0 !important;
+  color: #111111 !important;
+}
+
+.seek-action-btn {
+  margin-left: 8px !important;
+  padding: 8px !important;
+  color: #1a73e8 !important;
+}
+
+body.dark .seek-input-wrapper {
+  background-color: #2c2c2c;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+body.dark .seek-input-field {
+  color: #ffffff !important;
+}
+
+body.dark .seek-action-btn {
+  color: #8ab4f8 !important;
+}
