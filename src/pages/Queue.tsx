@@ -22,6 +22,7 @@ import { useQueue } from '../control/useQueue';
 import { type IssueReport } from '../database';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
 import SyncQueueButton from '../components/SyncQueueButton';
+import GlobalTopBar from '../components/GlobalTopBar';
 
 interface QueueProps {
   onReportClick: (report: IssueReport) => void;
@@ -32,7 +33,8 @@ export default function Queue({ onReportClick }: QueueProps) {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', bgcolor: 'background.default', overflow: 'hidden' }}>
-      <Box sx={{ flex: 1, overflowY: 'auto', pb: 12 }}>
+      <GlobalTopBar title="Cola" />
+      <Box sx={{ flex: 1, overflowY: 'auto', pt: 10, pb: 12 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300, color: 'text.secondary' }}>
             <Typography>Cargando...</Typography>

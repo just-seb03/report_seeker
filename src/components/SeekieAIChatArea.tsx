@@ -25,7 +25,7 @@ export default function SeekieAIChatArea() {
     <Box sx={{ flex: 1, position: 'relative', overflowY: 'auto' }}>
       <SeekieAIDoodles />
       
-      <Box sx={{ position: 'relative', zIndex: 1, minHeight: '100%', p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ position: 'relative', zIndex: 1, minHeight: '100%', pt: 10, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
             Hola, soy <Box component="span" sx={{ color: 'primary.main', textShadow: '0px 2px 4px rgba(0,0,0,0.2)' }}>Seekie AI</Box>

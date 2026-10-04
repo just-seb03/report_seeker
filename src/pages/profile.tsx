@@ -25,6 +25,7 @@ import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import { Box, Typography, Button, Card, List, ListItem, ListItemIcon, ListItemText, Avatar } from '@mui/material';
 import { getCurrentUser, logout, type Trabajador } from '../control/authControl';
+import GlobalTopBar from '../components/GlobalTopBar';
 
 interface ProfileProps {
 	onSettingsClick?: () => void;
@@ -50,6 +51,7 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 
 	return (
 		<Box sx={{ minHeight: '100%', backgroundColor: 'background.default', pb: 12 }}>
+      <GlobalTopBar title="Perfil" />
 			<Box sx={{ px: 3, pt: 14, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 				<Avatar 
           sx={{ 
