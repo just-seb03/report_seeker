@@ -79,22 +79,32 @@ export default function ChangeEmailDialog({ onClose }: ChangeEmailDialogProps) {
 
     setStep('loading');
     try {
-      // 1. Update in Firebase
-      const userRef = doc(db, 'trabajadores', user.trabajador_id.toString());
+      console.log('Iniciando updateEmail:', {
+        trabajador_id: user.trabajador_id,
+        idType: typeof user.trabajador_id,
+        emailInput
+      });
+      
+      const docId = String(user.trabajador_id);
+      console.log('Doc ID a actualizar:', docId);
+
+      const userRef = doc(db, 'trabajadores', docId);
       await updateDoc(userRef, { email: emailInput });
+      console.log('Firebase updateDoc completado con exito.');
       
       // 2. Update local storage & SQLite
       const updatedUser = { ...user, email: emailInput };
       updateUserLocal(updatedUser);
       await insertOrUpdateTrabajadorLocal(updatedUser);
+      console.log('Actualizacion local completada.');
 
       setStep('success');
       setTimeout(() => {
         onClose();
       }, 1500);
-    } catch (e) {
-      console.error(e);
-      setErrorMsg('Error al conectar con el servidor.');
+    } catch (e: any) {
+      console.error('Error detallado en updateEmail:', e);
+      setErrorMsg(`Error: ${e.message || 'Desconocido'}`);
       setStep('enter_new');
     }
   };

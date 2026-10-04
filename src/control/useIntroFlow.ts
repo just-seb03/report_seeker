@@ -19,7 +19,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState, useEffect, useCallback } from 'react';
-import { loginWithFirebase, seedTrabajadores, type Trabajador } from './authControl';
+import { loginWithFirebase, type Trabajador } from './authControl';
 
 import { getIssueReportsPage } from '../database';
 
@@ -95,11 +95,6 @@ export function useIntroFlow(onLoginSuccess: (user: Trabajador) => void) {
     const numId = parseInt(idStr, 10);
     try {
       let user = await loginWithFirebase(numId, pinStr);
-      
-      if (!user && numId === 10482) {
-        await seedTrabajadores();
-        user = await loginWithFirebase(numId, pinStr);
-      }
 
       if (user) {
         // Cargar caché real (SQLite) para evitar tirones en el inicio

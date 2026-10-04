@@ -77,22 +77,35 @@ export default function ChangePinDialog({ onClose }: ChangePinDialogProps) {
   const updatePin = async (newPin: string) => {
     if (!user) return;
     try {
-      // 1. Update in Firebase
-      const userRef = doc(db, 'trabajadores', user.trabajador_id.toString());
-      await updateDoc(userRef, { pin: newPin });
+      console.log('Iniciando updatePin:', {
+        trabajador_id: user.trabajador_id,
+        idType: typeof user.trabajador_id,
+        newPin
+      });
       
-      // 2. Update local storage & SQLite
+      const docId = String(user.trabajador_id);
+      console.log('Doc ID a actualizar:', docId);
+
+      const userRef = doc(db, 'trabajadores', docId);
+      await updateDoc(userRef, { pin: newPin });
+      console.log('Firebase updateDoc completado con exito.');
+      
       const updatedUser = { ...user, pin: newPin };
       updateUserLocal(updatedUser);
       await insertOrUpdateTrabajadorLocal(updatedUser);
+      console.log('Actualizacion local completada.');
 
+      // Temporarily use error dialog to show debug success message
+      setErrorMsg(`Exito! Doc actualizado: ${docId}, Nuevo PIN: ${newPin}`);
       setStep('success');
       setTimeout(() => {
         onClose();
-      }, 1500);
-    } catch (e) {
-      console.error(e);
-      setErrorMsg('Error al conectar con el servidor.');
+        // Reset error message so it doesn't persist forever
+        setErrorMsg('');
+      }, 3500);
+    } catch (e: any) {
+      console.error('Error detallado en updatePin:', e);
+      setErrorMsg(`Error: ${e.message || 'Desconocido'}`);
       setStep('enter_new');
       setPinInput('');
     }
