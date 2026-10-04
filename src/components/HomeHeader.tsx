@@ -26,6 +26,7 @@ import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import RefreshIndicator from './RefreshIndicator';
+import { useQueue } from '../control/useQueue';
 
 interface HomeHeaderProps {
   isExpanded: boolean;
@@ -43,6 +44,9 @@ export default function HomeHeader({
   isLoading = false,
 }: HomeHeaderProps) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const { reports: pendingReports, loading: loadingQueue } = useQueue();
+  
+  const hasPending = !loadingQueue && pendingReports.length > 0;
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return;
@@ -97,30 +101,34 @@ export default function HomeHeader({
         <Typography 
           variant="h3" 
           component="h1" 
-          aria-hidden={!hasNotifications}
+          aria-hidden={!hasNotifications && !hasPending}
           sx={{
             textAlign: 'center', fontWeight: 'bold', color: 'primary.main',
             transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
             gridArea: '1 / 1',
-            ...(hasNotifications ? {
+            ...(hasNotifications || hasPending ? {
               opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)'
             } : {
               opacity: 0, transform: 'translateY(-16px) scale(0.96)', filter: 'blur(4px)', pointerEvents: 'none'
             })
           }}
         >
-          Hay<br />Nuevos<br />Reportes
+          {hasPending ? (
+            <>Tienes<br />Reportes<br />Pendientes</>
+          ) : (
+            <>Hay<br />Nuevos<br />Reportes</>
+          )}
         </Typography>
 
         <Typography 
           variant="h3" 
           component="h1" 
-          aria-hidden={hasNotifications}
+          aria-hidden={hasNotifications || hasPending}
           sx={{
             textAlign: 'center', fontWeight: 'bold', color: 'primary.main',
             transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
             gridArea: '1 / 1',
-            ...(!hasNotifications ? {
+            ...(!hasNotifications && !hasPending ? {
               opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)'
             } : {
               opacity: 0, transform: 'translateY(-16px) scale(0.96)', filter: 'blur(4px)', pointerEvents: 'none'
