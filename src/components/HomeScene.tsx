@@ -15,26 +15,28 @@
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
  *   HomeScene -- Componente contenedor visual que muestra el encabezado y la lista de         *
- *        notificaciones en el inicio.                                                         *
+ *        notificaciones en el inicio; conecta el gesto y muestra el indicador al alcanzar    *
+ *        el umbral de actualización.                                                         *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import HomeHeader from './HomeHeader';
+import RefreshIndicator from './RefreshIndicator';
 import NotificationSheet, { type Notificacion } from './NotificationSheet';
 import { type IssueReport } from '../database';
 import './HomeScene.css';
 
 interface HomeSceneProps {
-  isDarkMode: boolean;
   pullDistance: number;
   isExpanded: boolean;
   hasUnreadNotifications: boolean;
   notificaciones: Notificacion[];
   hasMoreNotifications: boolean;
   isLoadingNotifications: boolean;
+  isRefreshingNotifications: boolean;
   listRef: React.RefObject<HTMLDivElement | null>;
-  onToggleManualTheme: () => void;
+  onRefreshNotifications: () => void;
   onSwipeProgress: (progress: number) => void;
   onTouchStart: (e: React.TouchEvent | React.MouseEvent) => void;
   onTouchEnd: (e: React.TouchEvent | React.MouseEvent) => void;
@@ -45,15 +47,15 @@ interface HomeSceneProps {
 }
 
 export default function HomeScene({
-  isDarkMode,
   pullDistance,
   isExpanded,
   hasUnreadNotifications,
   notificaciones,
   hasMoreNotifications,
   isLoadingNotifications,
+  isRefreshingNotifications,
   listRef,
-  onToggleManualTheme,
+  onRefreshNotifications,
   onSwipeProgress,
   onTouchStart,
   onTouchEnd,
@@ -79,8 +81,8 @@ export default function HomeScene({
         <HomeHeader
           isExpanded={isExpanded}
           hasNotifications={hasUnreadNotifications}
-          isLoading={isLoadingNotifications}
-          onSwipeDown={onToggleManualTheme}
+          isLoading={isRefreshingNotifications}
+          onSwipeDown={onRefreshNotifications}
           onSwipeProgress={onSwipeProgress}
         />
 
@@ -99,17 +101,11 @@ export default function HomeScene({
         <Box className="home-gradient-overlay" />
       </Box>
 
-      <Typography
-        aria-hidden={pullDistance < 8}
-        className="theme-swipe-feedback"
-        sx={{
-          opacity: Math.min(pullDistance / 36, 1),
-          transform: `translateY(${Math.min(pullDistance * 0.12, 12)}px)`,
-          transition: pullDistance === 0 ? 'opacity 180ms ease, transform 220ms ease' : 'none',
-        }}
-      >
-        Desliza hacia abajo para activar el modo {isDarkMode ? 'claro' : 'oscuro'}
-      </Typography>
+      {pullDistance >= 120 && !isRefreshingNotifications && (
+        <Box className="refresh-swipe-feedback">
+          <RefreshIndicator label="Suelta para actualizar reportes" />
+        </Box>
+      )}
     </>
   );
 }

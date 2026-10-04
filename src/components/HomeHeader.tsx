@@ -14,18 +14,18 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   HomeHeader -- Componente de cabecera en el inicio, maneja la interacción de gestos y el   *
- *        estado del tema.                                                                     *
+ *   HomeHeader -- Componente de cabecera en el inicio y detector del gesto para actualizar   *
+ *        las notificaciones; muestra el spinner mientras se ejecuta el refresco.              *
  *   handlePointerDown -- Maneja el inicio de un evento de puntero (toque o clic) para         *
  *        interactuar.                                                                         *
  *   handlePointerMove -- Calcula la distancia de arrastre del puntero para efectos visuales.  *
- *   handlePointerUp -- Finaliza la interacción del puntero, aplicando cambios si se superó el *
- *        umbral.                                                                              *
+ *   handlePointerUp -- Finaliza el gesto y solicita la actualización si se supera el umbral. *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import RefreshIndicator from './RefreshIndicator';
 import './HomeHeader.css';
 
 interface HomeHeaderProps {
@@ -114,7 +114,11 @@ export default function HomeHeader({
         </Typography>
       </Box>
       
-      <KeyboardArrowDownIcon className="header-icon" sx={{ fontSize: 48, pointerEvents: 'none' }} />
+      {isLoading ? (
+        <RefreshIndicator label="Actualizando reportes" />
+      ) : (
+        <KeyboardArrowDownIcon className="header-icon" sx={{ fontSize: 48, pointerEvents: 'none' }} />
+      )}
     </Box>
   );
 }

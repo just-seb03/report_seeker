@@ -93,3 +93,15 @@
 body.dark .header-icon { color: #aaaaaa; }
 body.dark .header-title { color: #ffffff; }
 body.dark .header-title-button.manual-light .header-title { color: #111111; }
+.home-refresh-indicator {
+  width: 40px;
+  height: 40px;
+  color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-refresh-indicator .MuiCircularProgress-svg,
+  .home-refresh-indicator .MuiCircularProgress-circle {
+    animation: none !important;
+  }
+}

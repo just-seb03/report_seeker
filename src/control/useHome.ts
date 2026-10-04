@@ -15,7 +15,11 @@
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
  *   useHome -- Custom hook que centraliza y provee toda la lógica de estado y navegación del  *
- *        Home.                                                                                *
+ *        Home, incluida la actualización de notificaciones.                                   *
+ *   handleRefreshNotifications -- Actualiza los cinco reportes más recientes, reinicia la     *
+ *        paginación y contrae la lista durante el refresco.                                   *
+ *   isRefreshingNotifications -- Indica que está activa la actualización manual para mostrar  *
+ *        el indicador de carga del encabezado.                                                *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -41,6 +45,7 @@ export function useHome() {
   const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
   const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
+  const [isRefreshingNotifications, setIsRefreshingNotifications] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeView, setActiveView] = useState<NavigationView>('home');
   const [selectedReport, setSelectedReport] = useState<IssueReport | null>(null);
@@ -54,11 +59,17 @@ export function useHome() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStart = useRef<number | null>(null);
   const isLoadingMoreNotifications = useRef(false);
+  const isRefreshingNotificationsRef = useRef(false);
+  const isMounted = useRef(true);
   const listRef = useRef<HTMLDivElement>(null);
   const transitionTimer = useRef<number | null>(null);
 
-  useEffect(() => () => {
-    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+    };
   }, []);
 
   const handleMarkAsRead = useCallback((id: number) => {
@@ -101,6 +112,32 @@ export function useHome() {
       window.removeEventListener('reportes_actualizados', loadInitialReports);
     };
   }, [readNotificationIds]);
+
+  const handleRefreshNotifications = useCallback(async () => {
+    if (
+      isRefreshingNotificationsRef.current
+      || isLoadingMoreNotifications.current
+      || isLoadingNotifications
+    ) return;
+    isRefreshingNotificationsRef.current = true;
+    setIsRefreshingNotifications(true);
+    setIsLoadingNotifications(true);
+    try {
+      const page = await getIssueReportsPage(notificationPageSize);
+      if (!isMounted.current) return;
+      setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
+      setLastNotificationId(page.items[page.items.length - 1]?.issueId);
+      setHasMoreNotifications(page.hasMore);
+      setIsExpanded(false);
+      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error: unknown) {
+      console.error('No se pudieron actualizar las notificaciones', error);
+    } finally {
+      isRefreshingNotificationsRef.current = false;
+      if (isMounted.current) setIsRefreshingNotifications(false);
+      if (isMounted.current) setIsLoadingNotifications(false);
+    }
+  }, [isLoadingNotifications, readNotificationIds]);
 
   const handleLoadMoreNotifications = useCallback(async () => {
     if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
@@ -324,6 +361,7 @@ export function useHome() {
     notificaciones,
     hasMoreNotifications,
     isLoadingNotifications,
+    isRefreshingNotifications,
     isExpanded,
     activeView,
     selectedReport,
@@ -339,6 +377,7 @@ export function useHome() {
     setIsNavEntering,
     setPullDistance,
     handleMarkAsRead,
+    handleRefreshNotifications,
     handleLoadMoreNotifications,
     handleCollapse,
     handleTouchStart,

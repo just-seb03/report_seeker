@@ -15,7 +15,7 @@
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
  *   Home -- Contenedor principal de la pantalla de inicio; enruta componentes utilizando el   *
- *        hook useHome.                                                                        *
+ *        hook useHome y conecta el gesto de actualización de notificaciones.                  *
  *   renderView -- Devuelve el JSX correspondiente al componente que está actualmente visible  *
  *        (Home, Report, etc.).                                                                *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -45,6 +45,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     notificaciones,
     hasMoreNotifications,
     isLoadingNotifications,
+    isRefreshingNotifications,
     isExpanded,
     activeView,
     selectedReport,
@@ -60,6 +61,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     setIsNavEntering,
     setPullDistance,
     handleMarkAsRead,
+    handleRefreshNotifications,
     handleLoadMoreNotifications,
     handleCollapse,
     handleTouchStart,
@@ -117,15 +119,15 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
     return (
       <HomeScene
-        isDarkMode={isDarkMode}
         pullDistance={pullDistance}
         isExpanded={isExpanded}
         hasUnreadNotifications={hasUnreadNotifications}
         notificaciones={notificaciones}
         hasMoreNotifications={hasMoreNotifications}
         isLoadingNotifications={isLoadingNotifications}
+        isRefreshingNotifications={isRefreshingNotifications}
         listRef={listRef}
-        onToggleManualTheme={onToggleManualTheme}
+        onRefreshNotifications={handleRefreshNotifications}
         onSwipeProgress={setPullDistance}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
