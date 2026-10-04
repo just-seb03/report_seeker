@@ -23,9 +23,10 @@ import { type Trabajador } from '../control/authControl';
 import {
   clearPinRecoveryLinkFromUrl,
   completePinRecoveryEmailLink,
-  getSavedPinRecoveryEmail,
+  getSavedPinRecoveryRequest,
   isPinRecoveryLink,
-  sendPinRecoveryLink
+  sendPinRecoveryLink,
+  verifyPinRecoveryWorker
 } from '../control/pinRecoveryControl';
 import { useIntroFlow } from '../control/useIntroFlow';
 import PinPad from '../components/PinPad';
@@ -38,14 +39,15 @@ interface LoginProps {
 
 export default function Login({ onLoginSuccess }: LoginProps) {
   const [openedFromRecoveryLink] = useState(() => isPinRecoveryLink(window.location.href));
+  const [savedRecoveryRequest] = useState(getSavedPinRecoveryRequest);
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(openedFromRecoveryLink);
-  const [recoveryWorkerId, setRecoveryWorkerId] = useState('');
-  const [recoveryEmail, setRecoveryEmail] = useState(getSavedPinRecoveryEmail);
+  const [recoveryWorkerId, setRecoveryWorkerId] = useState(savedRecoveryRequest?.workerId ?? '');
+  const [recoveryEmail, setRecoveryEmail] = useState(savedRecoveryRequest?.email ?? '');
   const [recoveryStatus, setRecoveryStatus] = useState<
-    'idle' | 'sending' | 'sent' | 'needs_email' | 'verifying' | 'verified' | 'error'
+    'idle' | 'sending' | 'sent' | 'needs_details' | 'verifying' | 'verified' | 'not_matched' | 'error'
   >(() => {
     if (!isPinRecoveryLink(window.location.href)) return 'idle';
-    return getSavedPinRecoveryEmail() ? 'verifying' : 'needs_email';
+    return savedRecoveryRequest ? 'verifying' : 'needs_details';
   });
   const [recoveryError, setRecoveryError] = useState('');
 
@@ -53,22 +55,22 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     const currentUrl = window.location.href;
     if (!isPinRecoveryLink(currentUrl)) return;
 
-    const savedEmail = getSavedPinRecoveryEmail();
-    if (!savedEmail) {
+    if (!savedRecoveryRequest) {
       return;
     }
 
-    void completePinRecoveryEmailLink(savedEmail, currentUrl)
-      .then(() => {
+    void completePinRecoveryEmailLink(savedRecoveryRequest.email, currentUrl)
+      .then(async () => {
         clearPinRecoveryLinkFromUrl();
-        setRecoveryStatus('verified');
+        const matchesWorker = await verifyPinRecoveryWorker(savedRecoveryRequest.workerId);
+        setRecoveryStatus(matchesWorker ? 'verified' : 'not_matched');
       })
       .catch((error: unknown) => {
         console.error('Error al verificar el enlace de recuperación:', error);
         setRecoveryError('No se pudo verificar el enlace. Puede haber vencido o ya haber sido utilizado.');
         setRecoveryStatus('error');
       });
-  }, []);
+  }, [savedRecoveryRequest]);
 
   const handleRecoverySubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -79,10 +81,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       try {
         await completePinRecoveryEmailLink(recoveryEmail, window.location.href);
         clearPinRecoveryLinkFromUrl();
-        setRecoveryStatus('verified');
+        const matchesWorker = await verifyPinRecoveryWorker(recoveryWorkerId);
+        setRecoveryStatus(matchesWorker ? 'verified' : 'not_matched');
       } catch (error) {
         console.error('Error al verificar el enlace de recuperación:', error);
-        setRecoveryError('No se pudo verificar el enlace. Revisa el correo ingresado o solicita un enlace nuevo.');
+        setRecoveryError(
+          error instanceof Error
+            ? error.message
+            : 'No se pudo verificar el enlace. Revisa los datos o solicita un enlace nuevo.'
+        );
         setRecoveryStatus('error');
       }
       return;
@@ -90,7 +97,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
     setRecoveryStatus('sending');
     try {
-      await sendPinRecoveryLink(recoveryEmail);
+      await sendPinRecoveryLink(recoveryEmail, recoveryWorkerId);
       setRecoveryStatus('sent');
     } catch (error) {
       console.error('Error al enviar el enlace de recuperación:', error);
@@ -195,7 +202,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   ? 'Enviando...'
                   : recoveryStatus === 'verifying'
                     ? 'Verificando...'
-                    : recoveryStatus === 'needs_email' || isPinRecoveryLink(window.location.href)
+                    : recoveryStatus === 'needs_details' || isPinRecoveryLink(window.location.href)
                       ? 'Confirmar correo'
                       : 'Enviar enlace'}
               </button>
@@ -207,7 +214,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             )}
             {recoveryStatus === 'verified' && (
               <p className="recovery-notice" role="status">
-                Correo verificado. Esto confirma el acceso al correo, pero todavía no cambia ni recupera el PIN.
+                Correo verificado y asociado al trabajador. El PIN todavía no se ha cambiado.
+              </p>
+            )}
+            {recoveryStatus === 'not_matched' && (
+              <p className="recovery-error" role="alert">
+                No se pudo validar la combinación de ID y correo. Revisa los datos e inténtalo nuevamente.
               </p>
             )}
             {recoveryError && (
