@@ -41,7 +41,7 @@ export const viewOrder: NavigationView[] = ['report', 'queue', 'home', 'seekie',
 const notificationPageSize = 5;
 
 export function useHome() {
-  const [readNotificationIds, setReadNotificationIds] = useState<Set<number>>(getInitialReadNotificationIds);
+  const readNotificationIds = useRef<Set<number>>(getInitialReadNotificationIds());
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
   const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
@@ -75,13 +75,10 @@ export function useHome() {
   }, []);
 
   const handleMarkAsRead = useCallback((id: number) => {
-    setReadNotificationIds((prev) => {
-      if (prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.add(id);
-      saveReadNotificationIds(next);
-      return next;
-    });
+    if (readNotificationIds.current.has(id)) return;
+    readNotificationIds.current.add(id);
+    saveReadNotificationIds(readNotificationIds.current);
+    
     setNotificaciones((prev) =>
       prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
     );
@@ -94,7 +91,7 @@ export function useHome() {
       getIssueReportsPage(notificationPageSize)
         .then((page) => {
           if (!isActive) return;
-          setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
+          setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
           setLastNotificationId(page.items[page.items.length - 1]?.issueId);
           setHasMoreNotifications(page.hasMore);
         })
@@ -113,7 +110,7 @@ export function useHome() {
       isActive = false;
       window.removeEventListener('reportes_actualizados', loadInitialReports);
     };
-  }, [readNotificationIds]);
+  }, []);
 
   const handleRefreshNotifications = useCallback(async () => {
     if (
@@ -127,7 +124,7 @@ export function useHome() {
     try {
       const page = await getIssueReportsPage(notificationPageSize);
       if (!isMounted.current) return;
-      setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds)));
+      setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
       setLastNotificationId(page.items[page.items.length - 1]?.issueId);
       setHasMoreNotifications(page.hasMore);
       setIsExpanded(false);
@@ -139,7 +136,7 @@ export function useHome() {
       if (isMounted.current) setIsRefreshingNotifications(false);
       if (isMounted.current) setIsLoadingNotifications(false);
     }
-  }, [isLoadingNotifications, readNotificationIds]);
+  }, [isLoadingNotifications]);
 
   const handleLoadMoreNotifications = useCallback(async () => {
     if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
@@ -149,7 +146,7 @@ export function useHome() {
     setIsLoadingNotifications(true);
     try {
       const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
-      const notifications = page.items.map((item) => toNotification(item, readNotificationIds));
+      const notifications = page.items.map((item) => toNotification(item, readNotificationIds.current));
       setNotificaciones((current) => {
         const existingIds = new Set(current.map((notification) => notification.issueId));
         return [...current, ...notifications.filter((notification) => !existingIds.has(notification.issueId))];
@@ -166,7 +163,7 @@ export function useHome() {
       isLoadingMoreNotifications.current = false;
       setIsLoadingNotifications(false);
     }
-  }, [hasMoreNotifications, isLoadingNotifications, lastNotificationId, readNotificationIds]);
+  }, [hasMoreNotifications, isLoadingNotifications, lastNotificationId]);
 
   const handleCollapse = useCallback(() => {
     setIsExpanded(false);
@@ -303,12 +300,12 @@ export function useHome() {
       location: report.location,
       priority: report.priority,
       capturedAt: new Date().toISOString(),
-    }, readNotificationIds);
+    }, readNotificationIds.current);
     setNotificaciones((current) => [
       notification,
       ...current.filter((item) => item.issueId !== report.issueId),
     ]);
-  }, [readNotificationIds, reportPhoto]);
+  }, [reportPhoto]);
 
   const hasUnreadNotifications = notificaciones.some((item) => item.unread);
 
