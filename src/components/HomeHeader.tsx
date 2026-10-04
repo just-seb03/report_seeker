@@ -68,7 +68,7 @@ export default function HomeHeader({
 
     const deltaY = event.clientY - start.y;
     const deltaX = Math.abs(event.clientX - start.x);
-    if (deltaY > 120 && deltaY > deltaX) onSwipeDown();
+    if (deltaY > 60 && deltaY > deltaX) onSwipeDown();
   };
 
   return (
