@@ -69,7 +69,7 @@ export default function SyncQueueButton() {
         disabled={isSyncing}
         sx={{
           pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5,
-          bgcolor: 'text.primary', color: 'background.default', border: 'none', borderRadius: '20px',
+          bgcolor: 'primary.main', color: 'primary.contrastText', border: 'none', borderRadius: '20px',
           px: 3.5, py: 2, cursor: isSyncing ? 'default' : 'pointer', fontFamily: 'inherit', minWidth: 200,
           boxShadow: (theme) => theme.palette.mode === 'dark' 
             ? '0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3)' 
