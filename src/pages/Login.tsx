@@ -10,15 +10,23 @@
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026    [SA]                                    *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Login -- Orquestador de la pantalla de bienvenida y flujo de ingreso de credenciales.     *
+ *   Login -- Orquesta el ingreso de credenciales y la verificación de correo para recuperar   *
+ *            el PIN.                                                                          *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { type Trabajador } from '../control/authControl';
+import {
+  clearPinRecoveryLinkFromUrl,
+  completePinRecoveryEmailLink,
+  getSavedPinRecoveryEmail,
+  isPinRecoveryLink,
+  sendPinRecoveryLink
+} from '../control/pinRecoveryControl';
 import { useIntroFlow } from '../control/useIntroFlow';
 import PinPad from '../components/PinPad';
 import LoginErrorDialog from '../components/LoginErrorDialog';
@@ -29,10 +37,71 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
+  const [openedFromRecoveryLink] = useState(() => isPinRecoveryLink(window.location.href));
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(openedFromRecoveryLink);
   const [recoveryWorkerId, setRecoveryWorkerId] = useState('');
-  const [recoveryEmail, setRecoveryEmail] = useState('');
-  const [recoveryDetailsSubmitted, setRecoveryDetailsSubmitted] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState(getSavedPinRecoveryEmail);
+  const [recoveryStatus, setRecoveryStatus] = useState<
+    'idle' | 'sending' | 'sent' | 'needs_email' | 'verifying' | 'verified' | 'error'
+  >(() => {
+    if (!isPinRecoveryLink(window.location.href)) return 'idle';
+    return getSavedPinRecoveryEmail() ? 'verifying' : 'needs_email';
+  });
+  const [recoveryError, setRecoveryError] = useState('');
+
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    if (!isPinRecoveryLink(currentUrl)) return;
+
+    const savedEmail = getSavedPinRecoveryEmail();
+    if (!savedEmail) {
+      return;
+    }
+
+    void completePinRecoveryEmailLink(savedEmail, currentUrl)
+      .then(() => {
+        clearPinRecoveryLinkFromUrl();
+        setRecoveryStatus('verified');
+      })
+      .catch((error: unknown) => {
+        console.error('Error al verificar el enlace de recuperación:', error);
+        setRecoveryError('No se pudo verificar el enlace. Puede haber vencido o ya haber sido utilizado.');
+        setRecoveryStatus('error');
+      });
+  }, []);
+
+  const handleRecoverySubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setRecoveryError('');
+
+    if (isPinRecoveryLink(window.location.href)) {
+      setRecoveryStatus('verifying');
+      try {
+        await completePinRecoveryEmailLink(recoveryEmail, window.location.href);
+        clearPinRecoveryLinkFromUrl();
+        setRecoveryStatus('verified');
+      } catch (error) {
+        console.error('Error al verificar el enlace de recuperación:', error);
+        setRecoveryError('No se pudo verificar el enlace. Revisa el correo ingresado o solicita un enlace nuevo.');
+        setRecoveryStatus('error');
+      }
+      return;
+    }
+
+    setRecoveryStatus('sending');
+    try {
+      await sendPinRecoveryLink(recoveryEmail);
+      setRecoveryStatus('sent');
+    } catch (error) {
+      console.error('Error al enviar el enlace de recuperación:', error);
+      setRecoveryError(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo enviar el enlace. Revisa la configuración de Firebase e inténtalo nuevamente.'
+      );
+      setRecoveryStatus('error');
+    }
+  };
 
   const {
     step,
@@ -43,7 +112,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     handleIdKeyPress,
     handlePinKeyPress,
     closeErrorDialog
-  } = useIntroFlow(onLoginSuccess);
+  } = useIntroFlow(onLoginSuccess, openedFromRecoveryLink);
 
   return (
     <main className={`login-screen ${step === 'loading' || step === 'done' || step === 'black_screen' ? 'is-loading' : ''}`}>
@@ -79,7 +148,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             type="button"
             onClick={() => {
               setRecoveryWorkerId(workerId);
-              setRecoveryDetailsSubmitted(false);
+              setRecoveryStatus('idle');
+              setRecoveryError('');
               setIsRecoveryOpen(true);
             }}
           >
@@ -90,10 +160,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         <div className={`intro-step recovery-step ${isRecoveryOpen ? 'active' : 'hidden'}`}>
           <form
             className="recovery-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setRecoveryDetailsSubmitted(true);
-            }}
+            onSubmit={handleRecoverySubmit}
           >
             <h2>Recuperar PIN</h2>
             <p>Ingresa tu ID de trabajador y el correo asociado a tu cuenta.</p>
@@ -109,7 +176,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               value={recoveryWorkerId}
               onChange={(event) => {
                 setRecoveryWorkerId(event.target.value.replace(/\D/g, '').slice(0, 5));
-                setRecoveryDetailsSubmitted(false);
               }}
             />
             <label htmlFor="recovery-email">Correo electrónico</label>
@@ -121,17 +187,35 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               value={recoveryEmail}
               onChange={(event) => {
                 setRecoveryEmail(event.target.value);
-                setRecoveryDetailsSubmitted(false);
               }}
             />
-            <button className="recovery-submit" type="submit">Continuar</button>
-            {recoveryDetailsSubmitted && (
+            {recoveryStatus !== 'sent' && recoveryStatus !== 'verified' && (
+              <button className="recovery-submit" type="submit" disabled={recoveryStatus === 'sending' || recoveryStatus === 'verifying'}>
+                {recoveryStatus === 'sending'
+                  ? 'Enviando...'
+                  : recoveryStatus === 'verifying'
+                    ? 'Verificando...'
+                    : recoveryStatus === 'needs_email' || isPinRecoveryLink(window.location.href)
+                      ? 'Confirmar correo'
+                      : 'Enviar enlace'}
+              </button>
+            )}
+            {recoveryStatus === 'sent' && (
               <p className="recovery-notice" role="status">
-                Datos ingresados. El envío del correo se incorporará en el siguiente paso.
+                Si el correo puede recibir enlaces de acceso, recibirás un enlace para confirmar que tienes acceso a esa bandeja.
               </p>
+            )}
+            {recoveryStatus === 'verified' && (
+              <p className="recovery-notice" role="status">
+                Correo verificado. Esto confirma el acceso al correo, pero todavía no cambia ni recupera el PIN.
+              </p>
+            )}
+            {recoveryError && (
+              <p className="recovery-error" role="alert">{recoveryError}</p>
             )}
             <button
               className="recovery-back"
+              disabled={recoveryStatus === 'sending' || recoveryStatus === 'verifying'}
               type="button"
               onClick={() => setIsRecoveryOpen(false)}
             >

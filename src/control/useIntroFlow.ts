@@ -10,12 +10,12 @@
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026                                            *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   useIntroFlow -- Controlador de la máquina de estados para la pantalla de bienvenida y     *
- *                   login.                                                                    *
+ *   useIntroFlow -- Controlador de la máquina de estados para la bienvenida y el login;      *
+ *                   permite omitir la introducción al abrir un enlace externo.               *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,8 +25,11 @@ import { getIssueReportsPage } from '../database';
 
 export type IntroStep = 'black_screen' | 'welcome' | 'id_input' | 'id_out' | 'pin_input' | 'loading' | 'done';
 
-export function useIntroFlow(onLoginSuccess: (user: Trabajador) => void) {
-  const [step, setStep] = useState<IntroStep>('black_screen');
+export function useIntroFlow(
+  onLoginSuccess: (user: Trabajador) => void,
+  skipIntro = false
+) {
+  const [step, setStep] = useState<IntroStep>(() => skipIntro ? 'id_input' : 'black_screen');
   const [workerId, setWorkerId] = useState('');
   const [pin, setPin] = useState('');
   const [isErrorDialogVisible, setIsErrorDialogVisible] = useState(false);
@@ -34,17 +37,51 @@ export function useIntroFlow(onLoginSuccess: (user: Trabajador) => void) {
 
   // Start sequence
   useEffect(() => {
+    if (skipIntro) return;
+
     const skipWelcome = sessionStorage.getItem('skip_welcome') === 'true';
     if (skipWelcome) {
-      setStep('black_screen');
       const timer = setTimeout(() => setStep('id_input'), 1000); // 1 segundo negro
       return () => clearTimeout(timer);
     } else {
-      setStep('welcome');
+      const welcomeTimer = setTimeout(() => setStep('welcome'), 0);
       const timer = setTimeout(() => setStep('id_input'), 2000); // Muestra "Bienvenido" por 2 segundos
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(welcomeTimer);
+        clearTimeout(timer);
+      };
     }
-  }, []);
+  }, [skipIntro]);
+
+  const performLogin = useCallback(async (idStr: string, pinStr: string) => {
+    const numId = parseInt(idStr, 10);
+    try {
+      const user = await loginWithFirebase(numId, pinStr);
+
+      if (user) {
+        // Cargar caché real (SQLite) para evitar tirones en el inicio
+        try {
+          await getIssueReportsPage(5);
+        } catch (error) {
+          console.error(error);
+        }
+
+        setTimeout(() => {
+          setStep('done');
+          setTimeout(() => {
+            onLoginSuccess(user);
+          }, 300); // Tiempo para terminar transición antes de desmontar
+        }, 500); // Breve espera para que la transición negra se vea bien
+      } else {
+        setErrorMessage('ID de trabajador o PIN incorrectos.');
+        setIsErrorDialogVisible(true);
+      }
+    } catch (error) {
+      console.error('Error inesperado durante el inicio de sesión:', error);
+      setErrorMessage('Error de conexión.');
+      setIsErrorDialogVisible(true);
+    }
+  }, [onLoginSuccess]);
 
   const handleIdKeyPress = useCallback((key: string) => {
     if (step !== 'id_input') return;
@@ -89,37 +126,7 @@ export function useIntroFlow(onLoginSuccess: (user: Trabajador) => void) {
         await performLogin(workerId, newVal);
       }
     }
-  }, [step, pin, workerId]);
-
-  const performLogin = async (idStr: string, pinStr: string) => {
-    const numId = parseInt(idStr, 10);
-    try {
-      let user = await loginWithFirebase(numId, pinStr);
-
-      if (user) {
-        // Cargar caché real (SQLite) para evitar tirones en el inicio
-        try {
-          await getIssueReportsPage(5);
-        } catch(e) {
-          console.error(e);
-        }
-
-        setTimeout(() => {
-          setStep('done');
-          setTimeout(() => {
-            onLoginSuccess(user as Trabajador);
-          }, 300); // Tiempo para terminar transición antes de desmontar
-        }, 500); // Breve espera para que la transición negra se vea bien
-      } else {
-        // Error
-        setErrorMessage('ID de trabajador o PIN incorrectos.');
-        setIsErrorDialogVisible(true);
-      }
-    } catch (error) {
-      setErrorMessage('Error de conexión.');
-      setIsErrorDialogVisible(true);
-    }
-  };
+  }, [step, pin, workerId, performLogin]);
 
   const closeErrorDialog = () => {
     setIsErrorDialogVisible(false);

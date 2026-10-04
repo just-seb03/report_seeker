@@ -27,6 +27,15 @@ Para compilar y ejecutar la aplicación en dispositivos móviles Android:
 - **Node.js**: v18+ recomendado para el entorno de desarrollo local.
 - **NPM**: v9+.
 
+## Recuperación de PIN
+
+La primera etapa de recuperación envía un enlace de acceso por correo con Firebase Authentication. Esto confirma el acceso al buzón, pero todavía no verifica que el correo corresponda al ID ingresado ni cambia el PIN.
+
+Para habilitar el envío:
+- En Firebase Console, activa el proveedor **Correo electrónico/Contraseña** y la opción **Enlace por correo electrónico (sin contraseña)** en Authentication.
+- Agrega el dominio donde está alojada la app web a los dominios autorizados de Authentication.
+- En `.env.local`, define `VITE_RECOVERY_CONTINUE_URL` con la URL pública de la app web. Es necesaria en la aplicación móvil para que el enlace vuelva a una página accesible; en web, si se omite, se usa el origen actual.
+
 ##  Historial de Cambios (Changelog)
 
 ### v0.7.2 (Actual) - Preparación para IA

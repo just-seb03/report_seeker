@@ -10,11 +10,11 @@
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026  [SA]                                      *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Archivo de estilos CSS para la coreografía de animaciones de la pantalla de bienvenida.   *
+ *   Estilos para la pantalla de acceso, recuperación de PIN y animaciones de bienvenida.      *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 .login-screen {
@@ -145,9 +145,20 @@ body.dark .login-screen {
   cursor: pointer;
 }
 
+.recovery-submit:disabled,
+.recovery-back:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .recovery-form .recovery-notice {
   margin: 4px 0 0;
   color: #188038;
+}
+
+.recovery-form .recovery-error {
+  margin: 4px 0 0;
+  color: #b3261e;
 }
 
 .recovery-back {
@@ -170,6 +181,10 @@ body.dark .recovery-form input {
 body.dark .recovery-submit {
   background: #a8c7fa;
   color: #062e6f;
+}
+
+body.dark .recovery-form .recovery-error {
+  color: #f2b8b5;
 }
 
 /* Título de Bienvenida */
