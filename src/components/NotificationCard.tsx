@@ -154,7 +154,7 @@ export default function NotificationCard({
 
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', flex: 1, mr: 1, maskImage: 'linear-gradient(to right, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)' }}>{titulo}</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: isRead ? 500 : 'bold', whiteSpace: 'nowrap', overflow: 'hidden', flex: 1, mr: 1, maskImage: 'linear-gradient(to right, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)' }}>{titulo}</Typography>
             <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0, position: 'relative', top: 2, lineHeight: 1 }}>{relativeTime}</Typography>
           </Box>
         </Box>
