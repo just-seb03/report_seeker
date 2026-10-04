@@ -99,7 +99,7 @@ export default function HomeHeader({
           component="h1" 
           aria-hidden={!hasNotifications}
           sx={{
-            textAlign: 'center', color: 'text.primary',
+            textAlign: 'center', fontWeight: 'bold', color: 'primary.main',
             transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
             gridArea: '1 / 1',
             ...(hasNotifications ? {
@@ -117,7 +117,7 @@ export default function HomeHeader({
           component="h1" 
           aria-hidden={hasNotifications}
           sx={{
-            textAlign: 'center', color: 'text.primary',
+            textAlign: 'center', fontWeight: 'bold', color: 'primary.main',
             transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
             gridArea: '1 / 1',
             ...(!hasNotifications ? {
@@ -127,7 +127,7 @@ export default function HomeHeader({
             })
           }}
         >
-          Todo<br />Está en<br />Orden
+          Todo<br />En<br />Orden
         </Typography>
       </Box>
       
