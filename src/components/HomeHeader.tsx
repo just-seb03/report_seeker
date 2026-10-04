@@ -26,27 +26,28 @@ import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import RefreshIndicator from './RefreshIndicator';
-import { useQueue } from '../control/useQueue';
 
 interface HomeHeaderProps {
   isExpanded: boolean;
   onSwipeDown: () => void;
   onSwipeProgress: (distance: number) => void;
   hasNotifications?: boolean;
+  hasPendingReports?: boolean;
   isLoading?: boolean;
+  isInitialLoading?: boolean;
 }
 
 export default function HomeHeader({ 
   isExpanded, 
   onSwipeDown, 
   onSwipeProgress,
-  hasNotifications = true,
+  hasNotifications = false,
+  hasPendingReports = false,
   isLoading = false,
+  isInitialLoading = false,
 }: HomeHeaderProps) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
-  const { reports: pendingReports, loading: loadingQueue } = useQueue();
-  
-  const hasPending = !loadingQueue && pendingReports.length > 0;
+  const hasPending = hasPendingReports;
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return;
@@ -97,7 +98,7 @@ export default function HomeHeader({
         transition: 'all 0.5s cubic-bezier(0.32, 0.72, 0, 1)',
       }}
     > 
-      <Box sx={{ display: 'grid', placeItems: 'center', mb: 3, opacity: isLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
+      <Box sx={{ display: 'grid', placeItems: 'center', mb: 3, opacity: isLoading || isInitialLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
         <Typography 
           variant="h3" 
           component="h1" 

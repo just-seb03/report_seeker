@@ -35,6 +35,8 @@ import ViewTransition from '../components/ViewTransition';
 import { useHome, type NavigationView } from '../control/useHome';
 
 
+import { useQueue } from '../control/useQueue';
+
 interface HomeProps {
   isDarkMode: boolean;
   onToggleManualTheme: () => void;
@@ -81,6 +83,9 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     handleReportCreated,
   } = useHome();
 
+  const { reports: pendingReports, loading: loadingQueue } = useQueue();
+  const hasPendingReports = !loadingQueue && pendingReports.length > 0;
+
   const renderView = (view: NavigationView) => {
     if (view === 'configuration') {
       return (
@@ -125,6 +130,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         pullDistance={pullDistance}
         isExpanded={isExpanded}
         hasUnreadNotifications={hasUnreadNotifications}
+        hasPendingReports={hasPendingReports}
         notificaciones={notificaciones}
         hasMoreNotifications={hasMoreNotifications}
         isLoadingNotifications={isLoadingNotifications}

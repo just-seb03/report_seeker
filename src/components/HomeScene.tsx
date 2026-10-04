@@ -30,6 +30,7 @@ interface HomeSceneProps {
   pullDistance: number;
   isExpanded: boolean;
   hasUnreadNotifications: boolean;
+  hasPendingReports?: boolean;
   notificaciones: Notificacion[];
   hasMoreNotifications: boolean;
   isLoadingNotifications: boolean;
@@ -49,6 +50,7 @@ export default function HomeScene({
   pullDistance,
   isExpanded,
   hasUnreadNotifications,
+  hasPendingReports = false,
   notificaciones,
   hasMoreNotifications,
   isLoadingNotifications,
@@ -83,7 +85,9 @@ export default function HomeScene({
         <HomeHeader
           isExpanded={isExpanded}
           hasNotifications={hasUnreadNotifications}
+          hasPendingReports={hasPendingReports}
           isLoading={isRefreshingNotifications}
+          isInitialLoading={isLoadingNotifications}
           onSwipeDown={onRefreshNotifications}
           onSwipeProgress={onSwipeProgress}
         />
