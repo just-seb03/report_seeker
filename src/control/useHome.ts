@@ -29,10 +29,10 @@ import { sendReportNotification } from './systemNotificationsControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
-export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue' | 'seek';
+export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue' | 'seekie';
 export type TransitionDirection = 'forward' | 'backward';
 
-export const viewOrder: NavigationView[] = ['report', 'queue', 'home', 'seek', 'info-report', 'profile', 'configuration'];
+export const viewOrder: NavigationView[] = ['report', 'queue', 'home', 'seekie', 'info-report', 'profile', 'configuration'];
 const notificationPageSize = 5;
 
 export function useHome() {
@@ -295,7 +295,7 @@ export function useHome() {
       navigateTo('home');
       return true;
     }
-    if (activeView === 'seek') {
+    if (activeView === 'seekie') {
       navigateTo('home');
       return true;
     }

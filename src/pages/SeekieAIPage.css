@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAITopBar.tsx                                              *
+ *                  Archivo : SeekAIPage.css                                                *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                           *
  *                                                                                             *
@@ -14,18 +14,19 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   SeekAITopBar -- Barra superior decorativa para el chat de Seek AI.                        *
+ *   Estilos base para el contenedor principal de la página de Seek AI.                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box, Typography } from '@mui/material';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import './SeekAI.css';
+.seekie-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background-color: var(--background-default);
+  position: relative;
+  overflow: hidden;
+}
 
-export default function SeekAITopBar() {
-  return (
-    <Box className="seek-topbar">
-      <AutoAwesomeIcon className="seek-topbar-icon" />
-      <Typography variant="h6" className="seek-topbar-title">Seek AI</Typography>
-    </Box>
-  );
+body.dark .seekie-page-container {
+  background-color: #121212;
 }

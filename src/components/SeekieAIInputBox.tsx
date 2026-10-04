@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAIPage.css                                                *
+ *                  Archivo : SeekAIInputBox.tsx                                            *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                           *
  *                                                                                             *
@@ -14,19 +14,37 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Estilos base para el contenedor principal de la página de Seek AI.                        *
+ *   SeekAIInputBox -- Caja de texto inferior estilo Gemini para enviar mensajes a Seek AI.    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-.seek-page-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  background-color: var(--background-default);
-  position: relative;
-  overflow: hidden;
-}
+import { Box, InputBase, IconButton } from '@mui/material';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import MicRoundedIcon from '@mui/icons-material/MicRounded';
+import { useState } from 'react';
+import './SeekieAI.css';
 
-body.dark .seek-page-container {
-  background-color: #121212;
+export default function SeekieAIInputBox() {
+  const [text, setText] = useState('');
+
+  return (
+    <Box className="seekie-input-container">
+      <Box className="seekie-input-wrapper">
+        <InputBase
+          className="seekie-input-field"
+          placeholder="Escribe tu mensaje aquí..."
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          multiline
+          maxRows={4}
+        />
+        <IconButton className="seekie-action-btn">
+          {text.trim().length > 0 ? (
+            <SendRoundedIcon className="seekie-send-icon" />
+          ) : (
+            <MicRoundedIcon className="seekie-mic-icon" />
+          )}
+        </IconButton>
+      </Box>
+    </Box>
+  );
 }

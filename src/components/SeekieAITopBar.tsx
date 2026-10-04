@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAIChatArea.tsx                                            *
+ *                  Archivo : SeekAITopBar.tsx                                              *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                           *
  *                                                                                             *
@@ -14,25 +14,16 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   SeekAIChatArea -- Área principal del chat donde se mostrarán los mensajes de Seek AI.     *
+ *   SeekAITopBar -- Barra superior decorativa para el chat de Seek AI.                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography } from '@mui/material';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import './SeekAI.css';
+import './SeekieAI.css';
 
-export default function SeekAIChatArea() {
+export default function SeekieAITopBar() {
   return (
-    <Box className="seek-chat-area">
-      <Box className="seek-greeting">
-        <AutoAwesomeIcon className="seek-greeting-icon" />
-        <Typography variant="h5" className="seek-greeting-title">
-          Hola, soy Seek AI
-        </Typography>
-        <Typography variant="body1" className="seek-greeting-subtitle">
-          ¿En qué te puedo ayudar el día de hoy?
-        </Typography>
-      </Box>
+    <Box className="seekie-topbar">
+      <Typography variant="h6" className="seekie-topbar-title">SEEKIE AI</Typography>
     </Box>
   );
 }

@@ -29,20 +29,20 @@ import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import './BottomNav.css';
 
 type BottomNavProps = {
-  activeView: 'home' | 'report' | 'profile' | 'cola' | 'seek';
+  activeView: 'home' | 'report' | 'profile' | 'cola' | 'seekie';
   onHomeClick?: () => void;
   onReportClick?: () => void;
   onProfileClick?: () => void;
   onColaClick?: () => void;
-  onSeekClick?: () => void;
+  onSeekieClick?: () => void;
 };
 
-export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick, onColaClick, onSeekClick }: BottomNavProps) {
+export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick, onColaClick, onSeekieClick }: BottomNavProps) {
   const value = 
     activeView === 'report' ? 0 : 
     activeView === 'cola' ? 1 : 
     activeView === 'home' ? 2 : 
-    activeView === 'seek' ? 3 : 
+    activeView === 'seekie' ? 3 : 
     activeView === 'profile' ? 4 : 2;
 
   const handleHomeClick = () => {
@@ -120,15 +120,15 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
           <Box
             component="button"
             type="button"
-            onClick={onSeekClick}
-            className={`nav-item ${activeView === 'seek' ? 'active' : ''}`}
-            aria-label="Seek AI"
-            aria-pressed={activeView === 'seek'}
+            onClick={onSeekieClick}
+            className={`nav-item ${activeView === 'seekie' ? 'active' : ''}`}
+            aria-label="Seekie AI"
+            aria-pressed={activeView === 'seekie'}
           >
             <Box className="nav-icon-wrap">
               <ChatOutlinedIcon className="nav-icon" sx={{ fontSize: 26 }} />
             </Box>
-            <span className="nav-item-text">Seek AI</span>
+            <span className="nav-item-text">Seekie AI</span>
           </Box>
 
           <Box

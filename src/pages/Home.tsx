@@ -29,7 +29,7 @@ import InfoReport from './InfoReport';
 import Report from './Report';
 import Profile from './profile';
 import Queue from './Queue';
-import SeekAIPage from './SeekAIPage';
+import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/HomeScene';
 import { useHome, type NavigationView } from '../control/useHome';
 import './Home.css';
@@ -111,8 +111,8 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     if (view === 'queue') {
       return <Queue onReportClick={handleOpenReport} />;
     }
-    if (view === 'seek') {
-      return <SeekAIPage />;
+    if (view === 'seekie') {
+      return <SeekieAIPage />;
     }
 
     return (
@@ -171,14 +171,14 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
               activeView === 'report' ? 'report' : 
               activeView === 'profile' || activeView === 'configuration' ? 'profile' : 
               activeView === 'queue' ? 'cola' : 
-              activeView === 'seek' ? 'seek' : 
+              activeView === 'seekie' ? 'seekie' : 
               'home'
             }
             onHomeClick={handleHomeClick}
             onReportClick={handleReportClick}
             onProfileClick={() => requestNavigation('profile')}
             onColaClick={() => requestNavigation('queue')}
-            onSeekClick={() => requestNavigation('seek')}
+            onSeekieClick={() => requestNavigation('seekie')}
           />
         </Box>
       )}
