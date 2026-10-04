@@ -14,12 +14,18 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Login -- Orquesta el ingreso, la verificación de correo y la actualización del PIN        *
- *            durante su recuperación.                                                        *
+ *   Login -- Orquesta el ingreso, la recuperación de PIN y la recepción de enlaces de cambio *
+ *            de correo.                                                                      *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { type Trabajador } from '../control/authControl';
+import {
+  clearPendingNativeEmailChangeLink,
+  getPendingNativeEmailChangeLink,
+  getSavedEmailChangeRequest,
+  isEmailChangeLink
+} from '../control/emailChangeControl';
 import {
   cancelPinRecoveryAuthentication,
   clearPinRecoveryLinkFromUrl,
@@ -46,11 +52,21 @@ function isInvalidRecoveryActionCode(error: unknown): boolean {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
+  const [savedEmailChangeRequest] = useState(getSavedEmailChangeRequest);
+  const [emailChangeActionUrl] = useState(() => {
+    const pendingNativeLink = getPendingNativeEmailChangeLink();
+    if (isEmailChangeLink(pendingNativeLink)) return pendingNativeLink;
+    return isEmailChangeLink(window.location.href) ? window.location.href : '';
+  });
+  const openedFromEmailChangeLink = Boolean(emailChangeActionUrl && savedEmailChangeRequest);
   const [recoveryActionUrl] = useState(() => {
+    if (openedFromEmailChangeLink) return '';
     const pendingNativeLink = getPendingNativePinRecoveryLink();
     return isPinRecoveryLink(pendingNativeLink) ? pendingNativeLink : window.location.href;
   });
-  const [openedFromRecoveryLink] = useState(() => isPinRecoveryLink(recoveryActionUrl));
+  const [openedFromRecoveryLink] = useState(
+    () => !openedFromEmailChangeLink && isPinRecoveryLink(recoveryActionUrl)
+  );
   const [savedRecoveryRequest] = useState(getSavedPinRecoveryRequest);
   const recoveryLinkProcessingStarted = useRef(false);
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(openedFromRecoveryLink);
@@ -193,6 +209,40 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     handlePinKeyPress,
     closeErrorDialog
   } = useIntroFlow(onLoginSuccess, openedFromRecoveryLink);
+
+  if (openedFromEmailChangeLink) {
+    return (
+      <main className="login-screen">
+        <section className="login-content">
+          <div className="intro-step recovery-step active">
+            <div className="recovery-form">
+              <h2>Confirmar cambio de correo</h2>
+              {savedEmailChangeRequest ? (
+                <p>
+                  Se recibió el enlace enviado a {savedEmailChangeRequest.email}.
+                  El correo actual aún no se ha modificado.
+                </p>
+              ) : (
+                <p className="recovery-error" role="alert">
+                  No se encontró la solicitud pendiente de este enlace. Vuelve a solicitar el cambio de correo.
+                </p>
+              )}
+              <button
+                className="recovery-back"
+                type="button"
+                onClick={() => {
+                  clearPendingNativeEmailChangeLink();
+                  window.location.replace(window.location.pathname);
+                }}
+              >
+                Volver al inicio de sesión
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className={`login-screen ${step === 'loading' || step === 'done' || step === 'black_screen' ? 'is-loading' : ''}`}>
