@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAI.css                                                    *
+ *                  Archivo : SeekieAI.css                                                  *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                           *
  *                                                                                             *
@@ -14,45 +14,37 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Estilos compartidos para todos los componentes de Seek AI.                                *
+ *   Estilos compartidos para todos los componentes de Seekie AI.                              *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 /* Top Bar */
-.seek-topbar {
+.seekie-topbar {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 48px 20px 16px;
   background-color: var(--background-paper, #ffffff);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  gap: 12px;
 }
 
-.seek-topbar-icon {
-  color: #1a73e8;
-  font-size: 24px !important;
-}
-
-.seek-topbar-title {
-  font-weight: 600 !important;
+.seekie-topbar-title {
+  font-weight: 700 !important;
   color: var(--text-primary, #111111);
-  font-size: 1.2rem !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 1.5px;
 }
 
-body.dark .seek-topbar {
+body.dark .seekie-topbar {
   background-color: #1e1e1e;
   border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
-body.dark .seek-topbar-title {
+body.dark .seekie-topbar-title {
   color: #ffffff;
 }
 
-body.dark .seek-topbar-icon {
-  color: #8ab4f8;
-}
-
 /* Chat Area */
-.seek-chat-area {
+.seekie-chat-area {
   flex: 1;
   overflow-y: auto;
   display: flex;
@@ -60,7 +52,7 @@ body.dark .seek-topbar-icon {
   padding: 20px;
 }
 
-.seek-greeting {
+.seekie-greeting {
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -76,42 +68,47 @@ body.dark .seek-topbar-icon {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.seek-greeting-icon {
-  font-size: 48px !important;
-  color: #1a73e8;
-  margin-bottom: 16px;
+.seekie-greeting-icon {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 24px;
+  background-color: var(--text-primary, #111111);
+  -webkit-mask-image: url('../assets/images/Seekie.png');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url('../assets/images/Seekie.png');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
 }
 
-.seek-greeting-title {
+.seekie-greeting-title {
   font-weight: 700 !important;
   color: var(--text-primary, #111111);
   margin-bottom: 8px !important;
 }
 
-.seek-greeting-subtitle {
+.seekie-greeting-subtitle {
   color: var(--text-secondary, #666666);
 }
 
-body.dark .seek-greeting-title {
+body.dark .seekie-greeting-title {
   color: #ffffff;
 }
 
-body.dark .seek-greeting-subtitle {
+body.dark .seekie-greeting-subtitle {
   color: #aaaaaa;
 }
 
-body.dark .seek-greeting-icon {
-  color: #8ab4f8;
-}
-
 /* Input Box */
-.seek-input-container {
+.seekie-input-container {
   padding: 16px 20px;
   padding-bottom: 110px; /* Space for bottom nav */
   background: transparent;
 }
 
-.seek-input-wrapper {
+.seekie-input-wrapper {
   display: flex;
   align-items: flex-end;
   background-color: #f1f3f4;
@@ -121,28 +118,28 @@ body.dark .seek-greeting-icon {
   transition: background-color 0.2s;
 }
 
-.seek-input-field {
+.seekie-input-field {
   flex: 1;
   font-size: 0.95rem !important;
   padding: 8px 0 !important;
   color: #111111 !important;
 }
 
-.seek-action-btn {
+.seekie-action-btn {
   margin-left: 8px !important;
   padding: 8px !important;
-  color: #1a73e8 !important;
+  color: #111111 !important;
 }
 
-body.dark .seek-input-wrapper {
+body.dark .seekie-input-wrapper {
   background-color: #2c2c2c;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
-body.dark .seek-input-field {
+body.dark .seekie-input-field {
   color: #ffffff !important;
 }
 
-body.dark .seek-action-btn {
-  color: #8ab4f8 !important;
+body.dark .seekie-action-btn {
+  color: #ffffff !important;
 }

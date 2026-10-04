@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAIInputBox.tsx                                            *
+ *                  Archivo : SeekAIChatArea.tsx                                            *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                           *
  *                                                                                             *
@@ -14,36 +14,22 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   SeekAIInputBox -- Caja de texto inferior estilo Gemini para enviar mensajes a Seek AI.    *
+ *   SeekAIChatArea -- Área principal del chat donde se mostrarán los mensajes de Seek AI.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box, InputBase, IconButton } from '@mui/material';
-import SendRoundedIcon from '@mui/icons-material/SendRounded';
-import MicRoundedIcon from '@mui/icons-material/MicRounded';
-import { useState } from 'react';
-import './SeekAI.css';
+import { Box, Typography } from '@mui/material';
+import './SeekieAI.css';
 
-export default function SeekAIInputBox() {
-  const [text, setText] = useState('');
-
+export default function SeekieAIChatArea() {
   return (
-    <Box className="seek-input-container">
-      <Box className="seek-input-wrapper">
-        <InputBase
-          className="seek-input-field"
-          placeholder="Escribe tu mensaje aquí..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          multiline
-          maxRows={4}
-        />
-        <IconButton className="seek-action-btn">
-          {text.trim().length > 0 ? (
-            <SendRoundedIcon className="seek-send-icon" />
-          ) : (
-            <MicRoundedIcon className="seek-mic-icon" />
-          )}
-        </IconButton>
+    <Box className="seekie-chat-area">
+      <Box className="seekie-greeting">
+        <Typography variant="h5" className="seekie-greeting-title">
+          Hola, soy Seekie AI
+        </Typography>
+        <Typography variant="body1" className="seekie-greeting-subtitle">
+          ¿En qué puedo ayudarte?
+        </Typography>
       </Box>
     </Box>
   );

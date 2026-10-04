@@ -18,17 +18,15 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box } from '@mui/material';
-import SeekAITopBar from '../components/SeekAITopBar';
-import SeekAIChatArea from '../components/SeekAIChatArea';
-import SeekAIInputBox from '../components/SeekAIInputBox';
-import './SeekAIPage.css';
+import SeekieAIChatArea from '../components/SeekieAIChatArea';
+import SeekieAIInputBox from '../components/SeekieAIInputBox';
+import './SeekieAIPage.css';
 
-export default function SeekAIPage() {
+export default function SeekieAIPage() {
   return (
-    <Box className="seek-page-container">
-      <SeekAITopBar />
-      <SeekAIChatArea />
-      <SeekAIInputBox />
+    <Box className="seekie-page-container">
+      <SeekieAIChatArea />
+      <SeekieAIInputBox />
     </Box>
   );
 }
