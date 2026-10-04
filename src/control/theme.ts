@@ -14,6 +14,13 @@ export const appTheme = createTheme({
     error: {
       main: '#ba1a1a',
     },
+    warning: {
+      main: '#fbc02d', // Amarillo suave
+      contrastText: '#000000',
+    },
+    success: {
+      main: '#2e7d32', // Verde
+    },
     background: {
       default: '#f5f5f5',
       paper: '#ffffff',

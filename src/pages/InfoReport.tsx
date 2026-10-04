@@ -22,7 +22,7 @@ import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { Box, Dialog, IconButton, Typography } from '@mui/material';
+import { Box, Dialog, IconButton, Typography, alpha } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
 
@@ -42,15 +42,15 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
     handleOpenFullImage,
   } = useInfoReport(report);
 
-  const getSeverityColors = (priorityClass: string) => {
+  const getSeverityPalette = (priorityClass: string) => {
     switch(priorityClass) {
-      case 'is-low': return { iconBg: '#e5eee7', iconColor: '#38804a', textColor: '#2e7d32', darkIconBg: '#243429', darkIconColor: '#81c784', darkTextColor: '#81c784' };
-      case 'is-medium': return { iconBg: '#f2eadb', iconColor: '#9a6b13', textColor: '#8a6113', darkIconBg: '#393125', darkIconColor: '#ffcc80', darkTextColor: '#ffcc80' };
-      case 'is-high': return { iconBg: '#f2e2e2', iconColor: '#c62828', textColor: '#c62828', darkIconBg: '#3a2929', darkIconColor: '#ef9a9a', darkTextColor: '#ef9a9a' };
-      default: return { iconBg: '#e5e5e5', iconColor: '#777777', textColor: '#333333', darkIconBg: '#303030', darkIconColor: '#aaaaaa', darkTextColor: '#eeeeee' };
+      case 'is-low': return 'success';
+      case 'is-medium': return 'warning';
+      case 'is-high': return 'error';
+      default: return 'primary';
     }
   };
-  const severityColors = getSeverityColors(priorityClass || '');
+  const severityPalette = getSeverityPalette(priorityClass || '');
 
   return (
     <Box 
@@ -114,8 +114,8 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
 
         <Box component="section" aria-label="Información del reporte" sx={{ display: 'grid', gap: 1.5, mt: 2.25 }}>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 0.72fr)', gap: 1.25 }}>
-            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 80, alignItems: 'center', gap: 1.4, p: 1.6, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#242424' : '#f0f0f0' }}>
-              <Box sx={{ display: 'grid', width: 38, height: 38, flex: '0 0 38px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => theme.palette.mode === 'dark' ? '#303030' : '#e5e5e5', color: (theme) => theme.palette.mode === 'dark' ? '#aaaaaa' : '#777777' }}>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 80, alignItems: 'center', gap: 1.4, p: 1.6, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.default' }}>
+              <Box sx={{ display: 'grid', width: 38, height: 38, flex: '0 0 38px', placeItems: 'center', borderRadius: '50%', bgcolor: 'grey.300', color: 'grey.600' }}>
                 <LocationOnOutlinedIcon sx={{ fontSize: 19 }} />
               </Box>
               <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
@@ -123,19 +123,19 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
                 <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '13px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || 'Ubicación no especificada'}</Typography>
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 80, alignItems: 'center', gap: 1.4, p: 1.6, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#242424' : '#f0f0f0' }}>
-              <Box sx={{ display: 'grid', width: 38, height: 38, flex: '0 0 38px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => theme.palette.mode === 'dark' ? severityColors.darkIconBg : severityColors.iconBg, color: (theme) => theme.palette.mode === 'dark' ? severityColors.darkIconColor : severityColors.iconColor }}>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 80, alignItems: 'center', gap: 1.4, p: 1.6, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.default' }}>
+              <Box sx={{ display: 'grid', width: 38, height: 38, flex: '0 0 38px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette[severityPalette as 'primary'|'success'|'warning'|'error'].main, 0.12), color: `${severityPalette}.main` }}>
                 <PriorityHighRoundedIcon sx={{ fontSize: 19 }} />
               </Box>
               <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
                 <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Gravedad</Typography>
-                <Typography component="p" sx={{ m: 0, color: (theme) => theme.palette.mode === 'dark' ? severityColors.darkTextColor : severityColors.textColor, fontSize: '13px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.priority}</Typography>
+                <Typography component="p" sx={{ m: 0, color: `${severityPalette}.main`, fontSize: '13px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.priority}</Typography>
               </Box>
             </Box>
           </Box>
-          <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 2px 8px rgb(0 0 0 / 20%)' : '0 2px 8px rgb(0 0 0 / 4%)' }}>
+          <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
             <Typography component="h2" sx={{ m: 0, mb: 1, color: 'text.secondary', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Descripción</Typography>
-            <Typography component="p" sx={{ m: 0, color: (theme) => theme.palette.mode === 'dark' ? '#d0d0d0' : '#424242', fontSize: '14px', fontWeight: 500, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || 'Sin descripción'}</Typography>
+            <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '14px', fontWeight: 500, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || 'Sin descripción'}</Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '3px 2px 8px', color: 'text.secondary', fontSize: '11px', '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 0.75 }, '& svg': { flex: '0 0 auto', fontSize: 15 } }}>
             <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || 'Trabajador Desconocido'}</span>
