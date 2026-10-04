@@ -134,7 +134,20 @@ export default function HomeHeader({
       {isLoading ? (
         <RefreshIndicator label="Actualizando reportes" />
       ) : (
-        <KeyboardArrowDownIcon sx={{ fontSize: 48, pointerEvents: 'none', color: 'text.secondary', animation: 'bounceSwipe 2.5s infinite' }} />
+        <KeyboardArrowDownIcon 
+          sx={{ 
+            fontSize: 48, 
+            pointerEvents: 'none', 
+            color: 'primary.main', 
+            opacity: 0.6,
+            '@keyframes muiBounceSwipe': {
+              '0%': { transform: 'translateY(0)', animationTimingFunction: 'ease-in' },
+              '15%': { transform: 'translateY(20px)', animationTimingFunction: 'ease-out' },
+              '100%': { transform: 'translateY(0)' }
+            },
+            animation: 'muiBounceSwipe 2.5s infinite' 
+          }} 
+        />
       )}
     </Box>
   );
