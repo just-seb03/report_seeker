@@ -25,7 +25,6 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import { Box, Dialog, IconButton, Typography } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
-import './InfoReport.css';
 
 type InfoReportProps = {
   report: IssueReport;
@@ -43,78 +42,125 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
     handleOpenFullImage,
   } = useInfoReport(report);
 
+  const getSeverityColors = (priorityClass: string) => {
+    switch(priorityClass) {
+      case 'is-low': return { iconBg: '#e5eee7', iconColor: '#38804a', textColor: '#2e7d32', darkIconBg: '#243429', darkIconColor: '#81c784', darkTextColor: '#81c784' };
+      case 'is-medium': return { iconBg: '#f2eadb', iconColor: '#9a6b13', textColor: '#8a6113', darkIconBg: '#393125', darkIconColor: '#ffcc80', darkTextColor: '#ffcc80' };
+      case 'is-high': return { iconBg: '#f2e2e2', iconColor: '#c62828', textColor: '#c62828', darkIconBg: '#3a2929', darkIconColor: '#ef9a9a', darkTextColor: '#ef9a9a' };
+      default: return { iconBg: '#e5e5e5', iconColor: '#777777', textColor: '#333333', darkIconBg: '#303030', darkIconColor: '#aaaaaa', darkTextColor: '#eeeeee' };
+    }
+  };
+  const severityColors = getSeverityColors(priorityClass || '');
+
   return (
-    <main className="info-report-screen">
-      <header className="info-report-header">
-        <IconButton className="info-report-back" aria-label="Volver" onClick={onBack}>
+    <Box 
+      component="main" 
+      sx={{
+        position: 'absolute', inset: 0, zIndex: 5, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box',
+        p: 'max(12px, env(safe-area-inset-top)) 18px calc(110px + env(safe-area-inset-bottom))',
+        bgcolor: 'background.default', color: 'text.primary', WebkitOverflowScrolling: 'touch',
+        '@media (max-width: 480px)': { px: '14px' }
+      }}
+    >
+      <Box component="header" sx={{ display: 'flex', minHeight: 58, alignItems: 'center', gap: 1.5, mx: 'auto', mb: 2, maxWidth: 560 }}>
+        <IconButton 
+          aria-label="Volver" 
+          onClick={onBack}
+          sx={{ 
+            width: 44, height: 44, flex: '0 0 auto', border: '1px solid', borderColor: 'divider', 
+            bgcolor: 'background.paper', color: 'text.primary', boxShadow: '0 2px 8px rgb(0 0 0 / 6%)',
+            '&:hover': { bgcolor: 'action.hover' }
+          }}
+        >
           <ArrowBackRoundedIcon />
         </IconButton>
-        <Box className="info-report-heading">
-          <Typography component="span">Reporte de riesgo</Typography>
-          <Typography component="h1">{report.title}</Typography>
+        <Box sx={{ display: 'grid', minWidth: 0, gap: '3px', color: 'inherit' }}>
+          <Typography component="span" sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Reporte de riesgo</Typography>
+          <Typography component="h1" sx={{ m: 0, overflowWrap: 'anywhere', fontSize: '21px', fontWeight: 800, lineHeight: 1.2 }}>{report.title}</Typography>
         </Box>
-      </header>
+      </Box>
 
-      <div className="info-report-content">
-        <button
-          className={`info-report-photo-button${isLoadingImage ? ' is-loading' : ''}`}
+      <Box sx={{ width: 'min(100%, 560px)', mx: 'auto', animation: 'info-report-enter 440ms cubic-bezier(0.2, 0.8, 0.2, 1) both' }}>
+        <Box
+          component="button"
           type="button"
           onClick={handleOpenFullImage}
           disabled={!image || isOpeningImage}
           aria-label="Abrir fotografía completa"
           aria-busy={isLoadingImage || isOpeningImage}
+          sx={{
+            position: 'relative', display: 'grid', width: '100%', height: 'min(55dvh, 520px)', minHeight: 220, placeItems: 'center', p: 0, overflow: 'hidden',
+            border: '1px solid', borderColor: 'divider', borderRadius: '10px', 
+            bgcolor: isLoadingImage ? 'transparent' : 'action.selected', color: 'text.secondary', font: 'inherit', cursor: 'zoom-in',
+            boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 22px rgb(0 0 0 / 24%)' : '0 8px 22px rgb(0 0 0 / 8%)',
+            transition: 'transform 180ms ease, box-shadow 180ms ease',
+            '@media (max-width: 480px)': { height: 'min(54dvh, 440px)' },
+            '&:disabled': { cursor: 'default' },
+            '&:not(:disabled):active': { transform: 'scale(0.99)', boxShadow: (theme) => theme.palette.mode === 'dark' ? 'none' : '0 3px 10px rgb(0 0 0 / 10%)' },
+            ...(isLoadingImage && {
+              background: (theme) => theme.palette.mode === 'dark' ? 'linear-gradient(100deg, #202020 20%, #303030 38%, #202020 58%)' : 'linear-gradient(100deg, #eeeeee 20%, #f7f7f7 38%, #eeeeee 58%)',
+              backgroundSize: '220% 100%', animation: 'info-report-shimmer 1.4s linear infinite'
+            })
+          }}
         >
           {image ? (
-            <img src={image} alt={`Fotografía del riesgo: ${report.title}`} />
+            <Box component="img" src={image} alt={`Fotografía del riesgo: ${report.title}`} sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', animation: 'info-report-photo-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both' }} />
           ) : (
-            <span className="info-report-photo-empty">
+            <Typography component="span" sx={{ p: 2.5, fontSize: '13px', fontWeight: 600 }}>
               {isLoadingImage ? 'Cargando fotografía...' : 'Este reporte no tiene fotografía'}
-            </span>
+            </Typography>
           )}
-        </button>
+        </Box>
 
-        <section className="info-report-details" aria-label="Información del reporte">
-          <div className="info-report-detail-grid">
-            <div className="info-report-fact">
-              <span className="info-report-fact-icon" aria-hidden="true"><LocationOnOutlinedIcon /></span>
-              <div className="info-report-fact-copy">
-                <Typography component="h3">Ubicación</Typography>
-                <p>{report.location || 'Ubicación no especificada'}</p>
-              </div>
-            </div>
-            <div className={`info-report-fact info-report-severity ${priorityClass}`}>
-              <span className="info-report-fact-icon" aria-hidden="true"><PriorityHighRoundedIcon /></span>
-              <div className="info-report-fact-copy">
-                <Typography component="h3">Gravedad</Typography>
-                <p>{report.priority}</p>
-              </div>
-            </div>
-          </div>
-          <div className="info-report-description">
-            <Typography component="h2">Descripción</Typography>
-            <p>{report.description || 'Sin descripción'}</p>
-          </div>
-          <div className="info-report-metadata" aria-label="Identificación y fecha del reporte">
+        <Box component="section" aria-label="Información del reporte" sx={{ display: 'grid', gap: 1.5, mt: 2.25 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 0.72fr)', gap: 1.25 }}>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 80, alignItems: 'center', gap: 1.4, p: 1.6, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#242424' : '#f0f0f0' }}>
+              <Box sx={{ display: 'grid', width: 38, height: 38, flex: '0 0 38px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => theme.palette.mode === 'dark' ? '#303030' : '#e5e5e5', color: (theme) => theme.palette.mode === 'dark' ? '#aaaaaa' : '#777777' }}>
+                <LocationOnOutlinedIcon sx={{ fontSize: 19 }} />
+              </Box>
+              <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Ubicación</Typography>
+                <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '13px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || 'Ubicación no especificada'}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 80, alignItems: 'center', gap: 1.4, p: 1.6, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? '#242424' : '#f0f0f0' }}>
+              <Box sx={{ display: 'grid', width: 38, height: 38, flex: '0 0 38px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => theme.palette.mode === 'dark' ? severityColors.darkIconBg : severityColors.iconBg, color: (theme) => theme.palette.mode === 'dark' ? severityColors.darkIconColor : severityColors.iconColor }}>
+                <PriorityHighRoundedIcon sx={{ fontSize: 19 }} />
+              </Box>
+              <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Gravedad</Typography>
+                <Typography component="p" sx={{ m: 0, color: (theme) => theme.palette.mode === 'dark' ? severityColors.darkTextColor : severityColors.textColor, fontSize: '13px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.priority}</Typography>
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper', boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 2px 8px rgb(0 0 0 / 20%)' : '0 2px 8px rgb(0 0 0 / 4%)' }}>
+            <Typography component="h2" sx={{ m: 0, mb: 1, color: 'text.secondary', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>Descripción</Typography>
+            <Typography component="p" sx={{ m: 0, color: (theme) => theme.palette.mode === 'dark' ? '#d0d0d0' : '#424242', fontSize: '14px', fontWeight: 500, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || 'Sin descripción'}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '3px 2px 8px', color: 'text.secondary', fontSize: '11px', '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 0.75 }, '& svg': { flex: '0 0 auto', fontSize: 15 } }}>
             <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || 'Trabajador Desconocido'}</span>
             <span><CalendarMonthOutlinedIcon aria-hidden="true" /> {formatReportDate(report.capturedAt)}</span>
-          </div>
-        </section>
-      </div>
+          </Box>
+        </Box>
+      </Box>
 
       <Dialog
-        className="info-report-image-dialog"
         open={imageDialogOpen}
         onClose={() => setImageDialogOpen(false)}
         fullScreen
         aria-label="Fotografía completa del reporte"
+
       >
-        <Box className="info-report-image-viewer" onClick={() => setImageDialogOpen(false)}>
-          <IconButton className="info-report-viewer-close" aria-label="Cerrar fotografía">
+        <Box sx={{ position: 'relative', display: 'grid', width: '100%', height: '100%', placeItems: 'center', bgcolor: '#000000' }} onClick={() => setImageDialogOpen(false)}>
+          <IconButton 
+            aria-label="Cerrar fotografía"
+            sx={{ position: 'absolute', zIndex: 1, top: 'max(12px, env(safe-area-inset-top))', left: 12, color: '#ffffff', bgcolor: 'rgb(255 255 255 / 16%)', '&:hover': { bgcolor: 'rgb(255 255 255 / 24%)' } }}
+          >
             <ArrowBackRoundedIcon />
           </IconButton>
-          {image && <img src={image} alt={`Fotografía completa: ${report.title}`} />}
+          {image && <Box component="img" src={image} alt={`Fotografía completa: ${report.title}`} sx={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />}
         </Box>
       </Dialog>
-    </main>
+    </Box>
   );
 }

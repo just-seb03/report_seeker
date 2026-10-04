@@ -95,3 +95,63 @@ html.dark body::before {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* view transitions from Home.css */
+.home-view-stage { position: absolute; inset: 0; overflow: hidden; }
+.home-view { position: absolute; inset: 0; will-change: transform, opacity; }
+.home-view-exit { z-index: 1; pointer-events: none; }
+.home-view-active { z-index: 2; }
+.home-view-active.enter-forward { animation: viewEnterFromRight 380ms cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.home-view-active.enter-backward { animation: viewEnterFromLeft 380ms cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.home-view-exit.exit-forward { animation: viewExitToLeft 380ms cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.home-view-exit.exit-backward { animation: viewExitToRight 380ms cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+@keyframes viewEnterFromRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes viewEnterFromLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes viewExitToLeft { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes viewExitToRight { from { transform: translateX(0); } to { transform: translateX(100%); } }
+
+.home-bottom-nav { position: absolute; bottom: 0; width: 100%; z-index: 10; }
+.home-bottom-nav.nav-entering { transform-origin: center bottom; animation: home-nav-enter 540ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes home-nav-enter { from { opacity: 0; transform: translate3d(0, 30px, 0) scale(0.94); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .home-bottom-nav.nav-entering, .home-view-active.enter-forward, .home-view-active.enter-backward, .home-view-exit.exit-forward, .home-view-exit.exit-backward { animation-duration: 1ms; }
+}
+
+@keyframes shake-anim {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(3px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+  40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.intro-step { position: absolute; width: 100%; padding: 24px; display: flex; justify-content: center; align-items: center; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.intro-step.hidden { opacity: 0; pointer-events: none; transform: translateY(100px) scale(0.95); }
+.intro-step.active { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+.intro-step.exit-up { opacity: 0; pointer-events: none; transform: translateY(-80px) scale(0.95); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.intro-pin { flex-direction: column; }
+.intro-welcome h1 { font-size: 32px; font-weight: 400; letter-spacing: 2px; margin: 0; }
+.intro-welcome.exit { opacity: 0; transform: translateY(-20px); pointer-events: none; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.intro-cache-loader { position: absolute; inset: 0; z-index: 10; background-color: #121212; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+.intro-cache-loader.active { opacity: 1; pointer-events: auto; }
+.intro-cache-loader.exit-done { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+
+.report-step-transition { animation: report-step-enter 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.report-ready-step.is-exiting { animation: report-ready-exit 420ms cubic-bezier(0.4, 0, 1, 1) both; }
+@keyframes report-step-enter { from { opacity: 0; transform: translateY(22px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes report-photo-enter { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+@keyframes report-ready-exit { to { opacity: 0; transform: translateY(-18px) scale(0.96); } }
+
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDownFade { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(40px); } }
+
+@keyframes info-report-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes info-report-photo-enter { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes info-report-shimmer { to { background-position-x: -220%; } }
+
+@keyframes bounceSwipe { 0% { transform: translateY(0); animation-timing-function: ease-in; } 15% { transform: translateY(20px); animation-timing-function: ease-out; } 100% { transform: translateY(0); } }
+@keyframes lightPulse { 0% { transform: scale(0.98); opacity: 0.72; } 45% { transform: scale(1.04); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }

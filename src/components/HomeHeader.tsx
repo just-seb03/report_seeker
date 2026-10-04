@@ -26,7 +26,6 @@ import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import RefreshIndicator from './RefreshIndicator';
-import './HomeHeader.css';
 
 interface HomeHeaderProps {
   isExpanded: boolean;
@@ -94,12 +93,21 @@ export default function HomeHeader({
         transition: 'all 0.5s cubic-bezier(0.32, 0.72, 0, 1)',
       }}
     > 
-      <Box className="header-title-container" sx={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
+      <Box sx={{ display: 'grid', placeItems: 'center', mb: 3, opacity: isLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
         <Typography 
           variant="h3" 
           component="h1" 
-          className={`header-title ${hasNotifications ? 'text-enter' : 'text-exit'}`}
           aria-hidden={!hasNotifications}
+          sx={{
+            textAlign: 'center', color: 'text.primary',
+            transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+            gridArea: '1 / 1',
+            ...(hasNotifications ? {
+              opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)'
+            } : {
+              opacity: 0, transform: 'translateY(-16px) scale(0.96)', filter: 'blur(4px)', pointerEvents: 'none'
+            })
+          }}
         >
           Hay<br />Nuevos<br />Reportes
         </Typography>
@@ -107,8 +115,17 @@ export default function HomeHeader({
         <Typography 
           variant="h3" 
           component="h1" 
-          className={`header-title ${!hasNotifications ? 'text-enter' : 'text-exit'}`}
           aria-hidden={hasNotifications}
+          sx={{
+            textAlign: 'center', color: 'text.primary',
+            transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+            gridArea: '1 / 1',
+            ...(!hasNotifications ? {
+              opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)'
+            } : {
+              opacity: 0, transform: 'translateY(-16px) scale(0.96)', filter: 'blur(4px)', pointerEvents: 'none'
+            })
+          }}
         >
           Todo<br />Está en<br />Orden
         </Typography>
@@ -117,7 +134,7 @@ export default function HomeHeader({
       {isLoading ? (
         <RefreshIndicator label="Actualizando reportes" />
       ) : (
-        <KeyboardArrowDownIcon className="header-icon" sx={{ fontSize: 48, pointerEvents: 'none' }} />
+        <KeyboardArrowDownIcon sx={{ fontSize: 48, pointerEvents: 'none', color: 'text.secondary', animation: 'bounceSwipe 2.5s infinite' }} />
       )}
     </Box>
   );

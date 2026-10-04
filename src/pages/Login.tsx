@@ -35,7 +35,7 @@ import { useIntroFlow } from '../control/useIntroFlow';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import PinPad from '../components/PinPad';
 import LoginErrorDialog from '../components/LoginErrorDialog';
-import './Login.css';
+
 
 interface LoginProps {
   onLoginSuccess: (user: Trabajador) => void;

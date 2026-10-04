@@ -18,7 +18,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography } from '@mui/material';
-import './SeekieAI.css';
+
 
 export default function SeekieAITopBar() {
   return (

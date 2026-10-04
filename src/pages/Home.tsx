@@ -32,7 +32,7 @@ import Queue from './Queue';
 import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/HomeScene';
 import { useHome, type NavigationView } from '../control/useHome';
-import './Home.css';
+
 
 interface HomeProps {
   isDarkMode: boolean;

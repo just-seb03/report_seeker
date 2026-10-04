@@ -24,9 +24,8 @@ import { getCurrentUser, updateUserLocal } from '../control/authControl';
 import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { insertOrUpdateTrabajadorLocal } from '../database';
-import { Box, IconButton, TextField, Button } from '@mui/material';
+import { Box, IconButton, TextField, Button, Typography } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import './ChangePinDialog.css'; // Reutilizamos estilos
 
 interface ChangeEmailDialogProps {
   onClose: () => void;
@@ -111,12 +110,33 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
   };
 
   return (
-    <Box className={`change-pin-dialog ${isClosing ? 'closing' : ''}`}>
-      <IconButton className="change-pin-close" onClick={onClose} aria-label="Cerrar">
+    <Box 
+      sx={{
+        position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', 
+        justifyContent: 'center', alignItems: 'center', overflow: 'hidden',
+        bgcolor: 'background.default', color: 'text.primary',
+        animation: isClosing 
+          ? 'slideDownFade 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards' 
+          : 'slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
+      }}
+    >
+      <IconButton 
+        onClick={onClose} 
+        aria-label="Cerrar"
+        sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1001 }}
+      >
         <CloseRoundedIcon />
       </IconButton>
 
-      <div className={`change-pin-step ${step === 'confirm_current' ? 'active' : 'hidden'}`}>
+      <Box 
+        sx={{
+          position: 'absolute', width: '100%', display: 'flex', justifyContent: 'center',
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          ...(step === 'confirm_current' 
+            ? { opacity: 1, pointerEvents: 'auto', transform: 'translateY(0) scale(1)' } 
+            : { opacity: 0, pointerEvents: 'none', transform: 'translateY(100px) scale(0.95)' })
+        }}
+      >
         <PinPad
           title="Confirma tu PIN"
           subtitle="Para cambiar el correo, verifica tu identidad"
@@ -124,11 +144,20 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
           currentValue={step === 'confirm_current' ? pinInput : ''}
           onKeyPress={handleKeyPress}
         />
-      </div>
+      </Box>
 
-      <div className={`change-pin-step ${step === 'enter_new' ? 'active' : 'hidden'}`} style={{ flexDirection: 'column', padding: '32px', maxWidth: '400px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 500, marginBottom: '8px', textAlign: 'center' }}>Nuevo Correo</h2>
-        <p style={{ color: '#74777f', marginBottom: '32px', textAlign: 'center' }}>Ingresa tu nueva dirección de correo de recuperación</p>
+      <Box 
+        sx={{
+          position: 'absolute', width: '100%', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', p: 4, maxWidth: 400,
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          ...(step === 'enter_new' 
+            ? { opacity: 1, pointerEvents: 'auto', transform: 'translateY(0) scale(1)' } 
+            : { opacity: 0, pointerEvents: 'none', transform: 'translateY(100px) scale(0.95)' })
+        }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: 500, mb: 1, textAlign: 'center' }}>Nuevo Correo</Typography>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, textAlign: 'center' }}>Ingresa tu nueva dirección de correo de recuperación</Typography>
         
         <TextField 
           fullWidth
@@ -137,7 +166,7 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
           variant="outlined"
           value={emailInput}
           onChange={(e) => setEmailInput(e.target.value)}
-          sx={{ marginBottom: '24px' }}
+          sx={{ mb: 3 }}
         />
         
         <Button 
@@ -149,15 +178,26 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
         >
           Actualizar Correo
         </Button>
-      </div>
+      </Box>
 
-      <div className={`change-pin-loader ${step === 'loading' ? 'active' : ''}`}>
-        {/* Loading overlay oscuro */}
-      </div>
+      <Box 
+        sx={{
+          position: 'absolute', inset: 0, zIndex: 1002, bgcolor: '#121212',
+          transition: 'opacity 0.4s ease',
+          opacity: step === 'loading' ? 1 : 0, pointerEvents: step === 'loading' ? 'auto' : 'none'
+        }}
+      />
 
-      <div className={`change-pin-success ${step === 'success' ? 'active' : ''}`}>
-        <h2>Correo actualizado con éxito</h2>
-      </div>
+      <Box 
+        sx={{
+          position: 'absolute', inset: 0, zIndex: 1003, bgcolor: 'primary.main', color: '#ffffff',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          transition: 'opacity 0.4s ease',
+          opacity: step === 'success' ? 1 : 0, pointerEvents: step === 'success' ? 'auto' : 'none'
+        }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: 500 }}>Correo actualizado con éxito</Typography>
+      </Box>
 
       <LoginErrorDialog 
         open={!!errorMsg} 
