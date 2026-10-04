@@ -19,6 +19,8 @@
  *   sendPinRecoveryLink -- Envía al correo un enlace para verificar acceso al buzón.          *
  *   completePinRecoveryEmailLink -- Completa el acceso mediante el enlace recibido.           *
  *   verifyPinRecoveryWorker -- Comprueba que el correo verificado pertenezca al trabajador.   *
+ *   updatePinRecoveryWorker -- Guarda un PIN nuevo tras volver a validar la identidad.         *
+ *   cancelPinRecoveryAuthentication -- Cierra la sesión temporal de recuperación.              *
  *   getSavedPinRecoveryRequest -- Recupera ID y correo guardados para completar el proceso.    *
  *   clearPinRecoveryLinkFromUrl -- Elimina parámetros del enlace del historial del navegador. *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -31,7 +33,7 @@ import {
   signOut,
   type UserCredential
 } from 'firebase/auth';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 const PIN_RECOVERY_REQUEST_KEY = 'pin_recovery_request';
@@ -102,6 +104,42 @@ export async function verifyPinRecoveryWorker(workerId: string): Promise<boolean
 
   window.localStorage.removeItem(PIN_RECOVERY_REQUEST_KEY);
   return true;
+}
+
+export async function updatePinRecoveryWorker(workerId: string, newPin: string): Promise<void> {
+  if (!/^\d{5}$/.test(workerId)) {
+    throw new Error('El ID del trabajador no es válido.');
+  }
+  if (!/^\d{4}$/.test(newPin)) {
+    throw new Error('El PIN debe contener exactamente 4 dígitos.');
+  }
+
+  const user = auth.currentUser;
+  if (!user?.email || !user.emailVerified) {
+    throw new Error('La sesión no contiene un correo verificado.');
+  }
+
+  const workerReference = doc(db, 'trabajadores', workerId);
+  const workerSnapshot = await getDoc(workerReference);
+  const workerEmail = workerSnapshot.exists()
+    ? (workerSnapshot.data().email as string | undefined)
+    : undefined;
+
+  if (workerEmail?.trim().toLowerCase() !== user.email.trim().toLowerCase()) {
+    await signOut(auth);
+    window.localStorage.removeItem(PIN_RECOVERY_REQUEST_KEY);
+    throw new Error('No se pudo confirmar que el correo pertenezca a este trabajador.');
+  }
+
+  await updateDoc(workerReference, { pin: newPin });
+  await signOut(auth);
+  window.localStorage.removeItem(PIN_RECOVERY_REQUEST_KEY);
+}
+
+export async function cancelPinRecoveryAuthentication(): Promise<void> {
+  if (auth.currentUser) {
+    await signOut(auth);
+  }
 }
 
 export function getSavedPinRecoveryRequest(): PinRecoveryRequest | null {

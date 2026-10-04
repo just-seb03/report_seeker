@@ -120,7 +120,7 @@ Para compilar y ejecutar la aplicación en dispositivos móviles Android:
 
 ## Recuperación de PIN
 
-La recuperación envía un enlace de acceso por correo con Firebase Authentication. Tras abrirlo, la aplicación compara el correo verificado con el correo guardado en Firestore para el ID de trabajador indicado. Esta comprobación en cliente no cambia el PIN; antes de implementar el cambio, las reglas de Firestore deben impedir que un usuario modifique el PIN de otro trabajador.
+La recuperación envía un enlace de acceso por correo con Firebase Authentication. Tras abrirlo, la aplicación compara el correo verificado con el correo guardado en Firestore para el ID de trabajador indicado y permite establecer un PIN nuevo de cuatro dígitos.
 
 Para habilitar el envío:
 - En Firebase Console, activa el proveedor **Correo electrónico/Contraseña** y la opción **Enlace por correo electrónico (sin contraseña)** en Authentication.
