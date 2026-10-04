@@ -144,7 +144,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const showBottomNav = !(activeView === 'report' && reportIsComplete) && configMenuState === 'none';
 
   return (
-    <Box className="home-container">
+    <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', bgcolor: 'background.default', transition: 'background-color 0.25s ease' }}>
       <Box className="home-view-stage">
         {previousView && (
           <Box

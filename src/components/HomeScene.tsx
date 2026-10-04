@@ -25,7 +25,6 @@ import HomeHeader from './HomeHeader';
 import RefreshIndicator from './RefreshIndicator';
 import NotificationSheet, { type Notificacion } from './NotificationSheet';
 import { type IssueReport } from '../database';
-import './HomeScene.css';
 
 interface HomeSceneProps {
   pullDistance: number;
@@ -67,13 +66,16 @@ export default function HomeScene({
   return (
     <>
       <Box
-        className="home-scene"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
         onMouseDown={onTouchStart}
         onMouseUp={onTouchEnd}
         onMouseLeave={onTouchEnd}
         sx={{
+          position: 'absolute',
+          inset: 0,
+          transformOrigin: 'top center',
+          willChange: 'transform',
           transform: `translateY(${Math.min(pullDistance * 0.65, 88)}px)`,
           transition: pullDistance === 0 ? 'transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none',
         }}
@@ -98,11 +100,20 @@ export default function HomeScene({
           onMarkAsRead={onMarkAsRead}
         />
 
-        <Box className="home-gradient-overlay" />
+        <Box sx={{
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0, height: 220, pointerEvents: 'none', zIndex: 2, transition: 'background 0.25s ease',
+          background: (theme) => `linear-gradient(to bottom, transparent, ${theme.palette.mode === 'dark' ? '#121212' : '#f5f5f5'} 75%)`
+        }} />
       </Box>
 
       {pullDistance >= 120 && !isRefreshingNotifications && (
-        <Box className="refresh-swipe-feedback">
+        <Box sx={{
+          position: 'absolute', zIndex: 20, top: 'max(12px, env(safe-area-inset-top))', left: '50%',
+          width: 40, height: 40, ml: '-20px', pointerEvents: 'none',
+          color: (theme) => theme.palette.mode === 'dark' ? '#f5f5f5' : '#202020',
+          textShadow: (theme) => theme.palette.mode === 'dark' ? '0 1px 8px rgba(0,0,0,0.7)' : 'none'
+        }}>
           <RefreshIndicator label="Suelta para actualizar reportes" />
         </Box>
       )}

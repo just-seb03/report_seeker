@@ -89,5 +89,9 @@ html.dark body::before {
     opacity: 1;
     transform: translateX(0) scale(1);
     filter: saturate(1);
-  }
+}
+
+@keyframes notification-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }

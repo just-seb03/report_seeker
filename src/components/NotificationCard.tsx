@@ -35,7 +35,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { getIssueReportImage } from '../database';
-import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
@@ -81,7 +80,6 @@ export default function NotificationCard({
   const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
   const isLowPriority = ['leve', 'baja', 'low'].includes(prioridad.toLowerCase());
-  const priorityClass = isHighPriority ? 'text-error' : isLowPriority ? 'text-success' : 'text-warning';
   const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
 
   useEffect(() => {
@@ -120,11 +118,15 @@ export default function NotificationCard({
     onOpenReport?.();
   };
 
-  // Determinamos las clases CSS a inyectar en el contenedor principal
-  const cardClass = `card-paper ${isRead ? 'read' : 'unread'} ${isHighPriority ? 'high-priority' : ''}`;
-
   return (
-    <Box className={cardClass}>
+    <Box sx={{ 
+      borderRadius: 4, 
+      overflow: 'hidden', 
+      bgcolor: 'background.paper', 
+      transition: 'border 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
+      border: isHighPriority && !isRead ? 2 : !isRead ? 2 : 1,
+      borderColor: isHighPriority && !isRead ? 'error.main' : !isRead ? (theme => theme.palette.mode === 'dark' ? 'common.white' : 'common.black') : 'divider'
+    }}>
       <Box
         onClick={handleHeaderClick}
         onKeyDown={(event) => activateWithKeyboard(event, handleHeaderClick)}
@@ -135,20 +137,20 @@ export default function NotificationCard({
         sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
       >
         {isHighPriority ? (
-          <ErrorOutlinedIcon className={!isRead ? "icon-error" : "icon-info"} sx={{ mr: 2, flexShrink: 0 }} />
+          <ErrorOutlinedIcon color={!isRead ? "error" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
         ) : (
-          <InfoOutlinedIcon className="icon-info" sx={{ mr: 2, flexShrink: 0 }} />
+          <InfoOutlinedIcon color="action" sx={{ mr: 2, flexShrink: 0 }} />
         )}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-            <Typography variant="subtitle2" className="card-title">{titulo}</Typography>
-            <Typography variant="caption" className="card-text-muted card-relative-time" sx={{ flexShrink: 0 }}>{relativeTime}</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', whiteSpace: 'nowrap', overflow: 'hidden', flex: 1, mr: 1, maskImage: 'linear-gradient(to right, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)' }}>{titulo}</Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0, position: 'relative', top: 2, lineHeight: 1 }}>{relativeTime}</Typography>
           </Box>
         </Box>
 
         <ExpandMoreIcon
-          className="card-text-muted"
+          color="action"
           sx={{
             position: 'absolute', right: 16, top: '50%', marginTop: '-12px',
             transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -179,13 +181,13 @@ export default function NotificationCard({
             '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: -2 },
           }}
         >
-          <Box className="card-placeholder">
+          <Box sx={{ width: '100%', height: 160, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2, border: 1, borderStyle: 'dashed', borderColor: 'divider' }}>
             {image ? (
-              <img className="card-report-image" src={image} alt={`Evidencia del reporte: ${titulo}`} />
+              <Box component="img" src={image} alt={`Evidencia del reporte: ${titulo}`} sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 2 }} />
             ) : (
-              <Box className="card-image-empty">
-                <InsertPhotoOutlinedIcon className="card-placeholder-icon" sx={{ fontSize: 48 }} />
-                <Typography variant="caption" className="card-text-muted">
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                <InsertPhotoOutlinedIcon color="disabled" sx={{ fontSize: 48 }} />
+                <Typography variant="caption" color="text.disabled">
                   {imageLoading ? 'Cargando fotografía...' : 'Sin fotografía asociada'}
                 </Typography>
               </Box>
@@ -193,27 +195,26 @@ export default function NotificationCard({
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 1.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, minWidth: 0, flex: 1 }}>
-              <LocationOnOutlinedIcon className="card-text-muted" fontSize="small" sx={{ flexShrink: 0 }} />
-              <Typography variant="body2" className="card-text-muted" sx={{ overflowWrap: 'anywhere' }}>
+              <LocationOnOutlinedIcon color="action" fontSize="small" sx={{ flexShrink: 0 }} />
+              <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: 'anywhere' }}>
                 {ubicacion || 'Ubicación no especificada'}
               </Typography>
             </Box>
             <Typography
               variant="body2"
-              className={priorityClass}
-              sx={{ flexShrink: 0, textAlign: 'right' }}
+              sx={{ flexShrink: 0, textAlign: 'right', fontWeight: 'bold', color: isHighPriority ? 'error.main' : isLowPriority ? 'success.main' : 'warning.main' }}
             >
               {prioridad}
             </Typography>
           </Box>
 
-          <Typography variant="body2" className="card-description" sx={{ mb: 2, overflowWrap: 'anywhere' }}>{detalle}</Typography>
+          <Typography variant="body2" sx={{ mb: 2, overflowWrap: 'anywhere', fontWeight: 500, color: 'text.primary', opacity: 0.85 }}>{detalle}</Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
-            <Typography variant="caption" className="card-text-muted">
+            <Typography variant="caption" color="text.secondary">
               {workerName ? `Por ${workerName}` : 'Por Trabajador Desconocido'}
             </Typography>
-            <Typography variant="caption" className="card-text-muted">{formatPublicationDate(fecha)}</Typography>
+            <Typography variant="caption" color="text.secondary">{formatPublicationDate(fecha)}</Typography>
           </Box>
 
         </Box>
