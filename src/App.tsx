@@ -15,7 +15,7 @@
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
  *   App -- Componente principal de la aplicación; maneja temas, sesión y enlaces de           *
- *          recuperación PIN recibidos por Android.                                            *
+ *          recuperación de PIN y cambio de correo recibidos por Android.                     *
  *   handleToggleManualTheme -- Alterna manualmente el tema visual (claro/oscuro) de la        *
  *        interfaz.                                                                            *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -32,6 +32,10 @@ import {
   savePendingNativePinRecoveryLink
 } from './control/pinRecoveryControl';
 import { appTheme } from './control/theme';
+import {
+  isEmailChangeLink,
+  savePendingNativeEmailChangeLink
+} from './control/emailChangeControl';
 
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/700.css';
@@ -39,27 +43,53 @@ import '@fontsource/inter/800.css';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<Trabajador | null>(getCurrentUser());
-  const [recoveryLinkLaunch, setRecoveryLinkLaunch] = useState(0);
+  const [actionLinkLaunch, setActionLinkLaunch] = useState(0);
 
   useEffect(() => {
+    let handledActionUrl = '';
+    const handleActionLink = (url: string) => {
+      if (url === handledActionUrl) return;
+
+      if (isEmailChangeLink(url)) {
+        savePendingNativeEmailChangeLink(url);
+      } else if (isPinRecoveryLink(url)) {
+        savePendingNativePinRecoveryLink(url);
+      } else {
+        return;
+      }
+
+      handledActionUrl = url;
+      logout();
+      setActionLinkLaunch((launch) => launch + 1);
+    };
+
     resetPushNotificationCount();
     const sub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) resetPushNotificationCount();
     });
-    const recoveryLinkSub = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
-      if (!isPinRecoveryLink(url)) return;
-
-      savePendingNativePinRecoveryLink(url);
-      logout();
-      setRecoveryLinkLaunch((launch) => launch + 1);
+    const actionLinkSub = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+      handleActionLink(url);
     });
 
     const handleLogout = () => setCurrentUser(null);
     window.addEventListener('user_logout', handleLogout);
 
+    const currentUrl = window.location.href;
+    if (isEmailChangeLink(currentUrl) || isPinRecoveryLink(currentUrl)) {
+      logout();
+    }
+
+    void CapacitorApp.getLaunchUrl()
+      .then((launchUrl) => {
+        if (launchUrl?.url) handleActionLink(launchUrl.url);
+      })
+      .catch((error: unknown) => {
+        console.error('No se pudo recuperar el enlace con el que se abrió la aplicación:', error);
+      });
+
     return () => {
       sub.then(listener => listener.remove());
-      recoveryLinkSub.then(listener => listener.remove());
+      actionLinkSub.then(listener => listener.remove());
       window.removeEventListener('user_logout', handleLogout);
     };
   }, []);
@@ -78,7 +108,7 @@ function App() {
         />
       ) : (
         <Login
-          key={recoveryLinkLaunch}
+          key={actionLinkLaunch}
           onLoginSuccess={(user) => setCurrentUser(user)}
         />
       )}

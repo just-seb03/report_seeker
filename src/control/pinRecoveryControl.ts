@@ -14,7 +14,7 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   getRecoveryContinueUrl -- Obtiene la URL web a la que Firebase devolverá el enlace.       *
+ *   getRecoveryContinueUrl -- Obtiene la URL de retorno para enlaces de Firebase Auth.         *
  *   isPinRecoveryLink -- Comprueba si una URL contiene un enlace de acceso de Firebase.       *
  *   sendPinRecoveryLink -- Envía al correo un enlace para verificar acceso al buzón.          *
  *   completePinRecoveryEmailLink -- Completa el acceso mediante el enlace recibido.           *
@@ -46,7 +46,7 @@ interface PinRecoveryRequest {
   workerId: string;
 }
 
-function getRecoveryContinueUrl(): string {
+export function getRecoveryContinueUrl(): string {
   const configuredUrl = import.meta.env.VITE_RECOVERY_CONTINUE_URL;
 
   if (configuredUrl) {

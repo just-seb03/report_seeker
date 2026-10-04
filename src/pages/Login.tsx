@@ -14,12 +14,20 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Login -- Orquesta el ingreso, la verificación de correo y la actualización del PIN        *
- *            durante su recuperación.                                                        *
+ *   Login -- Orquesta el ingreso, la recuperación de PIN y la actualización del correo      *
+ *            confirmado mediante enlace.                                                    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { type Trabajador } from '../control/authControl';
+import {
+  cancelEmailChangeAuthentication,
+  completeEmailChangeLink,
+  getPendingNativeEmailChangeLink,
+  getSavedEmailChangeRequest,
+  isEmailChangeLink,
+  updateEmailChangeWorker
+} from '../control/emailChangeControl';
 import {
   cancelPinRecoveryAuthentication,
   clearPinRecoveryLinkFromUrl,
@@ -47,11 +55,29 @@ function isInvalidRecoveryActionCode(error: unknown): boolean {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
+  const [savedEmailChangeRequest] = useState(getSavedEmailChangeRequest);
+  const [emailChangeActionUrl] = useState(() => {
+    const pendingNativeLink = getPendingNativeEmailChangeLink();
+    if (isEmailChangeLink(pendingNativeLink)) return pendingNativeLink;
+    return isEmailChangeLink(window.location.href) ? window.location.href : '';
+  });
+  const openedFromEmailChangeLink = Boolean(emailChangeActionUrl);
+  const emailChangeProcessingStarted = useRef(false);
+  const [emailChangeStatus, setEmailChangeStatus] = useState<
+    'checking' | 'updating' | 'updated' | 'needs_request' | 'error'
+  >(() => {
+    if (!emailChangeActionUrl) return 'checking';
+    return savedEmailChangeRequest ? 'checking' : 'needs_request';
+  });
+  const [emailChangeError, setEmailChangeError] = useState('');
   const [recoveryActionUrl] = useState(() => {
+    if (openedFromEmailChangeLink) return '';
     const pendingNativeLink = getPendingNativePinRecoveryLink();
     return isPinRecoveryLink(pendingNativeLink) ? pendingNativeLink : window.location.href;
   });
-  const [openedFromRecoveryLink] = useState(() => isPinRecoveryLink(recoveryActionUrl));
+  const [openedFromRecoveryLink] = useState(
+    () => !openedFromEmailChangeLink && isPinRecoveryLink(recoveryActionUrl)
+  );
   const [savedRecoveryRequest] = useState(getSavedPinRecoveryRequest);
   const recoveryLinkProcessingStarted = useRef(false);
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(openedFromRecoveryLink);
@@ -69,6 +95,62 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [activeRecoveryActionUrl, setActiveRecoveryActionUrl] = useState(
     () => isPinRecoveryLink(recoveryActionUrl) ? recoveryActionUrl : ''
   );
+
+  useEffect(() => {
+    if (
+      !openedFromEmailChangeLink
+      || !emailChangeActionUrl
+      || !savedEmailChangeRequest
+      || emailChangeProcessingStarted.current
+    ) {
+      return;
+    }
+
+    emailChangeProcessingStarted.current = true;
+    const completeEmailChange = async () => {
+      setEmailChangeStatus('updating');
+      let completionError: unknown;
+      let hasCompletionError = false;
+      try {
+        await completeEmailChangeLink(savedEmailChangeRequest, emailChangeActionUrl);
+        await updateEmailChangeWorker(savedEmailChangeRequest);
+      } catch (error) {
+        completionError = error;
+        hasCompletionError = true;
+      }
+
+      try {
+        await cancelEmailChangeAuthentication();
+      } catch (cleanupError) {
+        console.error('No se pudo limpiar la sesión temporal del cambio de correo:', cleanupError);
+        const message = !hasCompletionError
+          ? ''
+          : completionError instanceof Error
+          ? completionError.message
+          : 'No se pudo completar el cambio de correo.';
+        setEmailChangeError(
+          `${message}${message ? ' ' : ''}No se pudo cerrar la sesión temporal. Cierra la aplicación e inténtalo nuevamente.`
+        );
+        setEmailChangeStatus('error');
+        return;
+      }
+
+      if (hasCompletionError) {
+        console.error('No se pudo completar el cambio de correo:', completionError);
+        setEmailChangeError(
+          completionError instanceof Error
+            ? completionError.message
+            : 'No se pudo actualizar el correo. Vuelve a solicitar el cambio.'
+        );
+        setEmailChangeStatus('error');
+        return;
+      }
+
+      setEmailChangeStatus('updated');
+    };
+
+    void completeEmailChange();
+  }, [emailChangeActionUrl, openedFromEmailChangeLink, savedEmailChangeRequest]);
 
   useEffect(() => {
     const currentUrl = recoveryActionUrl;
@@ -194,6 +276,61 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     handlePinKeyPress,
     closeErrorDialog
   } = useIntroFlow(onLoginSuccess, openedFromRecoveryLink);
+
+  if (openedFromEmailChangeLink) {
+    return (
+      <main className="login-screen">
+        <section className="login-content">
+          <div className="intro-step recovery-step active">
+            <div className="recovery-form">
+              <h2>Confirmar cambio de correo</h2>
+              {emailChangeStatus === 'checking' && (
+                <p role="status">Verificando el enlace...</p>
+              )}
+              {emailChangeStatus === 'updating' && (
+                <p role="status">Confirmando el enlace y actualizando el correo...</p>
+              )}
+              {emailChangeStatus === 'updated' && savedEmailChangeRequest && (
+                <p>
+                  El correo de {savedEmailChangeRequest.workerId} se actualizó correctamente a
+                  {' '}{savedEmailChangeRequest.email}.
+                </p>
+              )}
+              {emailChangeStatus === 'needs_request' && (
+                <p className="recovery-error" role="alert">
+                  No se encontró la solicitud pendiente de este enlace. Vuelve a solicitar el cambio de correo.
+                </p>
+              )}
+              {emailChangeStatus === 'error' && (
+                <p className="recovery-error" role="alert">{emailChangeError}</p>
+              )}
+              {!['checking', 'updating'].includes(emailChangeStatus) && (
+                <button
+                  className="recovery-back"
+                  type="button"
+                  onClick={() => {
+                    void cancelEmailChangeAuthentication()
+                      .then(() => window.location.replace(window.location.pathname))
+                      .catch((error: unknown) => {
+                        console.error('No se pudo cancelar la solicitud de cambio de correo:', error);
+                        setEmailChangeError(
+                          error instanceof Error
+                            ? error.message
+                            : 'No se pudo cerrar la verificación temporal.'
+                        );
+                        setEmailChangeStatus('error');
+                      });
+                  }}
+                >
+                  Volver al inicio de sesión
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <Box 
