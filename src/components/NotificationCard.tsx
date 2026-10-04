@@ -79,7 +79,8 @@ export default function NotificationCard({
   const isRead = !unread;
   const [image, setImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
-  const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
+  const isHighPriority = ['alta', 'grave', 'high'].includes(prioridad.toLowerCase());
+  const isModeratePriority = ['media', 'moderada', 'medium', 'warning'].includes(prioridad.toLowerCase());
   const isLowPriority = ['leve', 'baja', 'low'].includes(prioridad.toLowerCase());
   const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
 
@@ -123,11 +124,13 @@ export default function NotificationCard({
     <Box sx={{ 
       borderRadius: '24px', 
       overflow: 'hidden', 
-      bgcolor: isRead 
+      bgcolor: expanded 
         ? 'background.paper' 
         : isHighPriority 
           ? alpha(theme.palette.error.main, 0.08) 
-          : alpha(theme.palette.primary.main, 0.08),
+          : isModeratePriority
+            ? alpha(theme.palette.warning.main, 0.12)
+            : alpha(theme.palette.primary.main, 0.08),
       transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
       border: isRead ? 1 : 0,
       borderColor: 'divider'
@@ -143,8 +146,10 @@ export default function NotificationCard({
       >
         {isHighPriority ? (
           <ErrorOutlinedIcon color={!isRead ? "error" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
+        ) : isModeratePriority ? (
+          <InfoOutlinedIcon color={!isRead ? "warning" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
         ) : (
-          <InfoOutlinedIcon color="action" sx={{ mr: 2, flexShrink: 0 }} />
+          <InfoOutlinedIcon color={!isRead ? "primary" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
         )}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
@@ -222,7 +227,11 @@ export default function NotificationCard({
                   width: 24, 
                   height: 24, 
                   fontSize: '0.75rem', 
-                  bgcolor: isHighPriority ? 'error.main' : 'primary.main',
+                  bgcolor: isHighPriority 
+                    ? 'error.main' 
+                    : isModeratePriority 
+                      ? 'warning.main' 
+                      : 'primary.main',
                   fontWeight: 'bold'
                 }}
               >
