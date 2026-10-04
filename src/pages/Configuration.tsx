@@ -32,11 +32,32 @@ type ConfigurationProps = {
   onBack: () => void;
   isDarkMode: boolean;
   onToggleTheme: () => void;
+  onMenuStateChange?: (isOpen: boolean) => void;
 };
 
-export default function Configuration({ onBack, isDarkMode, onToggleTheme }: ConfigurationProps) {
+export default function Configuration({ onBack, isDarkMode, onToggleTheme, onMenuStateChange }: ConfigurationProps) {
   const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+
+  const handleOpenPin = () => {
+    setIsPinDialogOpen(true);
+    onMenuStateChange?.(true);
+  };
+
+  const handleClosePin = () => {
+    setIsPinDialogOpen(false);
+    onMenuStateChange?.(false);
+  };
+
+  const handleOpenEmail = () => {
+    setIsEmailDialogOpen(true);
+    onMenuStateChange?.(true);
+  };
+
+  const handleCloseEmail = () => {
+    setIsEmailDialogOpen(false);
+    onMenuStateChange?.(false);
+  };
 
   return (
     <main className="configuration-screen">
@@ -60,19 +81,19 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme }: Con
             </div>
           </div>
 
-          <button className="configuration-button" type="button" onClick={() => setIsPinDialogOpen(true)}>
+          <button className="configuration-button" type="button" onClick={handleOpenPin}>
             <LockOutlinedIcon aria-hidden="true" />
             <span>Cambiar PIN</span>
           </button>
-          <button className="configuration-button" type="button" onClick={() => setIsEmailDialogOpen(true)}>
+          <button className="configuration-button" type="button" onClick={handleOpenEmail}>
             <AlternateEmailOutlinedIcon aria-hidden="true" />
             <span>Cambiar correo de recuperación</span>
           </button>
         </div>
       </section>
 
-      {isPinDialogOpen && <ChangePinDialog onClose={() => setIsPinDialogOpen(false)} />}
-      {isEmailDialogOpen && <ChangeEmailDialog onClose={() => setIsEmailDialogOpen(false)} />}
+      {isPinDialogOpen && <ChangePinDialog onClose={handleClosePin} />}
+      {isEmailDialogOpen && <ChangeEmailDialog onClose={handleCloseEmail} />}
     </main>
   );
 }

@@ -20,7 +20,7 @@
 import { useState } from 'react';
 import PinPad from './PinPad';
 import LoginErrorDialog from './LoginErrorDialog';
-import { getCurrentUser } from '../control/authControl';
+import { getCurrentUser, updateUserLocal } from '../control/authControl';
 import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { insertOrUpdateTrabajadorLocal } from '../database';
@@ -83,7 +83,7 @@ export default function ChangePinDialog({ onClose }: ChangePinDialogProps) {
       
       // 2. Update local storage & SQLite
       const updatedUser = { ...user, pin: newPin };
-      localStorage.setItem('logged_in_user', JSON.stringify(updatedUser));
+      updateUserLocal(updatedUser);
       await insertOrUpdateTrabajadorLocal(updatedUser);
 
       setStep('success');

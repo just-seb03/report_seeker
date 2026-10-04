@@ -20,6 +20,7 @@
  *        (Home, Report, etc.).                                                                *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { useState } from 'react';
 import { Box } from '@mui/material';
 import BottomNav from '../components/BottomNav';
 import ReportCancelDialog from '../components/ReportCancelDialog';
@@ -37,6 +38,7 @@ interface HomeProps {
 }
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
+  const [isConfigMenuOpen, setIsConfigMenuOpen] = useState(false);
   const {
     notificaciones,
     hasMoreNotifications,
@@ -80,6 +82,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           onBack={() => navigateTo('profile')} 
           isDarkMode={isDarkMode}
           onToggleTheme={onToggleManualTheme}
+          onMenuStateChange={setIsConfigMenuOpen}
         />
       );
     }
@@ -126,6 +129,8 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     );
   };
 
+  const showBottomNav = !(activeView === 'report' && reportIsComplete) && !isConfigMenuOpen;
+
   return (
     <Box className="home-container">
       <Box className="home-view-stage">
@@ -146,7 +151,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         </Box>
       </Box>
 
-      {!(activeView === 'report' && reportIsComplete) && (
+      {showBottomNav && (
         <Box
           className={`home-bottom-nav${isNavEntering ? ' nav-entering' : ''}`}
           onAnimationEnd={(event) => {

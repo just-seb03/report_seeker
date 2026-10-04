@@ -86,6 +86,11 @@ export function getCurrentUser(): Trabajador | null {
   }
 }
 
+export function updateUserLocal(user: Trabajador) {
+  localStorage.setItem('logged_in_user', JSON.stringify(user));
+  window.dispatchEvent(new CustomEvent('user_updated', { detail: user }));
+}
+
 export function logout() {
   localStorage.removeItem('logged_in_user');
   sessionStorage.setItem('skip_welcome', 'true');

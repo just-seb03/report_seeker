@@ -17,20 +17,30 @@
  *   Profile -- Componente visual del perfil que muestra datos estáticos del usuario actual.   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { useState, useEffect } from 'react';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import EmailOutlined from '@mui/icons-material/EmailOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import './profile.css';
-import { getCurrentUser, logout } from '../control/authControl';
+import { getCurrentUser, logout, type Trabajador } from '../control/authControl';
 
 interface ProfileProps {
 	onSettingsClick?: () => void;
 }
 
 export default function Profile({ onSettingsClick }: ProfileProps) {
-	const user = getCurrentUser();
+	const [user, setUser] = useState<Trabajador | null>(getCurrentUser());
+
+	useEffect(() => {
+		const handleUserUpdate = (e: any) => {
+			setUser(e.detail);
+		};
+		window.addEventListener('user_updated', handleUserUpdate);
+		return () => window.removeEventListener('user_updated', handleUserUpdate);
+	}, []);
+
 	const profileName = user?.nombre || 'Usuario Desconocido';
 
 	const profileDetails = [
