@@ -19,6 +19,7 @@
 
 import { Box, Typography } from '@mui/material';
 import SeekieAIDoodles from './SeekieAIDoodles';
+import { t } from '../control/i18n';
 
 export default function SeekieAIChatArea() {
   return (
@@ -28,10 +29,10 @@ export default function SeekieAIChatArea() {
       <Box sx={{ position: 'relative', zIndex: 1, minHeight: '100%', pt: 10, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
-            Hola, soy <Box component="span" sx={{ color: 'primary.main', textShadow: '0px 2px 4px rgba(0,0,0,0.2)' }}>Seekie AI</Box>
+            {t.seekie.greeting} <Box component="span" sx={{ color: 'primary.main', textShadow: '0px 2px 4px rgba(0,0,0,0.2)' }}>{t.seekie.aiName}</Box>
           </Typography>
           <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.9 }}>
-            ¿En qué te puedo ayudar hoy?
+            {t.seekie.help}
           </Typography>
         </Box>
       </Box>

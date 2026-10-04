@@ -26,6 +26,7 @@ import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import { Box, Typography, Button, Card, List, ListItem, ListItemIcon, ListItemText, Avatar } from '@mui/material';
 import { getCurrentUser, logout, type Trabajador } from '../control/authControl';
 import GlobalTopBar from '../components/GlobalTopBar';
+import { t } from '../control/i18n';
 
 interface ProfileProps {
 	onSettingsClick?: () => void;
@@ -42,16 +43,16 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 		return () => window.removeEventListener('user_updated', handleUserUpdate);
 	}, []);
 
-	const profileName = user?.nombre || 'Usuario Desconocido';
+	const profileName = user?.nombre || t.profile.unknownUser;
 
 	const profileDetails = [
-		{ label: 'Correo', value: user?.email || 'Sin correo', Icon: EmailOutlined },
-		{ label: 'ID de usuario', value: user?.trabajador_id.toString() || 'No asignado', Icon: BadgeOutlined },
+		{ label: t.profile.emailLabel, value: user?.email || t.profile.noEmail, Icon: EmailOutlined },
+		{ label: t.profile.userIdLabel, value: user?.trabajador_id.toString() || t.profile.noUserId, Icon: BadgeOutlined },
 	];
 
 	return (
 		<Box sx={{ minHeight: '100%', backgroundColor: 'background.default', pb: 12 }}>
-      <GlobalTopBar title="Perfil" />
+      <GlobalTopBar title={t.profile.title} />
 			<Box sx={{ px: 3, pt: 14, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 				<Avatar 
           sx={{ 
@@ -78,7 +79,7 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
             onClick={onSettingsClick}
             sx={{ flex: 1, maxWidth: 200 }}
           >
-						Configuración
+						{t.profile.settingsBtn}
 					</Button>
 					<Button
             variant="outlined"
@@ -87,7 +88,7 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 						onClick={() => logout()}
             sx={{ flex: 1, maxWidth: 200 }}
 					>
-						Cerrar Sesión
+						{t.profile.logoutBtn}
 					</Button>
 				</Box>
 
