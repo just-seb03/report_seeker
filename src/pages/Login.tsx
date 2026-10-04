@@ -14,8 +14,8 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Login -- Orquesta el ingreso, la recuperación de PIN y la verificación de enlaces de     *
- *            cambio de correo.                                                              *
+ *   Login -- Orquesta el ingreso, la recuperación de PIN y la actualización del correo      *
+ *            confirmado mediante enlace.                                                    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
@@ -25,7 +25,8 @@ import {
   completeEmailChangeLink,
   getPendingNativeEmailChangeLink,
   getSavedEmailChangeRequest,
-  isEmailChangeLink
+  isEmailChangeLink,
+  updateEmailChangeWorker
 } from '../control/emailChangeControl';
 import {
   cancelPinRecoveryAuthentication,
@@ -62,7 +63,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const openedFromEmailChangeLink = Boolean(emailChangeActionUrl);
   const emailChangeProcessingStarted = useRef(false);
   const [emailChangeStatus, setEmailChangeStatus] = useState<
-    'checking' | 'verified' | 'needs_request' | 'error'
+    'checking' | 'updating' | 'updated' | 'needs_request' | 'error'
   >(() => {
     if (!emailChangeActionUrl) return 'checking';
     return savedEmailChangeRequest ? 'checking' : 'needs_request';
@@ -105,14 +106,16 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
 
     emailChangeProcessingStarted.current = true;
+    setEmailChangeStatus('updating');
     void completeEmailChangeLink(savedEmailChangeRequest, emailChangeActionUrl)
-      .then(() => setEmailChangeStatus('verified'))
+      .then(() => updateEmailChangeWorker(savedEmailChangeRequest))
+      .then(() => setEmailChangeStatus('updated'))
       .catch((error: unknown) => {
-        console.error('No se pudo verificar el enlace de cambio de correo:', error);
+        console.error('No se pudo completar el cambio de correo:', error);
         setEmailChangeError(
           error instanceof Error
             ? error.message
-            : 'No se pudo verificar el enlace. Vuelve a solicitar el cambio de correo.'
+            : 'No se pudo actualizar el correo. Vuelve a solicitar el cambio.'
         );
         setEmailChangeStatus('error');
       });
@@ -253,10 +256,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               {emailChangeStatus === 'checking' && (
                 <p role="status">Verificando el enlace...</p>
               )}
-              {emailChangeStatus === 'verified' && savedEmailChangeRequest && (
+              {emailChangeStatus === 'updating' && (
+                <p role="status">Confirmando el enlace y actualizando el correo...</p>
+              )}
+              {emailChangeStatus === 'updated' && savedEmailChangeRequest && (
                 <p>
-                  Se confirmó el acceso a {savedEmailChangeRequest.email} para el trabajador
-                  {' '}{savedEmailChangeRequest.workerId}. El correo aún no se ha actualizado.
+                  El correo de {savedEmailChangeRequest.workerId} se actualizó correctamente a
+                  {' '}{savedEmailChangeRequest.email}.
                 </p>
               )}
               {emailChangeStatus === 'needs_request' && (
@@ -267,7 +273,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               {emailChangeStatus === 'error' && (
                 <p className="recovery-error" role="alert">{emailChangeError}</p>
               )}
-              {emailChangeStatus !== 'checking' && (
+              {!['checking', 'updating'].includes(emailChangeStatus) && (
                 <button
                   className="recovery-back"
                   type="button"

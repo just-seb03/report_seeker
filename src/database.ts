@@ -10,7 +10,7 @@
  *                                                                                             *
  *          Fecha de Inicio : 01 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
@@ -18,6 +18,7 @@
  *        SQLite.                                                                              *
  *   initializeDatabase -- Ejecuta las sentencias DDL para crear las tablas necesarias de la   *
  *        aplicación.                                                                          *
+ *   insertOrUpdateTrabajadorLocal -- Inserta o sincroniza datos locales del trabajador.        *
  *   saveIssueReport -- Guarda la información capturada de un nuevo reporte en la base de      *
  *        datos.                                                                               *
  *   getIssueReportsPage -- Recupera una lista paginada de reportes ordenados de forma         *
@@ -227,8 +228,8 @@ export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; 
 
   if (existingWorker.values?.length) {
     await connection.run(
-      'UPDATE trabajadores SET nombre = ?, pin = ? WHERE trabajador_id = ?;',
-      [t.nombre, t.pin, t.trabajador_id]
+      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ? WHERE trabajador_id = ?;',
+      [t.nombre, t.email, t.pin, t.trabajador_id]
     );
     return;
   }
