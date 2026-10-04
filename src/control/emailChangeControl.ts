@@ -22,7 +22,7 @@
  *   getPendingNativeEmailChangeLink -- Recupera un enlace recibido al abrir Android.          *
  *   savePendingNativeEmailChangeLink -- Conserva el enlace recibido hasta montar la pantalla. *
  *   clearPendingNativeEmailChangeLink -- Descarta el enlace nativo pendiente al salir.         *
- *   cancelEmailChangeAuthentication -- Cierra la sesión y descarta la solicitud al cancelar. *
+ *   cancelEmailChangeAuthentication -- Cierra la sesión y limpia los datos del flujo.        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import {
@@ -274,10 +274,16 @@ export function clearPendingNativeEmailChangeLink(): void {
 }
 
 export async function cancelEmailChangeAuthentication(): Promise<void> {
-  if (auth.currentUser) {
-    await signOut(auth);
-  }
+  try {
+    if (auth.currentUser) {
+      await signOut(auth);
+    }
+  } finally {
+    window.localStorage.removeItem(EMAIL_CHANGE_REQUEST_KEY);
+    clearPendingNativeEmailChangeLink();
 
-  window.localStorage.removeItem(EMAIL_CHANGE_REQUEST_KEY);
-  clearPendingNativeEmailChangeLink();
+    if (isEmailChangeLink(window.location.href)) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
 }

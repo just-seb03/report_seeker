@@ -106,19 +106,49 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
 
     emailChangeProcessingStarted.current = true;
-    setEmailChangeStatus('updating');
-    void completeEmailChangeLink(savedEmailChangeRequest, emailChangeActionUrl)
-      .then(() => updateEmailChangeWorker(savedEmailChangeRequest))
-      .then(() => setEmailChangeStatus('updated'))
-      .catch((error: unknown) => {
-        console.error('No se pudo completar el cambio de correo:', error);
+    const completeEmailChange = async () => {
+      setEmailChangeStatus('updating');
+      let completionError: unknown;
+      let hasCompletionError = false;
+      try {
+        await completeEmailChangeLink(savedEmailChangeRequest, emailChangeActionUrl);
+        await updateEmailChangeWorker(savedEmailChangeRequest);
+      } catch (error) {
+        completionError = error;
+        hasCompletionError = true;
+      }
+
+      try {
+        await cancelEmailChangeAuthentication();
+      } catch (cleanupError) {
+        console.error('No se pudo limpiar la sesión temporal del cambio de correo:', cleanupError);
+        const message = !hasCompletionError
+          ? ''
+          : completionError instanceof Error
+          ? completionError.message
+          : 'No se pudo completar el cambio de correo.';
         setEmailChangeError(
-          error instanceof Error
-            ? error.message
+          `${message}${message ? ' ' : ''}No se pudo cerrar la sesión temporal. Cierra la aplicación e inténtalo nuevamente.`
+        );
+        setEmailChangeStatus('error');
+        return;
+      }
+
+      if (hasCompletionError) {
+        console.error('No se pudo completar el cambio de correo:', completionError);
+        setEmailChangeError(
+          completionError instanceof Error
+            ? completionError.message
             : 'No se pudo actualizar el correo. Vuelve a solicitar el cambio.'
         );
         setEmailChangeStatus('error');
-      });
+        return;
+      }
+
+      setEmailChangeStatus('updated');
+    };
+
+    void completeEmailChange();
   }, [emailChangeActionUrl, openedFromEmailChangeLink, savedEmailChangeRequest]);
 
   useEffect(() => {
