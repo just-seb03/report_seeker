@@ -73,7 +73,17 @@ export default function ReportTextStep({
           slotProps={{ htmlInput: { maxLength } }}
           error={!!errorMessage}
           helperText={errorMessage || (multiline ? `${value.length} / ${maxLength}` : undefined)}
-          sx={{ '& .MuiInputBase-root': { borderRadius: 4, backgroundColor: 'background.paper' } }}
+          sx={{ 
+            '& .MuiInputBase-root': { 
+              borderRadius: 2, 
+              backgroundColor: 'background.paper',
+              padding: multiline ? '12px 16px' : undefined
+            },
+            '& .MuiOutlinedInput-input': {
+              paddingLeft: multiline ? undefined : '16px',
+              paddingRight: multiline ? undefined : '16px'
+            }
+          }}
         />
         <Button 
           variant="contained" 
