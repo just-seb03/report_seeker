@@ -115,21 +115,21 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
         <Box component="section" aria-label="Información del reporte" sx={{ display: 'grid', gap: 2, mt: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
-              <Box sx={{ display: 'grid', width: 48, height: 48, flex: '0 0 48px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12), color: 'primary.main' }}>
-                <LocationOnOutlinedIcon sx={{ fontSize: 24 }} />
-              </Box>
-              <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
-                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>Ubicación</Typography>
-                <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '14px', fontWeight: 500, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || 'No especificada'}</Typography>
-              </Box>
-            </Box>
-            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
               <Box sx={{ display: 'grid', width: 48, height: 48, flex: '0 0 48px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette[severityPalette as 'primary'|'success'|'warning'|'error'].main, 0.12), color: `${severityPalette}.main` }}>
                 <PriorityHighRoundedIcon sx={{ fontSize: 24 }} />
               </Box>
               <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
                 <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>Gravedad</Typography>
                 <Typography component="p" sx={{ m: 0, color: `${severityPalette}.main`, fontSize: '14px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.priority}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
+              <Box sx={{ display: 'grid', width: 48, height: 48, flex: '0 0 48px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12), color: 'primary.main' }}>
+                <LocationOnOutlinedIcon sx={{ fontSize: 24 }} />
+              </Box>
+              <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>Ubicación</Typography>
+                <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '14px', fontWeight: 500, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || 'No especificada'}</Typography>
               </Box>
             </Box>
           </Box>
@@ -139,7 +139,13 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '8px 4px', color: 'text.secondary', fontSize: '13px', fontWeight: 500, '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 1 }, '& svg': { flex: '0 0 auto', fontSize: 18 } }}>
             <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || 'Trabajador Desconocido'}</span>
-            <span><CalendarMonthOutlinedIcon aria-hidden="true" /> {formatReportDate(report.capturedAt)}</span>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.25 }}>
+              <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonthOutlinedIcon aria-hidden="true" sx={{ fontSize: 18 }} />
+                {formatReportDate(report.capturedAt).date}
+              </Box>
+              <Typography component="span" sx={{ fontSize: '11px', color: 'text.disabled', fontWeight: 600 }}>{formatReportDate(report.capturedAt).time}</Typography>
+            </Box>
           </Box>
         </Box>
       </Box>

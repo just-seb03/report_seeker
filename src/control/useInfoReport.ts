@@ -37,10 +37,12 @@ function getImageData(image: string) {
 }
 
 export function formatReportDate(capturedAt: string) {
-  const date = new Date(capturedAt);
-  return Number.isNaN(date.getTime())
-    ? 'Fecha desconocida'
-    : new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  const dateObj = new Date(capturedAt);
+  if (Number.isNaN(dateObj.getTime())) return { date: 'Fecha desconocida', time: '' };
+  return {
+    date: new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium' }).format(dateObj),
+    time: new Intl.DateTimeFormat('es-CL', { timeStyle: 'short' }).format(dateObj)
+  };
 }
 
 export function useInfoReport(report: IssueReport) {
