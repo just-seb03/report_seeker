@@ -24,31 +24,32 @@ const icons = [
 
 export default function SeekieAIDoodles() {
   const doodles = useMemo(() => {
-    return Array.from({ length: 100 }).map((_, i) => {
-      // Usar pseudo-aleatoriedad basada en el índice para que sea consistente en renderizados
+    // Reducimos la cantidad para mejorar rendimiento en móviles
+    return Array.from({ length: 50 }).map((_, i) => {
       const pseudoRandom1 = (Math.sin(i * 1.23) + 1) / 2;
       const pseudoRandom2 = (Math.cos(i * 3.45) + 1) / 2;
       
       const Icon = icons[i % icons.length];
-      const size = 20 + Math.floor(pseudoRandom1 * 24); // Tamaños entre 20 y 44
+      const size = 20 + Math.floor(pseudoRandom1 * 30); // Tamaños entre 20 y 50
       const rotate = Math.floor(pseudoRandom2 * 360);
-      const offsetX = Math.floor((pseudoRandom1 - 0.5) * 40); // Desfase X -20 a +20
-      const offsetY = Math.floor((pseudoRandom2 - 0.5) * 40); // Desfase Y -20 a +20
+      const offsetX = Math.floor((pseudoRandom1 - 0.5) * 60); 
+      const offsetY = Math.floor((pseudoRandom2 - 0.5) * 60); 
 
       return (
-        <Box
+        <div
           key={i}
-          sx={{
+          style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: '60px',
-            height: '60px',
+            width: '80px', // Áreas más grandes para compensar que hay menos iconos
+            height: '80px',
             transform: `translate(${offsetX}px, ${offsetY}px) rotate(${rotate}deg)`,
+            willChange: 'transform',
           }}
         >
-          <Icon sx={{ fontSize: size }} />
-        </Box>
+          <Icon style={{ fontSize: size }} />
+        </div>
       );
     });
   }, []);
@@ -57,20 +58,26 @@ export default function SeekieAIDoodles() {
     <Box
       sx={{
         position: 'absolute',
-        inset: -40, // Extendemos el inset para que no se corten los bordes por los offsets
-        overflow: 'hidden',
+        inset: 0, 
+        overflow: 'hidden', // Este contenedor exacto evita el scroll en el chat area
         zIndex: 0,
         pointerEvents: 'none',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignContent: 'flex-start',
-        justifyContent: 'space-evenly',
-        // Opacidad muy baja para que sea un patrón sutil de fondo
-        opacity: (theme) => theme.palette.mode === 'dark' ? 0.03 : 0.06,
-        color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
       }}
     >
-      {doodles}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: -60, // Este contenedor interno puede desbordarse libremente
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignContent: 'flex-start',
+          justifyContent: 'space-evenly',
+          opacity: (theme) => theme.palette.mode === 'dark' ? 0.03 : 0.06,
+          color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+        }}
+      >
+        {doodles}
+      </Box>
     </Box>
   );
 }
