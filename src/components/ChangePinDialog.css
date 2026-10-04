@@ -40,6 +40,15 @@ body.dark .change-pin-dialog {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.change-pin-dialog.closing {
+  animation: slideDownFade 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes slideDownFade {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(40px); }
+}
+
 .change-pin-close {
   position: absolute !important;
   top: 16px;

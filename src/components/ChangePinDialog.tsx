@@ -30,11 +30,12 @@ import './ChangePinDialog.css';
 
 interface ChangePinDialogProps {
   onClose: () => void;
+  isClosing?: boolean;
 }
 
 type Step = 'confirm_current' | 'enter_new' | 'loading' | 'success';
 
-export default function ChangePinDialog({ onClose }: ChangePinDialogProps) {
+export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogProps) {
   const [step, setStep] = useState<Step>('confirm_current');
   const [pinInput, setPinInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -112,7 +113,7 @@ export default function ChangePinDialog({ onClose }: ChangePinDialogProps) {
   };
 
   return (
-    <Box className="change-pin-dialog">
+    <Box className={`change-pin-dialog ${isClosing ? 'closing' : ''}`}>
       <IconButton className="change-pin-close" onClick={onClose} aria-label="Cerrar">
         <CloseRoundedIcon />
       </IconButton>

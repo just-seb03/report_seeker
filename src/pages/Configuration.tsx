@@ -17,6 +17,7 @@
  *   Configuration -- Componente visual para las opciones de configuración y perfil.           *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { useState, useEffect } from 'react';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -36,6 +37,29 @@ type ConfigurationProps = {
 };
 
 export default function Configuration({ onBack, isDarkMode, onToggleTheme, configMenuState, setConfigMenuState }: ConfigurationProps) {
+  const [renderPin, setRenderPin] = useState(configMenuState === 'pin');
+  const [renderEmail, setRenderEmail] = useState(configMenuState === 'email');
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    if (configMenuState === 'pin') {
+      setRenderPin(true);
+    } else if (renderPin) {
+      timeout = setTimeout(() => setRenderPin(false), 350);
+    }
+    return () => clearTimeout(timeout);
+  }, [configMenuState, renderPin]);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    if (configMenuState === 'email') {
+      setRenderEmail(true);
+    } else if (renderEmail) {
+      timeout = setTimeout(() => setRenderEmail(false), 350);
+    }
+    return () => clearTimeout(timeout);
+  }, [configMenuState, renderEmail]);
+
   const handleOpenPin = () => {
     setConfigMenuState('pin');
   };
@@ -85,8 +109,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
         </div>
       </section>
 
-      {configMenuState === 'pin' && <ChangePinDialog onClose={handleClosePin} />}
-      {configMenuState === 'email' && <ChangeEmailDialog onClose={handleCloseEmail} />}
+      {renderPin && <ChangePinDialog onClose={handleClosePin} isClosing={configMenuState !== 'pin'} />}
+      {renderEmail && <ChangeEmailDialog onClose={handleCloseEmail} isClosing={configMenuState !== 'email'} />}
     </main>
   );
 }

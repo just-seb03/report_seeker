@@ -30,11 +30,12 @@ import './ChangePinDialog.css'; // Reutilizamos estilos
 
 interface ChangeEmailDialogProps {
   onClose: () => void;
+  isClosing?: boolean;
 }
 
 type Step = 'confirm_current' | 'enter_new' | 'loading' | 'success';
 
-export default function ChangeEmailDialog({ onClose }: ChangeEmailDialogProps) {
+export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDialogProps) {
   const [step, setStep] = useState<Step>('confirm_current');
   const [pinInput, setPinInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
@@ -110,7 +111,7 @@ export default function ChangeEmailDialog({ onClose }: ChangeEmailDialogProps) {
   };
 
   return (
-    <Box className="change-pin-dialog">
+    <Box className={`change-pin-dialog ${isClosing ? 'closing' : ''}`}>
       <IconButton className="change-pin-close" onClick={onClose} aria-label="Cerrar">
         <CloseRoundedIcon />
       </IconButton>
