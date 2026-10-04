@@ -23,7 +23,7 @@ import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlin
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
-import { IconButton, Box, Typography, Button, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
+import { IconButton, Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import ChangePinDialog from '../components/ChangePinDialog';
 import ChangeEmailDialog from '../components/ChangeEmailDialog';
 
@@ -95,9 +95,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                   {isDarkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
                 </ListItemIcon>
                 <ListItemText 
-                  primary="Tema de la Aplicación" 
+                  primary={<Typography sx={{ fontWeight: 500 }}>Tema de la Aplicación</Typography>}
                   secondary={isDarkMode ? 'Modo Oscuro' : 'Modo Claro'} 
-                  primaryTypographyProps={{ fontWeight: 500 }}
                 />
               </ListItemButton>
             </ListItem>
@@ -108,9 +107,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                   <LockOutlinedIcon />
                 </ListItemIcon>
                 <ListItemText 
-                  primary="Cambiar PIN" 
+                  primary={<Typography sx={{ fontWeight: 500 }}>Cambiar PIN</Typography>}
                   secondary="Actualiza tu código de acceso"
-                  primaryTypographyProps={{ fontWeight: 500 }}
                 />
               </ListItemButton>
             </ListItem>
@@ -121,9 +119,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                   <AlternateEmailOutlinedIcon />
                 </ListItemIcon>
                 <ListItemText 
-                  primary="Cambiar correo de recuperación" 
+                  primary={<Typography sx={{ fontWeight: 500 }}>Cambiar correo de recuperación</Typography>}
                   secondary="Actualiza el email asociado a tu cuenta"
-                  primaryTypographyProps={{ fontWeight: 500 }}
                 />
               </ListItemButton>
             </ListItem>

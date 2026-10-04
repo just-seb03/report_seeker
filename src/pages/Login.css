@@ -17,33 +17,7 @@
  *   Estilos para la pantalla de acceso, recuperación de PIN y animaciones de bienvenida.      *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-.login-screen {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  overflow: hidden;
-  box-sizing: border-box;
-  background-color: #f5f5f5; /* Light Surface Container */
-  color: #1a1c1e;
-  transition: background-color 0.4s cubic-bezier(0.2, 0, 0, 1), color 0.4s ease;
-  display: flex;
-  flex-direction: column;
-}
 
-body.dark .login-screen {
-  background-color: #121212; /* Dark Surface Container */
-  color: #e2e2e5;
-}
-
-.login-content {
-  flex: 1;
-  width: 100%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Roboto', 'Inter', inherit;
-}
 
 /* Animaciones y Estados de los Pasos */
 .intro-step {
@@ -79,113 +53,7 @@ body.dark .login-screen {
   flex-direction: column;
 }
 
-.recovery-link,
-.recovery-back {
-  border: 0;
-  background: none;
-  color: #0b57d0;
-  font: inherit;
-  cursor: pointer;
-  padding: 12px;
-}
 
-.recovery-link {
-  margin-top: 12px;
-}
-
-.recovery-step {
-  overflow-y: auto;
-}
-
-.recovery-form {
-  display: flex;
-  flex-direction: column;
-  width: min(100%, 360px);
-  gap: 10px;
-}
-
-.recovery-form h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 500;
-}
-
-.recovery-form p {
-  margin: 0 0 10px;
-  color: #5f6368;
-  line-height: 1.5;
-}
-
-.recovery-form label {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.recovery-form input {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 48px;
-  padding: 0 12px;
-  border: 1px solid #74777f;
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-}
-
-.recovery-submit {
-  min-height: 48px;
-  margin-top: 8px;
-  border: 0;
-  border-radius: 24px;
-  background: #0b57d0;
-  color: #fff;
-  font: inherit;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.recovery-submit:disabled,
-.recovery-back:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-
-.recovery-form .recovery-notice {
-  margin: 4px 0 0;
-  color: #188038;
-}
-
-.recovery-form .recovery-error {
-  margin: 4px 0 0;
-  color: #b3261e;
-}
-
-.recovery-back {
-  align-self: center;
-}
-
-body.dark .recovery-link,
-body.dark .recovery-back {
-  color: #a8c7fa;
-}
-
-body.dark .recovery-form p {
-  color: #c4c6d0;
-}
-
-body.dark .recovery-form input {
-  border-color: #8e9099;
-}
-
-body.dark .recovery-submit {
-  background: #a8c7fa;
-  color: #062e6f;
-}
-
-body.dark .recovery-form .recovery-error {
-  color: #f2b8b5;
-}
 
 /* Título de Bienvenida */
 .intro-welcome h1 {

@@ -110,10 +110,8 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
                   <Icon />
                 </ListItemIcon>
                 <ListItemText 
-                  primary={label} 
-                  secondary={value} 
-                  primaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
-                  secondaryTypographyProps={{ variant: 'body1', color: 'text.primary', fontWeight: 500 }}
+                  primary={<Typography variant="caption" color="text.secondary">{label}</Typography>} 
+                  secondary={<Typography variant="body1" color="text.primary" sx={{ fontWeight: 500 }}>{value}</Typography>} 
                 />
 						  </ListItem>
 					  ))}

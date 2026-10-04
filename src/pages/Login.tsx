@@ -32,6 +32,7 @@ import {
   verifyPinRecoveryWorker
 } from '../control/pinRecoveryControl';
 import { useIntroFlow } from '../control/useIntroFlow';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import PinPad from '../components/PinPad';
 import LoginErrorDialog from '../components/LoginErrorDialog';
 import './Login.css';
@@ -195,12 +196,22 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   } = useIntroFlow(onLoginSuccess, openedFromRecoveryLink);
 
   return (
-    <main className={`login-screen ${step === 'loading' || step === 'done' || step === 'black_screen' ? 'is-loading' : ''}`}>
-      <section className="login-content">
+    <Box 
+      sx={{ 
+        position: 'absolute', 
+        inset: 0, 
+        zIndex: 5, 
+        overflow: 'hidden', 
+        display: 'flex', 
+        flexDirection: 'column',
+        backgroundColor: 'background.default'
+      }}
+    >
+      <Box sx={{ flex: 1, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         
         {/* Paso: Bienvenida */}
         <div className={`intro-step intro-welcome ${step === 'welcome' ? 'active' : 'exit'}`}>
-          <h1>Bienvenido</h1>
+          <Typography variant="h3" sx={{ fontWeight: 400, letterSpacing: 2 }}>Bienvenido</Typography>
         </div>
 
         {/* Paso: Ingreso de ID */}
@@ -223,9 +234,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             currentValue={pin}
             onKeyPress={handlePinKeyPress}
           />
-          <button
-            className="recovery-link"
-            type="button"
+          <Button
+            variant="text"
+            color="primary"
+            sx={{ mt: 2 }}
             onClick={() => {
               setRecoveryWorkerId(workerId);
               setRecoveryStatus('idle');
@@ -234,68 +246,65 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             }}
           >
             Olvidé mi PIN
-          </button>
+          </Button>
         </div>
 
-        <div className={`intro-step recovery-step ${isRecoveryOpen ? 'active' : 'hidden'}`}>
-          <form
-            className="recovery-form"
+        <div className={`intro-step recovery-step ${isRecoveryOpen ? 'active' : 'hidden'}`} style={{ overflowY: 'auto' }}>
+          <Box
+            component="form"
             onSubmit={handleRecoverySubmit}
+            sx={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: 360, gap: 2 }}
           >
-            <h2>Recuperar PIN</h2>
-            <p>
+            <Typography variant="h5" sx={{ fontWeight: 500 }}>Recuperar PIN</Typography>
+            <Typography variant="body2" color="text.secondary">
               {recoveryStatus === 'verified'
                 ? 'Correo verificado. Ingresa y confirma tu nuevo PIN de 4 dígitos.'
                 : 'Ingresa tu ID de trabajador y el correo asociado a tu cuenta.'}
-            </p>
-            <label htmlFor="recovery-worker-id">ID de trabajador</label>
-            <input
-              id="recovery-worker-id"
-              type="text"
+            </Typography>
+
+            <TextField
+              label="ID de trabajador"
+              variant="outlined"
+              fullWidth
               inputMode="numeric"
-              pattern="[0-9]{5}"
-              maxLength={5}
               autoComplete="off"
               required
               disabled={recoveryStatus === 'verified' || recoveryStatus === 'updating' || recoveryStatus === 'completed'}
               value={recoveryWorkerId}
-              onChange={(event) => {
-                setRecoveryWorkerId(event.target.value.replace(/\D/g, '').slice(0, 5));
-              }}
+              onChange={(event) => setRecoveryWorkerId(event.target.value.replace(/\D/g, '').slice(0, 5))}
             />
-            <label htmlFor="recovery-email">Correo electrónico</label>
-            <input
-              id="recovery-email"
+
+            <TextField
+              label="Correo electrónico"
               type="email"
+              variant="outlined"
+              fullWidth
               autoComplete="email"
               required
               disabled={recoveryStatus === 'verified' || recoveryStatus === 'updating' || recoveryStatus === 'completed'}
               value={recoveryEmail}
-              onChange={(event) => {
-                setRecoveryEmail(event.target.value);
-              }}
+              onChange={(event) => setRecoveryEmail(event.target.value)}
             />
+
             {recoveryStatus === 'verified' && (
               <>
-                <label htmlFor="recovery-new-pin">Nuevo PIN</label>
-                <input
-                  id="recovery-new-pin"
+                <TextField
+                  label="Nuevo PIN"
                   type="password"
+                  variant="outlined"
+                  fullWidth
                   inputMode="numeric"
-                  pattern="[0-9]{4}"
-                  maxLength={4}
                   autoComplete="new-password"
                   required
                   value={newRecoveryPin}
                   onChange={(event) => setNewRecoveryPin(event.target.value.replace(/\D/g, '').slice(0, 4))}
                 />
-                <label htmlFor="recovery-confirm-pin">Confirma el nuevo PIN</label>
-                <input
-                  id="recovery-confirm-pin"
+                <TextField
+                  label="Confirma el nuevo PIN"
                   type="password"
+                  variant="outlined"
+                  fullWidth
                   inputMode="numeric"
-                  pattern="[0-9]{4}"
-                  maxLength={4}
                   autoComplete="new-password"
                   required
                   value={confirmRecoveryPin}
@@ -303,8 +312,15 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 />
               </>
             )}
+
             {!['sent', 'completed'].includes(recoveryStatus) && (
-              <button className="recovery-submit" type="submit" disabled={recoveryStatus === 'sending' || recoveryStatus === 'verifying' || recoveryStatus === 'updating'}>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                type="submit" 
+                disabled={recoveryStatus === 'sending' || recoveryStatus === 'verifying' || recoveryStatus === 'updating'}
+                sx={{ mt: 1, py: 1.5, borderRadius: 6 }}
+              >
                 {recoveryStatus === 'sending'
                   ? 'Enviando...'
                   : recoveryStatus === 'verifying'
@@ -316,43 +332,46 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                     : recoveryStatus === 'needs_details' || isPinRecoveryLink(activeRecoveryActionUrl)
                       ? 'Confirmar correo'
                       : 'Enviar enlace'}
-              </button>
+              </Button>
             )}
+
             {recoveryStatus === 'sent' && (
-              <p className="recovery-notice" role="status">
+              <Typography color="success.main" variant="body2" role="status" sx={{ mt: 1 }}>
                 Si el correo puede recibir enlaces de acceso, recibirás un enlace para confirmar que tienes acceso a esa bandeja.
-              </p>
+              </Typography>
             )}
             {recoveryStatus === 'verified' && (
-              <p className="recovery-notice" role="status">
+              <Typography color="success.main" variant="body2" role="status" sx={{ mt: 1 }}>
                 Correo verificado y asociado al trabajador.
-              </p>
+              </Typography>
             )}
             {recoveryStatus === 'completed' && (
-              <p className="recovery-notice" role="status">
+              <Typography color="success.main" variant="body2" role="status" sx={{ mt: 1 }}>
                 PIN actualizado. Vuelve al inicio de sesión para ingresar con tu PIN nuevo.
-              </p>
+              </Typography>
             )}
             {recoveryStatus === 'not_matched' && (
-              <p className="recovery-error" role="alert">
+              <Typography color="error.main" variant="body2" role="alert" sx={{ mt: 1 }}>
                 No se pudo validar la combinación de ID y correo. Revisa los datos e inténtalo nuevamente.
-              </p>
+              </Typography>
             )}
             {recoveryError && (
-              <p className="recovery-error" role="alert">{recoveryError}</p>
+              <Typography color="error.main" variant="body2" role="alert" sx={{ mt: 1 }}>{recoveryError}</Typography>
             )}
-            <button
-              className="recovery-back"
+
+            <Button
+              variant="text"
+              color="primary"
               disabled={recoveryStatus === 'sending' || recoveryStatus === 'verifying' || recoveryStatus === 'updating'}
-              type="button"
               onClick={() => void handleRecoveryBack()}
+              sx={{ alignSelf: 'center', mt: 1 }}
             >
               {recoveryStatus === 'completed' ? 'Ir al inicio de sesión' : 'Volver al inicio de sesión'}
-            </button>
-          </form>
+            </Button>
+          </Box>
         </div>
 
-      </section>
+      </Box>
 
       {/* Pantalla negra de carga que cubre todo y se desvanece suavemente */}
       <div className={`intro-cache-loader ${step === 'loading' || step === 'black_screen' ? 'active' : ''} ${step === 'done' || step === 'welcome' || step === 'id_input' ? 'exit-done' : ''}`}>
@@ -363,6 +382,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         message={errorMessage}
         onClose={closeErrorDialog}
       />
-    </main>
+    </Box>
   );
 }
