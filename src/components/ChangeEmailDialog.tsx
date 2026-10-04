@@ -78,7 +78,7 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
 
     setStep('loading');
     try {
-      await sendEmailChangeLink(emailInput, user.trabajador_id);
+      await sendEmailChangeLink(emailInput, user.email, user.trabajador_id);
       setStep('success');
     } catch (error) {
       console.error('No se pudo enviar el enlace para cambiar el correo:', error);

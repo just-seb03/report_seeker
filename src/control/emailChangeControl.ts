@@ -14,16 +14,24 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   sendEmailChangeLink -- Envía un enlace marcado para el flujo de cambio y guarda la solicitud.
+ *   sendEmailChangeLink -- Envía el enlace y guarda los datos de la solicitud.                 *
  *   getSavedEmailChangeRequest -- Recupera la solicitud pendiente de cambio de correo.        *
  *   isEmailChangeLink -- Identifica enlaces de acceso del flujo de cambio de correo.          *
+ *   completeEmailChangeLink -- Comprueba el enlace y su correspondencia con el trabajador.   *
  *   getPendingNativeEmailChangeLink -- Recupera un enlace recibido al abrir Android.          *
  *   savePendingNativeEmailChangeLink -- Conserva el enlace recibido hasta montar la pantalla. *
  *   clearPendingNativeEmailChangeLink -- Descarta el enlace nativo pendiente al salir.         *
+ *   cancelEmailChangeAuthentication -- Cierra la sesión y descarta la solicitud al cancelar. *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { isSignInWithEmailLink, sendSignInLinkToEmail } from 'firebase/auth';
-import { auth } from '../firebase';
+import {
+  isSignInWithEmailLink,
+  signInWithEmailLink,
+  sendSignInLinkToEmail,
+  signOut
+} from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 import { getRecoveryContinueUrl } from './pinRecoveryControl';
 
 const EMAIL_CHANGE_REQUEST_KEY = 'email_change_request';
@@ -31,11 +39,31 @@ const PENDING_NATIVE_EMAIL_CHANGE_LINK_KEY = 'pending_native_email_change_link';
 
 export interface EmailChangeRequest {
   email: string;
+  currentEmail: string;
   workerId: string;
 }
 
-export async function sendEmailChangeLink(email: string, workerId: number): Promise<void> {
+function isValidEmailChangeRequest(request: EmailChangeRequest): boolean {
+  return /^\S+@\S+\.\S+$/.test(request.email.trim())
+    && /^\S+@\S+\.\S+$/.test(request.currentEmail.trim())
+    && /^\d{5}$/.test(request.workerId);
+}
+
+export async function sendEmailChangeLink(
+  email: string,
+  currentEmail: string,
+  workerId: number
+): Promise<void> {
   const normalizedEmail = email.trim();
+  const normalizedCurrentEmail = currentEmail.trim();
+  if (!isValidEmailChangeRequest({
+    email: normalizedEmail,
+    currentEmail: normalizedCurrentEmail,
+    workerId: String(workerId)
+  })) {
+    throw new Error('Los datos de la solicitud de cambio de correo no son válidos.');
+  }
+
   const continueUrl = new URL(getRecoveryContinueUrl());
   continueUrl.searchParams.set('flow', 'email-change');
 
@@ -49,8 +77,49 @@ export async function sendEmailChangeLink(email: string, workerId: number): Prom
 
   window.localStorage.setItem(EMAIL_CHANGE_REQUEST_KEY, JSON.stringify({
     email: normalizedEmail,
+    currentEmail: normalizedCurrentEmail,
     workerId: String(workerId)
   } satisfies EmailChangeRequest));
+}
+
+export async function completeEmailChangeLink(
+  request: EmailChangeRequest,
+  url: string
+): Promise<void> {
+  if (!isValidEmailChangeRequest(request)) {
+    throw new Error('La solicitud pendiente de cambio de correo no es válida.');
+  }
+  if (!isEmailChangeLink(url)) {
+    throw new Error('El enlace no corresponde a una solicitud de cambio de correo.');
+  }
+
+  const credential = await signInWithEmailLink(auth, request.email.trim(), url);
+
+  try {
+    const verifiedEmail = credential.user.email?.trim().toLowerCase();
+    const requestedEmail = request.email.trim().toLowerCase();
+    if (!credential.user.emailVerified || verifiedEmail !== requestedEmail) {
+      throw new Error('El enlace no confirma el correo solicitado para esta cuenta.');
+    }
+
+    const workerSnapshot = await getDoc(doc(db, 'trabajadores', request.workerId));
+    const workerData = workerSnapshot.data();
+    const workerEmail = typeof workerData?.email === 'string'
+      ? workerData.email.trim().toLowerCase()
+      : '';
+    const workerIdMatches = workerData?.trabajador_id === Number(request.workerId);
+
+    if (
+      !workerSnapshot.exists()
+      || !workerIdMatches
+      || workerEmail !== request.currentEmail.trim().toLowerCase()
+    ) {
+      throw new Error('La solicitud ya no corresponde al correo registrado para este trabajador.');
+    }
+  } catch (error) {
+    await signOut(auth);
+    throw error;
+  }
 }
 
 export function getSavedEmailChangeRequest(): EmailChangeRequest | null {
@@ -64,10 +133,17 @@ export function getSavedEmailChangeRequest(): EmailChangeRequest | null {
       && request !== null
       && 'email' in request
       && typeof request.email === 'string'
+      && 'currentEmail' in request
+      && typeof request.currentEmail === 'string'
       && 'workerId' in request
       && typeof request.workerId === 'string'
     ) {
-      return { email: request.email, workerId: request.workerId };
+      const emailChangeRequest = {
+        email: request.email,
+        currentEmail: request.currentEmail,
+        workerId: request.workerId
+      };
+      if (isValidEmailChangeRequest(emailChangeRequest)) return emailChangeRequest;
     }
   } catch (error) {
     console.error('No se pudo recuperar la solicitud pendiente de cambio de correo:', error);
@@ -110,4 +186,13 @@ export function savePendingNativeEmailChangeLink(url: string): void {
 
 export function clearPendingNativeEmailChangeLink(): void {
   window.sessionStorage.removeItem(PENDING_NATIVE_EMAIL_CHANGE_LINK_KEY);
+}
+
+export async function cancelEmailChangeAuthentication(): Promise<void> {
+  if (auth.currentUser) {
+    await signOut(auth);
+  }
+
+  window.localStorage.removeItem(EMAIL_CHANGE_REQUEST_KEY);
+  clearPendingNativeEmailChangeLink();
 }
