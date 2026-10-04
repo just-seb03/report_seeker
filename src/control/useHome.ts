@@ -359,7 +359,7 @@ export function useHome() {
       return false; // Permite que la app se cierre nativamente
     }
     return false;
-  }, [cancelDialogOpen, activeView, reportIsComplete, isExpanded, navigateTo, handleCollapse]);
+  }, [cancelDialogOpen, activeView, reportIsComplete, isExpanded, navigateTo, handleCollapse, configMenuState]);
 
   useHardwareBackButton(handleHardwareBack);
 
