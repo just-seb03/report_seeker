@@ -10,12 +10,12 @@
  *                                                                                             *
  *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
  *                                                                                             *
- *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   App -- Componente principal de la aplicación, provee el contexto global y manejo de       *
- *        temas.                                                                               *
+ *   App -- Componente principal de la aplicación; maneja temas, sesión y enlaces de           *
+ *          recuperación PIN recibidos por Android.                                            *
  *   handleToggleManualTheme -- Alterna manualmente el tema visual (claro/oscuro) de la        *
  *        interfaz.                                                                            *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -26,7 +26,11 @@ import { resetPushNotificationCount } from './control/systemNotificationsControl
 import { ThemeProvider, createTheme, CssBaseline, useMediaQuery } from '@mui/material';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import { getCurrentUser, type Trabajador } from './control/authControl';
+import { getCurrentUser, logout, type Trabajador } from './control/authControl';
+import {
+  isPinRecoveryLink,
+  savePendingNativePinRecoveryLink
+} from './control/pinRecoveryControl';
 
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/700.css';
@@ -38,6 +42,7 @@ function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [manualThemeMode, setManualThemeMode] = useState<ManualThemeMode>('system');
   const [currentUser, setCurrentUser] = useState<Trabajador | null>(getCurrentUser());
+  const [recoveryLinkLaunch, setRecoveryLinkLaunch] = useState(0);
 
   const effectiveDarkMode =
     manualThemeMode === 'system' ? prefersDarkMode : manualThemeMode === 'dark';
@@ -47,12 +52,20 @@ function App() {
     const sub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) resetPushNotificationCount();
     });
+    const recoveryLinkSub = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+      if (!isPinRecoveryLink(url)) return;
+
+      savePendingNativePinRecoveryLink(url);
+      logout();
+      setRecoveryLinkLaunch((launch) => launch + 1);
+    });
 
     const handleLogout = () => setCurrentUser(null);
     window.addEventListener('user_logout', handleLogout);
 
     return () => {
       sub.then(listener => listener.remove());
+      recoveryLinkSub.then(listener => listener.remove());
       window.removeEventListener('user_logout', handleLogout);
     };
   }, []);
@@ -108,7 +121,10 @@ function App() {
           onToggleManualTheme={handleToggleManualTheme}
         />
       ) : (
-        <Login onLoginSuccess={(user) => setCurrentUser(user)} />
+        <Login
+          key={recoveryLinkLaunch}
+          onLoginSuccess={(user) => setCurrentUser(user)}
+        />
       )}
     </ThemeProvider>
   );

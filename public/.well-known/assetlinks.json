@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.reportseeker.mobile",
+      "sha256_cert_fingerprints": [
+        "C5:14:E8:6F:B7:2E:78:CD:F4:60:4F:7D:72:54:F3:44:36:15:EB:9C:06:6D:AA:F2:D5:41:CD:B6:4D:E1:D3:15"
+      ]
+    }
+  }
+]

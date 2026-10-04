@@ -124,8 +124,13 @@ La recuperación envía un enlace de acceso por correo con Firebase Authenticati
 
 Para habilitar el envío:
 - En Firebase Console, activa el proveedor **Correo electrónico/Contraseña** y la opción **Enlace por correo electrónico (sin contraseña)** en Authentication.
-- Agrega el dominio donde está alojada la app web a los dominios autorizados de Authentication.
-- En `.env.local`, define `VITE_RECOVERY_CONTINUE_URL` con la URL pública de la app web. Es necesaria en la aplicación móvil para que el enlace vuelva a una página accesible; en web, si se omite, se usa el origen actual.
+- Agrega `report-seeker-d8526.web.app` a los dominios autorizados de Authentication.
+- En web se usa el origen actual como URL de continuación. En Android se usa `https://<projectId>.web.app` por defecto; `VITE_RECOVERY_CONTINUE_URL` puede sobrescribirla si se despliega en otro dominio.
+
+### Apertura del enlace directamente en Android
+
+El proyecto Android registra el dominio de Firebase Authentication como Android App Link y pasa el enlace recibido a la pantalla de recuperación.
+
 
 ##  Historial de Cambios (Changelog)
 

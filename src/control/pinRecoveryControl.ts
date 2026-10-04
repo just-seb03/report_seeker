@@ -23,6 +23,8 @@
  *   cancelPinRecoveryAuthentication -- Cierra la sesión temporal de recuperación.              *
  *   getSavedPinRecoveryRequest -- Recupera ID y correo guardados para completar el proceso.    *
  *   clearPinRecoveryLinkFromUrl -- Elimina parámetros del enlace del historial del navegador. *
+ *   getPendingNativePinRecoveryLink -- Recupera temporalmente el enlace recibido en Android.   *
+ *   savePendingNativePinRecoveryLink -- Conserva el enlace Android hasta montar la pantalla.  *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Capacitor } from '@capacitor/core';
@@ -37,6 +39,7 @@ import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'fireb
 import { auth, db } from '../firebase';
 
 const PIN_RECOVERY_REQUEST_KEY = 'pin_recovery_request';
+const PENDING_NATIVE_RECOVERY_LINK_KEY = 'pending_native_pin_recovery_link';
 
 interface PinRecoveryRequest {
   email: string;
@@ -51,7 +54,11 @@ function getRecoveryContinueUrl(): string {
   }
 
   if (Capacitor.isNativePlatform()) {
-    throw new Error('Configura VITE_RECOVERY_CONTINUE_URL con la URL pública de la aplicación web.');
+    const projectId = auth.app.options.projectId;
+    if (!projectId) {
+      throw new Error('Firebase no tiene projectId configurado para crear el enlace de recuperación móvil.');
+    }
+    return `https://${projectId}.web.app`;
   }
 
   return window.location.origin;
@@ -65,7 +72,10 @@ export async function sendPinRecoveryLink(email: string, workerId: string): Prom
   const normalizedEmail = email.trim();
   await sendSignInLinkToEmail(auth, normalizedEmail, {
     url: getRecoveryContinueUrl(),
-    handleCodeInApp: true
+    handleCodeInApp: true,
+    android: {
+      packageName: 'app.reportseeker.mobile'
+    }
   });
   window.localStorage.setItem(PIN_RECOVERY_REQUEST_KEY, JSON.stringify({
     email: normalizedEmail,
@@ -167,5 +177,16 @@ export function getSavedPinRecoveryRequest(): PinRecoveryRequest | null {
 }
 
 export function clearPinRecoveryLinkFromUrl(): void {
-  window.history.replaceState({}, document.title, window.location.pathname);
+  if (isPinRecoveryLink(window.location.href)) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  window.sessionStorage.removeItem(PENDING_NATIVE_RECOVERY_LINK_KEY);
+}
+
+export function getPendingNativePinRecoveryLink(): string {
+  return window.sessionStorage.getItem(PENDING_NATIVE_RECOVERY_LINK_KEY) ?? '';
+}
+
+export function savePendingNativePinRecoveryLink(url: string): void {
+  window.sessionStorage.setItem(PENDING_NATIVE_RECOVERY_LINK_KEY, url);
 }

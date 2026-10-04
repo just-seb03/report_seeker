@@ -24,6 +24,7 @@ import {
   cancelPinRecoveryAuthentication,
   clearPinRecoveryLinkFromUrl,
   completePinRecoveryEmailLink,
+  getPendingNativePinRecoveryLink,
   getSavedPinRecoveryRequest,
   isPinRecoveryLink,
   sendPinRecoveryLink,
@@ -45,7 +46,11 @@ function isInvalidRecoveryActionCode(error: unknown): boolean {
 }
 
 export default function Login({ onLoginSuccess }: LoginProps) {
-  const [openedFromRecoveryLink] = useState(() => isPinRecoveryLink(window.location.href));
+  const [recoveryActionUrl] = useState(() => {
+    const pendingNativeLink = getPendingNativePinRecoveryLink();
+    return isPinRecoveryLink(pendingNativeLink) ? pendingNativeLink : window.location.href;
+  });
+  const [openedFromRecoveryLink] = useState(() => isPinRecoveryLink(recoveryActionUrl));
   const [savedRecoveryRequest] = useState(getSavedPinRecoveryRequest);
   const recoveryLinkProcessingStarted = useRef(false);
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(openedFromRecoveryLink);
@@ -54,15 +59,18 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [recoveryStatus, setRecoveryStatus] = useState<
     'idle' | 'sending' | 'sent' | 'needs_details' | 'verifying' | 'verified' | 'updating' | 'completed' | 'not_matched' | 'error'
   >(() => {
-    if (!isPinRecoveryLink(window.location.href)) return 'idle';
+    if (!isPinRecoveryLink(recoveryActionUrl)) return 'idle';
     return savedRecoveryRequest ? 'verifying' : 'needs_details';
   });
   const [recoveryError, setRecoveryError] = useState('');
   const [newRecoveryPin, setNewRecoveryPin] = useState('');
   const [confirmRecoveryPin, setConfirmRecoveryPin] = useState('');
+  const [activeRecoveryActionUrl, setActiveRecoveryActionUrl] = useState(
+    () => isPinRecoveryLink(recoveryActionUrl) ? recoveryActionUrl : ''
+  );
 
   useEffect(() => {
-    const currentUrl = window.location.href;
+    const currentUrl = recoveryActionUrl;
     if (!isPinRecoveryLink(currentUrl) || recoveryLinkProcessingStarted.current) return;
 
     if (!savedRecoveryRequest) {
@@ -73,6 +81,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     void completePinRecoveryEmailLink(savedRecoveryRequest.email, currentUrl)
       .then(async () => {
         clearPinRecoveryLinkFromUrl();
+        setActiveRecoveryActionUrl('');
         const matchesWorker = await verifyPinRecoveryWorker(savedRecoveryRequest.workerId);
         setRecoveryStatus(matchesWorker ? 'verified' : 'not_matched');
       })
@@ -80,13 +89,14 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         console.error('Error al verificar el enlace de recuperación:', error);
         if (isInvalidRecoveryActionCode(error)) {
           clearPinRecoveryLinkFromUrl();
+          setActiveRecoveryActionUrl('');
           setRecoveryError('Este enlace venció o ya fue utilizado. Solicita uno nuevo e intenta abrirlo una sola vez.');
         } else {
           setRecoveryError('No se pudo completar la verificación. Revisa tu conexión e inténtalo nuevamente.');
         }
         setRecoveryStatus('error');
       });
-  }, [savedRecoveryRequest]);
+  }, [recoveryActionUrl, savedRecoveryRequest]);
 
   const handleRecoverySubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -120,17 +130,19 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       return;
     }
 
-    if (isPinRecoveryLink(window.location.href)) {
+    if (isPinRecoveryLink(activeRecoveryActionUrl)) {
       setRecoveryStatus('verifying');
       try {
-        await completePinRecoveryEmailLink(recoveryEmail, window.location.href);
+        await completePinRecoveryEmailLink(recoveryEmail, activeRecoveryActionUrl);
         clearPinRecoveryLinkFromUrl();
+        setActiveRecoveryActionUrl('');
         const matchesWorker = await verifyPinRecoveryWorker(recoveryWorkerId);
         setRecoveryStatus(matchesWorker ? 'verified' : 'not_matched');
       } catch (error) {
         console.error('Error al verificar el enlace de recuperación:', error);
         if (isInvalidRecoveryActionCode(error)) {
           clearPinRecoveryLinkFromUrl();
+          setActiveRecoveryActionUrl('');
           setRecoveryError('Este enlace venció o ya fue utilizado. Solicita uno nuevo e intenta abrirlo una sola vez.');
         } else {
           setRecoveryError('No se pudo completar la verificación. Revisa los datos y tu conexión.');
@@ -143,6 +155,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     setRecoveryStatus('sending');
     try {
       await sendPinRecoveryLink(recoveryEmail, recoveryWorkerId);
+      setActiveRecoveryActionUrl('');
       setRecoveryStatus('sent');
     } catch (error) {
       console.error('Error al enviar el enlace de recuperación:', error);
@@ -300,7 +313,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                       ? 'Actualizando PIN...'
                       : recoveryStatus === 'verified'
                         ? 'Guardar nuevo PIN'
-                    : recoveryStatus === 'needs_details' || isPinRecoveryLink(window.location.href)
+                    : recoveryStatus === 'needs_details' || isPinRecoveryLink(activeRecoveryActionUrl)
                       ? 'Confirmar correo'
                       : 'Enviar enlace'}
               </button>
