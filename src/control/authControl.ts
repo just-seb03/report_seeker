@@ -50,6 +50,7 @@ export async function seedTrabajadores() {
 }
 
 export async function loginWithFirebase(trabajador_id: number, pin: string): Promise<Trabajador | null> {
+  let snapshot;
   try {
     const q = query(
       collection(db, 'trabajadores'),
@@ -57,23 +58,25 @@ export async function loginWithFirebase(trabajador_id: number, pin: string): Pro
       where('pin', '==', pin)
     );
 
-    const snapshot = await getDocs(q);
-    if (!snapshot.empty) {
-      const trabajador = snapshot.docs[0].data() as Trabajador;
-      
-      // Guardar sesión activa localmente
-      localStorage.setItem('logged_in_user', JSON.stringify(trabajador));
-      
-      // Guardar en la DB de SQLite para satisfacer la Foreign Key de los reportes
-      await insertOrUpdateTrabajadorLocal(trabajador);
-      
-      return trabajador;
-    }
-    return null;
+    snapshot = await getDocs(q);
   } catch (error) {
-    console.error("❌ [Auth] Error en login:", error);
-    return null;
+    console.error('❌ [Auth] No se pudieron validar las credenciales en Firebase:', error);
+    throw new Error('No se pudo conectar con Firebase para validar las credenciales.', { cause: error });
   }
+
+  if (snapshot.empty) return null;
+
+  const trabajador = snapshot.docs[0].data() as Trabajador;
+
+  // Una falla de caché local no debe invalidar unas credenciales válidas en Firebase.
+  localStorage.setItem('logged_in_user', JSON.stringify(trabajador));
+  try {
+    await insertOrUpdateTrabajadorLocal(trabajador);
+  } catch (error) {
+    console.error('❌ [Auth] Login validado, pero no se pudo sincronizar el trabajador en SQLite:', error);
+  }
+
+  return trabajador;
 }
 
 export function getCurrentUser(): Trabajador | null {

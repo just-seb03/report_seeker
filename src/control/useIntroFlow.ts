@@ -78,7 +78,11 @@ export function useIntroFlow(
       }
     } catch (error) {
       console.error('Error inesperado durante el inicio de sesión:', error);
-      setErrorMessage('Error de conexión.');
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo completar el inicio de sesión. Revisa la conexión e inténtalo de nuevo.'
+      );
       setIsErrorDialogVisible(true);
     }
   }, [onLoginSuccess]);

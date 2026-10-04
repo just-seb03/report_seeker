@@ -209,8 +209,21 @@ export function initializeDatabase(): Promise<SQLiteDBConnection> {
 export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; nombre: string; email: string; pin: string }) {
   if (!Capacitor.isNativePlatform()) return;
   const connection = await initializeDatabase();
+  const existingWorker = await connection.query(
+    'SELECT trabajador_id FROM trabajadores WHERE trabajador_id = ? LIMIT 1;',
+    [t.trabajador_id]
+  );
+
+  if (existingWorker.values?.length) {
+    await connection.run(
+      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ? WHERE trabajador_id = ?;',
+      [t.nombre, t.email, t.pin, t.trabajador_id]
+    );
+    return;
+  }
+
   await connection.run(
-    'INSERT OR REPLACE INTO trabajadores (trabajador_id, nombre, email, pin) VALUES (?, ?, ?, ?);',
+    'INSERT INTO trabajadores (trabajador_id, nombre, email, pin) VALUES (?, ?, ?, ?);',
     [t.trabajador_id, t.nombre, t.email, t.pin]
   );
 }

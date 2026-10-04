@@ -27,7 +27,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState } from 'react';
-import { saveIssueReport } from '../database';
+import { insertOrUpdateTrabajadorLocal, saveIssueReport } from '../database';
 import { syncPendingReports } from './sincronizador';
 import { type ReportPhoto } from '../pages/Report';
 import { type EditableReportStep } from '../components/ReportSummaryStep';
@@ -84,6 +84,10 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
 
     try {
       const user = getCurrentUser();
+      if (user) {
+        await insertOrUpdateTrabajadorLocal(user);
+      }
+
       const issueId = await saveIssueReport({
         title: title.trim(),
         description: description.trim(),
