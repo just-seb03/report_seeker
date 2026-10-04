@@ -60,8 +60,8 @@ export default function ReportSummaryStep({
       <Typography variant="h5" id="report-summary-heading" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, mt: 4 }}>
         Revisa tu reporte
       </Typography>
-      
-      <Card sx={{ mb: 3, borderRadius: 3, overflow: 'hidden' }} variant="outlined">
+
+      <Card sx={{ mb: 3, borderRadius: 2, overflow: 'hidden' }} variant="outlined">
         <CardActionArea onClick={() => onEdit('photo')} aria-label="Editar fotografía">
           <CardMedia
             component="img"
@@ -81,7 +81,7 @@ export default function ReportSummaryStep({
         {summaryFields.map(({ step, label, valueKey }) => (
           <ListItem key={step} disablePadding sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <ListItemButton onClick={() => onEdit(step)} aria-label={`Editar ${label.toLowerCase()}`}>
-              <ListItemText 
+              <ListItemText
                 primary={<Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>{label}</Typography>}
                 secondary={<Typography variant="body2" color="text.primary" sx={{ overflowWrap: 'anywhere' }}>{values[valueKey]}</Typography>}
               />
@@ -92,11 +92,11 @@ export default function ReportSummaryStep({
       </List>
 
       {errorMessage && <Typography color="error" variant="body2" sx={{ textAlign: 'center', mb: 2 }} role="alert">{errorMessage}</Typography>}
-      
-      <Button 
-        variant="contained" 
-        color="primary" 
-        onClick={onConfirm} 
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={onConfirm}
         disabled={isSaving}
         fullWidth
         sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
