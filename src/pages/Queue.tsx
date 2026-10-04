@@ -21,6 +21,7 @@ import { Box, Typography } from '@mui/material';
 import { useQueue } from '../control/useQueue';
 import { type IssueReport } from '../database';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
+import SyncQueueButton from '../components/SyncQueueButton';
 import './Queue.css';
 
 interface QueueProps {
@@ -65,6 +66,8 @@ export default function Queue({ onReportClick }: QueueProps) {
           ))
         )}
       </Box>
+
+      {!loading && reports.length > 0 && <SyncQueueButton />}
     </Box>
   );
 }

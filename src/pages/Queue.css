@@ -116,3 +116,20 @@ body.dark .queue-item {
 body.dark .queue-item:active {
   background-color: rgba(255, 255, 255, 0.05);
 }
+
+body.dark .queue-title,
+body.dark .queue-item-title {
+  color: #ffffff;
+}
+
+body.dark .queue-item-subtitle {
+  color: #aaaaaa;
+}
+
+body.dark .queue-item-date {
+  color: #777777;
+}
+
+body.dark .queue-empty-state {
+  color: #aaaaaa;
+}

@@ -241,11 +241,21 @@ export function useHome() {
     if (destination) navigateTo(destination);
   }, [pendingView, navigateTo]);
 
-  const handleReportCreated = useCallback((report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
+  const handleReportCreated = useCallback(async (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
     setReportIsComplete(true);
     
     // Lanzar notificación push local con la imagen actual antes de que se limpie
     sendReportNotification(report.title, report.description, reportPhoto?.blob);
+
+    try {
+      const status = await Network.getStatus();
+      if (!status.connected) {
+         window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+         return;
+      }
+    } catch(e) {
+      console.error(e);
+    }
     
     const notification = toNotification({
       issueId: report.issueId,
