@@ -120,12 +120,12 @@ export default function NotificationCard({
 
   return (
     <Box sx={{ 
-      borderRadius: 4, 
+      borderRadius: '24px', 
       overflow: 'hidden', 
       bgcolor: 'background.paper', 
       transition: 'border 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
       border: isHighPriority && !isRead ? 2 : !isRead ? 2 : 1,
-      borderColor: isHighPriority && !isRead ? 'error.main' : !isRead ? (theme => theme.palette.mode === 'dark' ? 'common.white' : 'common.black') : 'divider'
+      borderColor: isHighPriority && !isRead ? 'error.main' : !isRead ? 'text.primary' : 'grey.400'
     }}>
       <Box
         onClick={handleHeaderClick}
@@ -134,7 +134,7 @@ export default function NotificationCard({
         tabIndex={0}
         aria-expanded={expanded}
         aria-label={`${expanded ? 'Contraer' : 'Expandir'} notificación: ${titulo}`}
-        sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
+        sx={{ p: 2.5, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
       >
         {isHighPriority ? (
           <ErrorOutlinedIcon color={!isRead ? "error" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
@@ -175,7 +175,7 @@ export default function NotificationCard({
           tabIndex={onOpenReport ? 0 : undefined}
           aria-label={onOpenReport ? `Abrir reporte completo: ${titulo}` : undefined}
           sx={{
-            p: 2,
+            p: 2.5,
             pt: 0,
             cursor: onOpenReport ? 'pointer' : 'default',
             '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: -2 },
