@@ -171,6 +171,17 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
 
   await connection.execute('PRAGMA foreign_keys = ON;');
   await connection.execute(schema);
+
+  const workerColumns = await connection.query('PRAGMA table_info(trabajadores);');
+  if (!workerColumns.values?.some((column) => column.name === 'pin')) {
+    await connection.execute("ALTER TABLE trabajadores ADD COLUMN pin TEXT NOT NULL DEFAULT '';");
+  }
+
+  const issueColumns = await connection.query('PRAGMA table_info(issues_riesgos);');
+  if (!issueColumns.values?.some((column) => column.name === 'trabajador_nombre')) {
+    await connection.execute('ALTER TABLE issues_riesgos ADD COLUMN trabajador_nombre TEXT;');
+  }
+
   return connection;
 }
 
@@ -216,8 +227,8 @@ export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; 
 
   if (existingWorker.values?.length) {
     await connection.run(
-      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ? WHERE trabajador_id = ?;',
-      [t.nombre, t.email, t.pin, t.trabajador_id]
+      'UPDATE trabajadores SET nombre = ?, pin = ? WHERE trabajador_id = ?;',
+      [t.nombre, t.pin, t.trabajador_id]
     );
     return;
   }

@@ -111,7 +111,8 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
       setStep('ready');
     } catch (error) {
       console.error('No se pudo guardar el reporte.', error);
-      setErrorMessage('No se pudo guardar el reporte. Inténtalo de nuevo.');
+      const detail = error instanceof Error ? error.message : String(error);
+      setErrorMessage(`No se pudo guardar el reporte. Detalle: ${detail}`);
     } finally {
       setIsSaving(false);
     }
