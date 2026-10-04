@@ -17,7 +17,6 @@
  *   Configuration -- Componente visual para las opciones de configuración y perfil.           *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useState } from 'react';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlined';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -32,31 +31,25 @@ type ConfigurationProps = {
   onBack: () => void;
   isDarkMode: boolean;
   onToggleTheme: () => void;
-  onMenuStateChange?: (isOpen: boolean) => void;
+  configMenuState: 'none' | 'pin' | 'email';
+  setConfigMenuState: (state: 'none' | 'pin' | 'email') => void;
 };
 
-export default function Configuration({ onBack, isDarkMode, onToggleTheme, onMenuStateChange }: ConfigurationProps) {
-  const [isPinDialogOpen, setIsPinDialogOpen] = useState(false);
-  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
-
+export default function Configuration({ onBack, isDarkMode, onToggleTheme, configMenuState, setConfigMenuState }: ConfigurationProps) {
   const handleOpenPin = () => {
-    setIsPinDialogOpen(true);
-    onMenuStateChange?.(true);
+    setConfigMenuState('pin');
   };
 
   const handleClosePin = () => {
-    setIsPinDialogOpen(false);
-    onMenuStateChange?.(false);
+    setConfigMenuState('none');
   };
 
   const handleOpenEmail = () => {
-    setIsEmailDialogOpen(true);
-    onMenuStateChange?.(true);
+    setConfigMenuState('email');
   };
 
   const handleCloseEmail = () => {
-    setIsEmailDialogOpen(false);
-    onMenuStateChange?.(false);
+    setConfigMenuState('none');
   };
 
   return (
@@ -92,8 +85,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, onMen
         </div>
       </section>
 
-      {isPinDialogOpen && <ChangePinDialog onClose={handleClosePin} />}
-      {isEmailDialogOpen && <ChangeEmailDialog onClose={handleCloseEmail} />}
+      {configMenuState === 'pin' && <ChangePinDialog onClose={handleClosePin} />}
+      {configMenuState === 'email' && <ChangeEmailDialog onClose={handleCloseEmail} />}
     </main>
   );
 }

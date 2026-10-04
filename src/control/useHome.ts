@@ -35,6 +35,7 @@ import { type Notificacion } from '../components/NotificationSheet';
 
 export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue' | 'seekie';
 export type TransitionDirection = 'forward' | 'backward';
+export type ConfigMenuState = 'none' | 'pin' | 'email';
 
 export const viewOrder: NavigationView[] = ['report', 'queue', 'home', 'seekie', 'info-report', 'profile', 'configuration'];
 const notificationPageSize = 5;
@@ -53,6 +54,7 @@ export function useHome() {
   const [reportIsComplete, setReportIsComplete] = useState(false);
   const [isNavEntering, setIsNavEntering] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [configMenuState, setConfigMenuState] = useState<ConfigMenuState>('none');
   const [pendingView, setPendingView] = useState<NavigationView | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
@@ -321,6 +323,10 @@ export function useHome() {
       return true;
     }
     if (activeView === 'configuration') {
+      if (configMenuState !== 'none') {
+        setConfigMenuState('none');
+        return true;
+      }
       navigateTo('profile');
       return true;
     }
@@ -369,6 +375,7 @@ export function useHome() {
     reportIsComplete,
     isNavEntering,
     cancelDialogOpen,
+    configMenuState,
     previousView,
     transitionDirection,
     pullDistance,
@@ -376,6 +383,7 @@ export function useHome() {
     hasUnreadNotifications,
     setIsNavEntering,
     setPullDistance,
+    setConfigMenuState,
     handleMarkAsRead,
     handleRefreshNotifications,
     handleLoadMoreNotifications,

@@ -40,7 +40,6 @@ interface HomeProps {
 }
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
-  const [isConfigMenuOpen, setIsConfigMenuOpen] = useState(false);
   const {
     notificaciones,
     hasMoreNotifications,
@@ -53,6 +52,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     reportIsComplete,
     isNavEntering,
     cancelDialogOpen,
+    configMenuState,
     previousView,
     transitionDirection,
     pullDistance,
@@ -60,6 +60,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     hasUnreadNotifications,
     setIsNavEntering,
     setPullDistance,
+    setConfigMenuState,
     handleMarkAsRead,
     handleRefreshNotifications,
     handleLoadMoreNotifications,
@@ -86,7 +87,8 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           onBack={() => navigateTo('profile')} 
           isDarkMode={isDarkMode}
           onToggleTheme={onToggleManualTheme}
-          onMenuStateChange={setIsConfigMenuOpen}
+          configMenuState={configMenuState}
+          setConfigMenuState={setConfigMenuState}
         />
       );
     }
@@ -139,7 +141,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     );
   };
 
-  const showBottomNav = !(activeView === 'report' && reportIsComplete) && !isConfigMenuOpen;
+  const showBottomNav = !(activeView === 'report' && reportIsComplete) && configMenuState === 'none';
 
   return (
     <Box className="home-container">
