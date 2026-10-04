@@ -10,20 +10,18 @@
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                            *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026                                            *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   ChangeEmailDialog -- Componente de pantalla completa para cambiar el correo.              *
+ *   ChangeEmailDialog -- Solicita un cambio de correo mediante un enlace de confirmación.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState } from 'react';
 import PinPad from './PinPad';
 import LoginErrorDialog from './LoginErrorDialog';
-import { getCurrentUser, updateUserLocal } from '../control/authControl';
-import { db } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
-import { insertOrUpdateTrabajadorLocal } from '../database';
+import { getCurrentUser } from '../control/authControl';
+import { sendEmailChangeLink } from '../control/emailChangeControl';
 import { Box, IconButton, TextField, Button } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import './ChangePinDialog.css'; // Reutilizamos estilos
@@ -80,32 +78,11 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
 
     setStep('loading');
     try {
-      console.log('Iniciando updateEmail:', {
-        trabajador_id: user.trabajador_id,
-        idType: typeof user.trabajador_id,
-        emailInput
-      });
-      
-      const docId = String(user.trabajador_id);
-      console.log('Doc ID a actualizar:', docId);
-
-      const userRef = doc(db, 'trabajadores', docId);
-      await updateDoc(userRef, { email: emailInput });
-      console.log('Firebase updateDoc completado con exito.');
-      
-      // 2. Update local storage & SQLite
-      const updatedUser = { ...user, email: emailInput };
-      updateUserLocal(updatedUser);
-      await insertOrUpdateTrabajadorLocal(updatedUser);
-      console.log('Actualizacion local completada.');
-
+      await sendEmailChangeLink(emailInput, user.trabajador_id);
       setStep('success');
-      setTimeout(() => {
-        onClose();
-      }, 1500);
-    } catch (e: any) {
-      console.error('Error detallado en updateEmail:', e);
-      setErrorMsg(`Error: ${e.message || 'Desconocido'}`);
+    } catch (error) {
+      console.error('No se pudo enviar el enlace para cambiar el correo:', error);
+      setErrorMsg(error instanceof Error ? error.message : 'No se pudo enviar el enlace.');
       setStep('enter_new');
     }
   };
@@ -155,8 +132,20 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
         {/* Loading overlay oscuro */}
       </div>
 
-      <div className={`change-pin-success ${step === 'success' ? 'active' : ''}`}>
-        <h2>Correo actualizado con éxito</h2>
+      <div
+        className={`change-pin-success ${step === 'success' ? 'active' : ''}`}
+        style={{ flexDirection: 'column', gap: '16px', padding: '32px', textAlign: 'center' }}
+      >
+        <h2>Enlace enviado a {emailInput}</h2>
+        <p>El correo actual se mantendrá hasta que confirmes el enlace.</p>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={onClose}
+          sx={{ borderRadius: '24px', padding: '12px', textTransform: 'none', fontSize: '16px' }}
+        >
+          Cerrar
+        </Button>
       </div>
 
       <LoginErrorDialog 
