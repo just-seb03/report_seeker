@@ -210,12 +210,30 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       <Box sx={{ flex: 1, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         
         {/* Paso: Bienvenida */}
-        <div className={`intro-step intro-welcome ${step === 'welcome' ? 'active' : 'exit'}`}>
+        <Box 
+          sx={{
+            position: 'absolute', inset: 0, display: 'flex', justifyContent: 'center', alignItems: 'center',
+            transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            ...(step === 'welcome' 
+              ? { opacity: 1, transform: 'translateY(0) scale(1)', pointerEvents: 'auto' } 
+              : { opacity: 0, transform: 'translateY(-40px) scale(0.95)', pointerEvents: 'none' })
+          }}
+        >
           <Typography variant="h3" sx={{ fontWeight: 400, letterSpacing: 2 }}>Bienvenido</Typography>
-        </div>
+        </Box>
 
         {/* Paso: Ingreso de ID */}
-        <div className={`intro-step intro-id ${step === 'id_input' && !isRecoveryOpen ? 'active' : ''} ${step === 'welcome' || isRecoveryOpen ? 'hidden' : ''} ${step === 'id_out' || step === 'pin_input' || step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
+        <Box 
+          sx={{
+            position: 'absolute', inset: 0, display: 'flex', justifyContent: 'center', alignItems: 'center',
+            transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            ...(step === 'id_input' && !isRecoveryOpen 
+              ? { opacity: 1, transform: 'translateX(0) scale(1)', pointerEvents: 'auto' } 
+              : step === 'welcome' || isRecoveryOpen
+                ? { opacity: 0, transform: 'translateX(100px) scale(0.95)', pointerEvents: 'none' }
+                : { opacity: 0, transform: 'translateX(-100px) scale(0.95)', pointerEvents: 'none' })
+          }}
+        >
           <PinPad
             title="Ingrese su ID de trabajador"
             subtitle="5 dígitos"
@@ -223,10 +241,20 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             currentValue={workerId}
             onKeyPress={handleIdKeyPress}
           />
-        </div>
+        </Box>
 
         {/* Paso: Ingreso de PIN */}
-        <div className={`intro-step intro-pin ${step === 'pin_input' && !isRecoveryOpen ? 'active' : ''} ${step === 'welcome' || step === 'id_input' || step === 'id_out' || isRecoveryOpen ? 'hidden' : ''} ${step === 'loading' || step === 'done' ? 'exit-up' : ''}`}>
+        <Box 
+          sx={{
+            position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+            transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            ...(step === 'pin_input' && !isRecoveryOpen 
+              ? { opacity: 1, transform: 'translateX(0) scale(1)', pointerEvents: 'auto' } 
+              : step === 'welcome' || step === 'id_input' || isRecoveryOpen
+                ? { opacity: 0, transform: 'translateX(100px) scale(0.95)', pointerEvents: 'none' }
+                : { opacity: 0, transform: 'translateX(-100px) scale(0.95)', pointerEvents: 'none' })
+          }}
+        >
           <PinPad
             title="Ingrese su PIN"
             subtitle={workerId}
@@ -247,9 +275,17 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           >
             Olvidé mi PIN
           </Button>
-        </div>
+        </Box>
 
-        <div className={`intro-step recovery-step ${isRecoveryOpen ? 'active' : 'hidden'}`} style={{ overflowY: 'auto' }}>
+        <Box 
+          sx={{
+            position: 'absolute', inset: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', overflowY: 'auto', p: 2,
+            transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            ...(isRecoveryOpen 
+              ? { opacity: 1, transform: 'translateY(0) scale(1)', pointerEvents: 'auto' } 
+              : { opacity: 0, transform: 'translateY(100px) scale(0.95)', pointerEvents: 'none' })
+          }}
+        >
           <Box
             component="form"
             onSubmit={handleRecoverySubmit}
@@ -369,13 +405,20 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               {recoveryStatus === 'completed' ? 'Ir al inicio de sesión' : 'Volver al inicio de sesión'}
             </Button>
           </Box>
-        </div>
+        </Box>
 
       </Box>
 
       {/* Pantalla negra de carga que cubre todo y se desvanece suavemente */}
-      <div className={`intro-cache-loader ${step === 'loading' || step === 'black_screen' ? 'active' : ''} ${step === 'done' || step === 'welcome' || step === 'id_input' ? 'exit-done' : ''}`}>
-      </div>
+      <Box 
+        sx={{
+          position: 'absolute', inset: 0, zIndex: 10, bgcolor: '#121212',
+          transition: 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+          ...(step === 'loading' || step === 'black_screen' 
+            ? { opacity: 1, pointerEvents: 'auto' } 
+            : { opacity: 0, pointerEvents: 'none' })
+        }}
+      />
 
       <LoginErrorDialog
         open={isErrorDialogVisible}
