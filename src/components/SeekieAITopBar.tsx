@@ -22,8 +22,10 @@ import { Box, Typography } from '@mui/material';
 
 export default function SeekieAITopBar() {
   return (
-    <Box className="seekie-topbar">
-      <Typography variant="h6" className="seekie-topbar-title">SEEKIE AI</Typography>
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 64, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', flexShrink: 0 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: '0.5px', background: 'linear-gradient(90deg, #1976d2, #9c27b0)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        Seekie AI
+      </Typography>
     </Box>
   );
 }

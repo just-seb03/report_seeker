@@ -26,27 +26,38 @@ export default function SeekieAIInputBox() {
   const [text, setText] = useState('');
 
   return (
-    <Box sx={{ p: 2, pb: 4, bgcolor: 'background.default', borderTop: 1, borderColor: 'divider' }}>
+    <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto', pointerEvents: 'auto' }}>
       <Box 
         sx={{ 
           display: 'flex', 
-          alignItems: 'center', 
+          alignItems: 'flex-end', 
           bgcolor: 'background.paper', 
-          borderRadius: 6, 
-          p: 1, 
-          pl: 2, 
-          boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+          borderRadius: '32px', 
+          p: '6px 12px 6px 24px', 
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          transition: 'box-shadow 0.2s',
+          '&:focus-within': { boxShadow: '0 6px 24px rgba(0,0,0,0.12)' },
+          border: '1px solid',
+          borderColor: 'divider'
         }}
       >
         <InputBase
-          sx={{ flex: 1, typography: 'body1' }}
-          placeholder="Escribe tu mensaje aquí..."
+          sx={{ flex: 1, py: 1.5, typography: 'body1', maxHeight: '120px', overflowY: 'auto' }}
+          placeholder="Pregúntale a Seekie AI..."
           value={text}
           onChange={(e) => setText(e.target.value)}
           multiline
-          maxRows={4}
+          maxRows={5}
         />
-        <IconButton sx={{ bgcolor: text.trim() ? 'primary.main' : 'action.selected', color: text.trim() ? 'primary.contrastText' : 'text.secondary', ml: 1, '&:hover': { bgcolor: text.trim() ? 'primary.dark' : 'action.hover' } }}>
+        <IconButton 
+          sx={{ 
+            mb: '4px', ml: 1, width: 44, height: 44, flexShrink: 0,
+            bgcolor: text.trim() ? 'primary.main' : 'transparent', 
+            color: text.trim() ? 'primary.contrastText' : 'text.secondary', 
+            '&:hover': { bgcolor: text.trim() ? 'primary.dark' : 'action.hover' },
+            transition: 'all 0.2s'
+          }}
+        >
           {text.trim().length > 0 ? (
             <SendRoundedIcon fontSize="small" />
           ) : (
