@@ -113,7 +113,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
         </Box>
 
         <Box component="section" aria-label="Información del reporte" sx={{ display: 'grid', gap: 2, mt: 3 }}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 0.72fr)', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
               <Box sx={{ display: 'grid', width: 48, height: 48, flex: '0 0 48px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12), color: 'primary.main' }}>
                 <LocationOnOutlinedIcon sx={{ fontSize: 24 }} />
