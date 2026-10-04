@@ -5,13 +5,13 @@ interface ViewTransitionProps {
   children: React.ReactNode;
   isActive: boolean;
   direction: 'forward' | 'backward';
-  isEntering: boolean;
+  isTransitioning: boolean;
 }
 
-export default function ViewTransition({ children, isActive, direction, isEntering }: ViewTransitionProps) {
+export default function ViewTransition({ children, isActive, direction, isTransitioning }: ViewTransitionProps) {
   let animationName = 'none';
 
-  if (isEntering) {
+  if (isTransitioning) {
     if (isActive) {
       animationName = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
     } else {
@@ -29,7 +29,7 @@ export default function ViewTransition({ children, isActive, direction, isEnteri
           : 'none',
         pointerEvents: isActive ? 'auto' : 'none',
         zIndex: isActive ? 1 : 0,
-        opacity: isEntering ? undefined : (isActive ? 1 : 0),
+        opacity: isTransitioning ? undefined : (isActive ? 1 : 0),
         bgcolor: 'background.default'
       }}
       aria-hidden={!isActive}

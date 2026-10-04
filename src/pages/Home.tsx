@@ -152,7 +152,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
             key={`exit-${previousView}`}
             isActive={false}
             direction={transitionDirection}
-            isEntering={false}
+            isTransitioning={true}
           >
             {renderView(previousView)}
           </ViewTransition>
@@ -161,7 +161,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           key={`active-${activeView}`}
           isActive={true}
           direction={transitionDirection}
-          isEntering={!!previousView}
+          isTransitioning={!!previousView}
         >
           {renderView(activeView)}
         </ViewTransition>
