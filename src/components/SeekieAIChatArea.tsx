@@ -26,12 +26,12 @@ export default function SeekieAIChatArea() {
       <SeekieAIDoodles />
       
       <Box sx={{ position: 'relative', zIndex: 1, minHeight: '100%', p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <Box sx={{ textAlign: 'center', opacity: 0.8 }}>
-          <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
-            Hola, soy Seekie AI
+        <Box sx={{ textAlign: 'center' }}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
+            Hola, soy <Box component="span" sx={{ color: 'primary.main', textShadow: '0px 2px 4px rgba(0,0,0,0.2)' }}>Seekie AI</Box>
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            ¿En qué puedo ayudarte?
+          <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.9 }}>
+            ¿En qué te puedo ayudar hoy?
           </Typography>
         </Box>
       </Box>
