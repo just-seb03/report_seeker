@@ -14,16 +14,17 @@ export default function GlobalTopBar({ title }: GlobalTopBarProps) {
         transform: 'translateX(-50%)',
         zIndex: 50,
         backgroundColor: 'background.paper',
-        borderRadius: 6, // 24px
-        boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
-        px: 4,
-        py: 1.5,
+        borderRadius: 4, // 16px
+        boxShadow: '0px 2px 8px rgba(0,0,0,0.1)',
+        px: 6,
+        py: 0.75,
+        minWidth: 160,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'primary.main', textTransform: 'uppercase', letterSpacing: 1 }}>
         {title}
       </Typography>
     </Box>
