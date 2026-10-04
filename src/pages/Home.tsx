@@ -31,6 +31,7 @@ import Profile from './profile';
 import Queue from './Queue';
 import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/HomeScene';
+import ViewTransition from '../components/ViewTransition';
 import { useHome, type NavigationView } from '../control/useHome';
 
 
@@ -145,27 +146,34 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
   return (
     <Box sx={{ height: '100%', position: 'relative', overflow: 'hidden', bgcolor: 'background.default', transition: 'background-color 0.25s ease' }}>
-      <Box className="home-view-stage">
+      <Box sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
         {previousView && (
-          <Box
+          <ViewTransition
             key={`exit-${previousView}`}
-            className={`home-view home-view-exit exit-${transitionDirection}`}
-            aria-hidden="true"
+            isActive={false}
+            direction={transitionDirection}
+            isEntering={false}
           >
             {renderView(previousView)}
-          </Box>
+          </ViewTransition>
         )}
-        <Box
+        <ViewTransition
           key={`active-${activeView}`}
-          className={`home-view home-view-active${previousView ? ` enter-${transitionDirection}` : ''}`}
+          isActive={true}
+          direction={transitionDirection}
+          isEntering={!!previousView}
         >
           {renderView(activeView)}
-        </Box>
+        </ViewTransition>
       </Box>
 
       {showBottomNav && (
         <Box
-          className={`home-bottom-nav${isNavEntering ? ' nav-entering' : ''}`}
+          sx={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
+            transform: isNavEntering ? 'translateY(100%)' : 'translateY(0)',
+            animation: isNavEntering ? 'navEnter 400ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards' : 'none'
+          }}
           onAnimationEnd={(event) => {
             if (event.target === event.currentTarget) setIsNavEntering(false);
           }}
