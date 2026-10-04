@@ -28,7 +28,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useEffect, useState, type KeyboardEvent } from 'react';
-import { Box, Typography, Collapse } from '@mui/material';
+import { Box, Typography, Collapse, Avatar, alpha, useTheme } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -74,6 +74,7 @@ export default function NotificationCard({
   titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, workerName, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
 
+  const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const isRead = !unread;
   const [image, setImage] = useState<string | null>(null);
@@ -122,10 +123,14 @@ export default function NotificationCard({
     <Box sx={{ 
       borderRadius: '24px', 
       overflow: 'hidden', 
-      bgcolor: 'background.paper', 
-      transition: 'border 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease',
-      border: isHighPriority && !isRead ? 2 : !isRead ? 2 : 1,
-      borderColor: isHighPriority && !isRead ? 'error.main' : !isRead ? 'text.primary' : 'grey.400'
+      bgcolor: isRead 
+        ? 'background.paper' 
+        : isHighPriority 
+          ? alpha(theme.palette.error.main, 0.08) 
+          : alpha(theme.palette.primary.main, 0.08),
+      transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+      border: isRead ? 1 : 0,
+      borderColor: 'divider'
     }}>
       <Box
         onClick={handleHeaderClick}
@@ -211,9 +216,22 @@ export default function NotificationCard({
           <Typography variant="body2" sx={{ mb: 2, overflowWrap: 'anywhere', fontWeight: 500, color: 'text.primary', opacity: 0.85 }}>{detalle}</Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              {workerName ? `Por ${workerName}` : 'Por Trabajador Desconocido'}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Avatar 
+                sx={{ 
+                  width: 24, 
+                  height: 24, 
+                  fontSize: '0.75rem', 
+                  bgcolor: isHighPriority ? 'error.main' : 'primary.main',
+                  fontWeight: 'bold'
+                }}
+              >
+                {workerName ? workerName.charAt(0).toUpperCase() : '?'}
+              </Avatar>
+              <Typography variant="caption" color="text.secondary">
+                {workerName || 'Trabajador Desconocido'}
+              </Typography>
+            </Box>
             <Typography variant="caption" color="text.secondary">{formatPublicationDate(fecha)}</Typography>
           </Box>
 
