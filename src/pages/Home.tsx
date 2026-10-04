@@ -20,7 +20,7 @@
  *        (Home, Report, etc.).                                                                *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useState } from 'react';
+
 import { Box } from '@mui/material';
 import BottomNav from '../components/BottomNav';
 import ReportCancelDialog from '../components/ReportCancelDialog';
