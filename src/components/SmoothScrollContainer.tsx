@@ -20,15 +20,17 @@
 
 import { Box } from '@mui/material';
 import type { BoxProps } from '@mui/material';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface SmoothScrollContainerProps extends BoxProps {
   children: React.ReactNode;
 }
 
-export default function SmoothScrollContainer({ children, sx, ...props }: SmoothScrollContainerProps) {
-  return (
-    <Box
+const SmoothScrollContainer = forwardRef<HTMLDivElement, SmoothScrollContainerProps>(
+  ({ children, sx, ...props }, ref) => {
+    return (
+      <Box
+        ref={ref}
       sx={{
         flex: 1,
         overflowY: 'auto',
@@ -39,6 +41,11 @@ export default function SmoothScrollContainer({ children, sx, ...props }: Smooth
         overscrollBehaviorY: 'contain',
         // Desplazamiento suave para anclas
         scrollBehavior: 'smooth',
+        
+        // Efecto de desvanecimiento (fade) en la parte inferior del contenedor
+        // para indicar visualmente que hay más contenido hacia abajo
+        WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+        maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
         
         // Estilización elegante de la barra de scroll (Webkit)
         '&::-webkit-scrollbar': {
@@ -61,4 +68,6 @@ export default function SmoothScrollContainer({ children, sx, ...props }: Smooth
       {children}
     </Box>
   );
-}
+});
+
+export default SmoothScrollContainer;
