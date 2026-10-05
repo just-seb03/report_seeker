@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS trabajadores (
   nombre TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   pin TEXT NOT NULL,
+  es_prevencionista INTEGER DEFAULT 0,
   estado TEXT DEFAULT 'activo'
 );
 
@@ -177,6 +178,9 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
   if (!workerColumns.values?.some((column) => column.name === 'pin')) {
     await connection.execute("ALTER TABLE trabajadores ADD COLUMN pin TEXT NOT NULL DEFAULT '';");
   }
+  if (!workerColumns.values?.some((column) => column.name === 'es_prevencionista')) {
+    await connection.execute("ALTER TABLE trabajadores ADD COLUMN es_prevencionista INTEGER DEFAULT 0;");
+  }
 
   const issueColumns = await connection.query('PRAGMA table_info(issues_riesgos);');
   if (!issueColumns.values?.some((column) => column.name === 'trabajador_nombre')) {
@@ -218,7 +222,7 @@ export function initializeDatabase(): Promise<SQLiteDBConnection> {
   return databasePromise;
 }
 
-export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; nombre: string; email: string; pin: string }) {
+export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; nombre: string; email: string; pin: string; es_prevencionista?: boolean }) {
   if (!Capacitor.isNativePlatform()) return;
   const connection = await initializeDatabase();
   const existingWorker = await connection.query(
@@ -228,15 +232,15 @@ export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; 
 
   if (existingWorker.values?.length) {
     await connection.run(
-      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ? WHERE trabajador_id = ?;',
-      [t.nombre, t.email, t.pin, t.trabajador_id]
+      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ?, es_prevencionista = ? WHERE trabajador_id = ?;',
+      [t.nombre, t.email, t.pin, t.es_prevencionista ? 1 : 0, t.trabajador_id]
     );
     return;
   }
 
   await connection.run(
-    'INSERT INTO trabajadores (trabajador_id, nombre, email, pin) VALUES (?, ?, ?, ?);',
-    [t.trabajador_id, t.nombre, t.email, t.pin]
+    'INSERT INTO trabajadores (trabajador_id, nombre, email, pin, es_prevencionista) VALUES (?, ?, ?, ?, ?);',
+    [t.trabajador_id, t.nombre, t.email, t.pin, t.es_prevencionista ? 1 : 0]
   );
 }
 

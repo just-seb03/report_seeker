@@ -29,14 +29,17 @@ export interface Trabajador {
   nombre: string;
   email: string;
   pin: string;
+  es_prevencionista?: boolean;
 }
 
 // Semilla inicial (solo para poblar Firebase por primera vez si no existen)
 export async function seedTrabajadores() {
   const trabajadores: Trabajador[] = [
-    { trabajador_id: 10482, nombre: 'Sebastian Arredondo', email: 'seb.arredondo@proton.me', pin: '8080' },
-    { trabajador_id: 29531, nombre: 'Cristian Vega', email: 'cristianvegagallardo@gmail.com', pin: '2005' },
-    { trabajador_id: 34910, nombre: 'Maximiliano Cantuarias', email: 'maximiliano.cantuarias@gmail.com', pin: '2000' }
+    { trabajador_id: 10482, nombre: 'Sebastian Arredondo', email: 'seb.arredondo@proton.me', pin: '8080', es_prevencionista: false },
+    { trabajador_id: 29531, nombre: 'Cristian Vega', email: 'cristianvegagallardo@gmail.com', pin: '2005', es_prevencionista: false },
+    { trabajador_id: 34910, nombre: 'Maximiliano Cantuarias', email: 'maximiliano.cantuarias@gmail.com', pin: '2000', es_prevencionista: false },
+    // Agregamos un prevencionista de prueba
+    { trabajador_id: 99999, nombre: 'Prevencionista Jefe', email: 'prevencion@minera.cl', pin: '1234', es_prevencionista: true }
   ];
 
   try {
