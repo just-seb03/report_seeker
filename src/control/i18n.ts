@@ -1,3 +1,12 @@
+export function getTranslatedSeverity(raw: string | undefined): string {
+  if (!raw) return '';
+  const lower = raw.toLowerCase();
+  if (['baja', 'leve', 'low'].includes(lower)) return t.report.severityLow;
+  if (['media', 'moderada', 'medium'].includes(lower)) return t.report.severityMedium;
+  if (['alta', 'grave', 'high'].includes(lower)) return t.report.severityHigh;
+  return raw;
+}
+
 export const TEXTS = {
   es: {
 

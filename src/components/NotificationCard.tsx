@@ -27,7 +27,7 @@
  *        notificación.                                                                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { t, currentLanguage } from '../control/i18n';
+import { t, currentLanguage, getTranslatedSeverity } from '../control/i18n';
 import { useEffect, useState, type KeyboardEvent } from 'react';
 import { Box, Typography, Collapse, Avatar, alpha, useTheme } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -215,7 +215,7 @@ export default function NotificationCard({
               variant="body2"
               sx={{ flexShrink: 0, textAlign: 'right', fontWeight: 'bold', color: isHighPriority ? 'error.main' : isLowPriority ? 'success.main' : 'warning.main' }}
             >
-              {prioridad}
+              {getTranslatedSeverity(prioridad)}
             </Typography>
           </Box>
 

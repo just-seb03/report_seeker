@@ -25,7 +25,7 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import { Box, Dialog, IconButton, Typography, alpha } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
-import { t } from '../control/i18n';
+import { t, getTranslatedSeverity } from '../control/i18n';
 
 type InfoReportProps = {
   report: IssueReport;
@@ -121,7 +121,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
               </Box>
               <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
                 <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>{t.infoReport.infoSeverity}</Typography>
-                <Typography component="p" sx={{ m: 0, color: `${severityPalette}.main`, fontSize: '14px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.priority}</Typography>
+                <Typography component="p" sx={{ m: 0, color: `${severityPalette}.main`, fontSize: '14px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{getTranslatedSeverity(report.priority)}</Typography>
               </Box>
             </Box>
             <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
