@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { t } from './i18n';
 
 export type ChatMessage = {
@@ -7,8 +7,21 @@ export type ChatMessage = {
   text: string;
 };
 
+const STORAGE_KEY = 'seekie_chat_history';
+
 export function useSeekieChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    try {
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
 
   const sendMessage = useCallback((text: string) => {
     if (!text.trim()) return;
