@@ -6,7 +6,7 @@
  *                                                                                             *
  *                  Archivo : useReportManagement.ts                                           *
  *                                                                                             *
- *              Programador : Equipo Report Seeker                                             *
+ *              Programador : Maximiliano Cantuarias                                             *
  *                                                                                             *
  *          Fecha de Inicio : 05 de Octubre de 2026                                            *
  *                                                                                             *

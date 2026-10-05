@@ -6,7 +6,7 @@
  *                                                                                             *
  *                  Archivo : SeverityEditor.tsx                                               *
  *                                                                                             *
- *              Programador : Equipo Report Seeker                                             *
+ *              Programador : Maximiliano Cantuarias                                            *
  *                                                                                             *
  *          Fecha de Inicio : 05 de Octubre de 2026                                            *
  *                                                                                             *
@@ -19,7 +19,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState } from 'react';
-import { Alert, Button, FormControl, InputLabel, MenuItem, Select, Stack } from '@mui/material';
+import { Alert, Button, FormControl, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { getTranslatedSeverity, t } from '../../control/global/i18n';
 
 type SeverityOption = 'low' | 'medium' | 'high' | 'current';
@@ -69,16 +69,20 @@ export default function SeverityEditor({
     }
   };
 
+  const hasChanged = selectedSeverity !== 'current' && getPriority(selectedSeverity) !== priority;
+
   return (
-    <Stack spacing={1.5}>
-      <FormControl fullWidth disabled={isDisabled}>
-        <InputLabel id="report-severity-label">{t.reportManagement.severityLabel}</InputLabel>
+    <Stack spacing={2} sx={{ mt: 1, p: 2, borderRadius: 3, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider' }}>
+      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+        {t.reportManagement.severityLabel}
+      </Typography>
+      
+      <FormControl fullWidth disabled={isDisabled} size="small">
         <Select<SeverityOption>
-          labelId="report-severity-label"
           id="report-severity"
           value={selectedSeverity}
-          label={t.reportManagement.severityLabel}
-          onChange={(event) => setSelectedSeverity(event.target.value)}
+          onChange={(event) => setSelectedSeverity(event.target.value as SeverityOption)}
+          sx={{ fontWeight: 600, borderRadius: 2 }}
         >
           {selectedSeverity === 'current' && (
             <MenuItem value="current">{getTranslatedSeverity(priority)}</MenuItem>
@@ -88,19 +92,26 @@ export default function SeverityEditor({
           <MenuItem value="high">{t.report.severityHigh}</MenuItem>
         </Select>
       </FormControl>
+      
       {(isOnline === false || error === 'offline') && (
-        <Alert severity="warning">{t.reportManagement.severityOffline}</Alert>
+        <Alert severity="warning" sx={{ py: 0, px: 2, borderRadius: 2 }}>{t.reportManagement.severityOffline}</Alert>
       )}
       {error === 'save' && (
-        <Alert severity="error">{t.reportManagement.saveSeverityError}</Alert>
+        <Alert severity="error" sx={{ py: 0, px: 2, borderRadius: 2 }}>{t.reportManagement.saveSeverityError}</Alert>
       )}
-      <Button
-        variant="contained"
-        disabled={isDisabled || selectedSeverity === 'current'}
-        onClick={handleSave}
-      >
-        {t.reportManagement.saveSeverity}
-      </Button>
+      
+      {hasChanged && (
+        <Button
+          variant="contained"
+          disabled={isDisabled}
+          onClick={handleSave}
+          fullWidth
+          disableElevation
+          sx={{ fontWeight: 600, borderRadius: 2, textTransform: 'none' }}
+        >
+          {t.reportManagement.saveSeverity}
+        </Button>
+      )}
     </Stack>
   );
 }

@@ -15,27 +15,12 @@
  *        Al guardar correctamente, solicita volver a la vista de inicio.                     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
-import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
-import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
-import {
-  Box,
-  Card,
-  Chip,
-  IconButton,
-  Stack,
-  Typography,
-  alpha,
-  useTheme
-} from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { type IssueReport } from '../database';
-import { formatReportDate } from '../control/global/useInfoReport';
-import { getTranslatedSeverity, t } from '../control/global/i18n';
-import SeverityEditor from '../components/ReportManagement/SeverityEditor';
 import { useReportManagement } from '../control/ReportManagement/useReportManagement';
+import ReportHeader from '../components/ReportManagement/ReportHeader';
+import ReportDetailsCard from '../components/ReportManagement/ReportDetailsCard';
+import FollowUpCard from '../components/ReportManagement/FollowUpCard';
 
 interface ReportManagementProps {
   report: IssueReport;
@@ -44,15 +29,7 @@ interface ReportManagementProps {
 }
 
 export default function ReportManagement({ report, onBack, onSeveritySaved }: ReportManagementProps) {
-  const theme = useTheme();
   const { priority, isOnline, isSavingSeverity, severitySaveError, saveSeverity } = useReportManagement(report);
-  const normalizedPriority = priority.toLowerCase();
-  const severityPalette = ['alta', 'grave', 'high'].includes(normalizedPriority)
-    ? 'error'
-    : ['media', 'moderada', 'medium', 'warning'].includes(normalizedPriority)
-      ? 'warning'
-      : 'success';
-  const capturedDate = formatReportDate(report.capturedAt);
 
   return (
     <Box
@@ -71,108 +48,19 @@ export default function ReportManagement({ report, onBack, onSeveritySaved }: Re
         WebkitOverflowScrolling: 'touch'
       }}
     >
-      <Box
-        component="header"
-        sx={{ display: 'flex', minHeight: 64, alignItems: 'center', gap: 1.5, mx: 'auto', mb: 2, maxWidth: 560 }}
-      >
-        <IconButton aria-label={t.common.back} onClick={onBack} sx={{ width: 48, height: 48, flex: '0 0 auto' }}>
-          <ArrowBackRoundedIcon />
-        </IconButton>
-        <Box sx={{ minWidth: 0 }}>
-          <Typography component="h1" variant="h6" sx={{ fontWeight: 700, lineHeight: 1.25 }}>
-            {t.reportManagement.title}
-          </Typography>
-        </Box>
-      </Box>
+      <ReportHeader onBack={onBack} />
 
-      <Stack spacing={2} sx={{ width: '100%', maxWidth: 560, mx: 'auto' }}>
-        <Card variant="outlined" sx={{ p: 2.5, borderRadius: 3 }}>
-          <Stack spacing={2}>
-            <Box>
-              <Typography variant="overline" color="text.secondary">
-                {t.reportManagement.reportLabel} · #{report.issueId}
-              </Typography>
-              <Typography variant="h5" component="h2" sx={{ fontWeight: 700, overflowWrap: 'anywhere' }}>
-                {report.title}
-              </Typography>
-            </Box>
-
-            <Chip
-              icon={<PriorityHighRoundedIcon />}
-              label={getTranslatedSeverity(priority)}
-              color={severityPalette}
-              sx={{ alignSelf: 'flex-start', fontWeight: 600 }}
-            />
-
-            <SeverityEditor
-              priority={priority}
-              isOnline={isOnline}
-              isSaving={isSavingSeverity}
-              error={severitySaveError}
-              onSave={saveSeverity}
-              onSaved={onSeveritySaved}
-            />
-
-            <Stack spacing={1.5}>
-              <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>
-                <LocationOnOutlinedIcon color="action" fontSize="small" />
-                <Typography variant="body2">{report.location || t.notification.noLocation}</Typography>
-              </Stack>
-              <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>
-                <PersonOutlineRoundedIcon color="action" fontSize="small" />
-                <Typography variant="body2">{report.workerName || t.notification.unknownWorker}</Typography>
-              </Stack>
-              <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>
-                <CalendarMonthOutlinedIcon color="action" fontSize="small" />
-                <Typography variant="body2">
-                  {capturedDate.date}{capturedDate.time ? ` · ${capturedDate.time}` : ''}
-                </Typography>
-              </Stack>
-            </Stack>
-
-            {report.description && (
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 700 }}>
-                  {t.reportManagement.descriptionLabel}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                  {report.description}
-                </Typography>
-              </Box>
-            )}
-          </Stack>
-        </Card>
-
-        <Card
-          variant="outlined"
-          component="section"
-          aria-labelledby="report-follow-up-heading"
-          sx={{ p: 2.5, borderRadius: 3 }}
-        >
-          <Stack spacing={1.5}>
-            <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  display: 'grid',
-                  placeItems: 'center',
-                  borderRadius: '50%',
-                  bgcolor: alpha(theme.palette.primary.main, 0.12),
-                  color: 'primary.main'
-                }}
-              >
-                <AssignmentOutlinedIcon />
-              </Box>
-              <Typography id="report-follow-up-heading" variant="h6" component="h2" sx={{ fontWeight: 700 }}>
-                {t.reportManagement.followUpTitle}
-              </Typography>
-            </Stack>
-            <Typography variant="body2" color="text.secondary">
-              {t.reportManagement.followUpPlaceholder}
-            </Typography>
-          </Stack>
-        </Card>
+      <Stack spacing={2.5} sx={{ width: '100%', maxWidth: 560, mx: 'auto' }}>
+        <ReportDetailsCard
+          report={report}
+          priority={priority}
+          isOnline={isOnline}
+          isSavingSeverity={isSavingSeverity}
+          severitySaveError={severitySaveError}
+          saveSeverity={saveSeverity}
+          onSeveritySaved={onSeveritySaved}
+        />
+        <FollowUpCard />
       </Stack>
     </Box>
   );
