@@ -38,7 +38,7 @@ export type TransitionDirection = 'forward' | 'backward';
 export type ConfigMenuState = 'none' | 'pin' | 'email';
 
 export const viewOrder: NavigationView[] = ['report', 'queue', 'sumario', 'home', 'seekie', 'info-report', 'report-management', 'profile', 'configuration'];
-const notificationPageSize = 5;
+const notificationPageSize = 50;
 
 export function useHome() {
   const readNotificationIds = useRef<Set<number>>(getInitialReadNotificationIds());

@@ -275,11 +275,11 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   const connection = await initializeDatabase();
   const result = beforeIssueId === undefined
     ? await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? ORDER BY issue_id DESC LIMIT ?;',
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? ORDER BY fecha_captura DESC LIMIT ?;',
       ['pendiente', limit + 1],
     )
     : await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? AND issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
+      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? AND fecha_captura < (SELECT fecha_captura FROM issues_riesgos WHERE issue_id = ?) ORDER BY fecha_captura DESC LIMIT ?;',
       ['pendiente', beforeIssueId, limit + 1],
     );
   const reports = result.values ?? [];

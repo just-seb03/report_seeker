@@ -36,6 +36,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { getIssueReportImage } from '../../database';
+import { Capacitor } from '@capacitor/core';
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
@@ -91,7 +92,14 @@ export default function NotificationCard({
     let isActive = true;
     getIssueReportImage(issueId)
       .then((reportImage) => {
-        if (isActive) setImage(reportImage);
+        if (!isActive) return;
+        if (reportImage?.startsWith('file://') && Capacitor.isNativePlatform()) {
+            import('@capacitor/core').then(({ Capacitor }) => {
+                if (isActive) setImage(Capacitor.convertFileSrc(reportImage));
+            });
+        } else {
+            setImage(reportImage);
+        }
       })
       .catch((error: unknown) => console.error('No se pudo cargar la fotografía del reporte', error))
       .finally(() => {

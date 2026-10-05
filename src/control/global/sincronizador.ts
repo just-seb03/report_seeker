@@ -113,6 +113,9 @@ export async function syncPendingReports() {
             );
 
             console.log(`✅ [Sincronizador] Reporte local #${reporteLocal.issue_id} sincronizado con éxito (Cloud ID: ${cloudId})`);
+            
+            // Avisar a la UI (Home) que hay nuevos reportes sincronizados
+            window.dispatchEvent(new CustomEvent('reportes_actualizados'));
 
         } catch (err) {
             console.error(`❌ [Sincronizador] Error sincronizando reporte #${reporteLocal.issue_id}`, err);
@@ -179,6 +182,7 @@ export function startListeningForNewReports() {
     // onSnapshot escucha la colección 24/7 mientras haya internet
     onSnapshot(q, async (snapshot) => {
         const sqlite = await initializeDatabase();
+        const pendingNotifications: import('@capacitor/local-notifications').LocalNotificationSchema[] = [];
         
         for (const change of snapshot.docChanges()) {
             // Solo nos importan los reportes NUEVOS que entran a Firebase
@@ -186,15 +190,46 @@ export function startListeningForNewReports() {
                 const data = change.doc.data() as IssueReportFirebase;
                 const cloudId = change.doc.id;
 
-                // 1. Verificamos si ya lo tenemos en el SQLite local (para no duplicar nuestros propios reportes)
-                const localCheck = await sqlite.query(`SELECT issue_id FROM issues_riesgos WHERE firebase_id = ?`, [cloudId]);
+                let fechaParaGuardar = new Date().toISOString();
+                if (data.fecha_captura) {
+                    if (typeof data.fecha_captura === 'string') {
+                        fechaParaGuardar = data.fecha_captura;
+                    } else if (typeof (data.fecha_captura as any).toDate === 'function') {
+                        fechaParaGuardar = (data.fecha_captura as any).toDate().toISOString();
+                    }
+                }
+
+                // 1. Verificamos si ya lo tenemos en el SQLite local
+                const localCheck = await sqlite.query(`SELECT issue_id, fecha_captura FROM issues_riesgos WHERE firebase_id = ?`, [cloudId]);
                 if (localCheck.values && localCheck.values.length > 0) {
+                    // Auto-reparación: si la fecha se guardó como [object Object], la corregimos
+                    if (localCheck.values[0].fecha_captura === '[object Object]') {
+                        await sqlite.run(`UPDATE issues_riesgos SET fecha_captura = ? WHERE firebase_id = ?`, [fechaParaGuardar, cloudId]);
+                    }
                     continue; // Ya lo tenemos, lo ignoramos
                 }
 
                 console.log(`[Sincronizador] 📥 ¡Nuevo reporte recibido de la nube! (ID: ${cloudId})`);
 
                 try {
+                    // Procesar la foto para evitar que el texto gigante rompa el límite del plugin de SQLite
+                    let localPhotoUri: string | null = null;
+                    if (data.fotografiaBase64) {
+                        localPhotoUri = await convertBase64ToWebP(data.fotografiaBase64, cloudId);
+                    }
+
+                    // 1.5. Asegurarnos que el trabajador existe localmente para no violar la Foreign Key
+                    if (data.trabajador_id) {
+                        try {
+                            await sqlite.run(
+                                `INSERT OR IGNORE INTO trabajadores (trabajador_id, nombre, email, pin, es_prevencionista) VALUES (?, ?, ?, ?, ?)`,
+                                [data.trabajador_id, data.trabajador_nombre || 'Desconocido', `dummy-${data.trabajador_id}@system.local`, '', 0]
+                            );
+                        } catch (err) {
+                            console.warn("[Sincronizador] No se pudo insertar el trabajador preventivamente", err);
+                        }
+                    }
+
                     // 2. Insertamos en nuestro SQLite respetando la fecha original del reporte
                     await sqlite.run(
                         `INSERT INTO issues_riesgos (firebase_id, titulo, descripcion, ubicacion, prioridad, estado, fotografia_url, estado_sync, trabajador_id, trabajador_nombre, fecha_captura) 
@@ -206,33 +241,36 @@ export function startListeningForNewReports() {
                             data.ubicacion || null, 
                             data.prioridad || 'Normal', 
                             data.estado || 'capturado', 
-                            data.fotografiaBase64 || null, 
+                            localPhotoUri, 
                             data.trabajador_id || null,
                             data.trabajador_nombre || null,
-                            data.fecha_captura || new Date().toISOString()
+                            fechaParaGuardar
                         ]
                     );
 
-                    // 3. Lanzamos la Notificación Nativa en el celular con un ID verdaderamente único
-                    await LocalNotifications.schedule({
-                        notifications: [
-                            {
-                                title: `🚨 Nuevo Riesgo: ${data.prioridad?.toUpperCase() || 'NORMAL'}`,
-                                body: `${data.titulo} en ${data.ubicacion || 'Ubicación no especificada'}`,
-                                id: Math.floor(Math.random() * 2147483647), // Evita que se sobreescriban al llegar al mismo tiempo
-                                schedule: { at: new Date(Date.now() + 1000) }
-                            }
-                        ]
+                    // 3. Preparamos la Notificación Nativa para agruparla
+                    pendingNotifications.push({
+                        title: `🚨 Nuevo Riesgo: ${data.prioridad?.toUpperCase() || 'NORMAL'}`,
+                        body: `${data.titulo} en ${data.ubicacion || 'Ubicación no especificada'}`,
+                        id: Math.floor(Math.random() * 2147483647), // Evita que se sobreescriban al llegar al mismo tiempo
+                        schedule: { at: new Date(Date.now() + 1000) }
                     });
-
-                    // 4. Avisar a la interfaz gráfica (React) que debe refrescar su lista
-                    window.dispatchEvent(new CustomEvent('reportes_actualizados'));
 
                     console.log(`✅ [Sincronizador] Reporte descargado y guardado #${cloudId}`);
                 } catch (e) {
                     console.error(`[Sincronizador] Error al procesar el reporte entrante ${cloudId}:`, e);
                 }
             }
+        }
+        
+        // Lanzamos todas las notificaciones juntas para evitar bloqueos del sistema operativo
+        if (pendingNotifications.length > 0) {
+            await LocalNotifications.schedule({ notifications: pendingNotifications }).catch(e => console.error("Error scheduling notifications", e));
+        }
+
+        // 4. Avisar a la interfaz gráfica (React) UNA SOLA VEZ al final, para no saturar SQLite
+        if (snapshot.docChanges().some(change => change.type === "added")) {
+            window.dispatchEvent(new CustomEvent('reportes_actualizados'));
         }
     }, (error) => {
         console.error("[Sincronizador] ❌ Error en el radar de Firebase:", error);

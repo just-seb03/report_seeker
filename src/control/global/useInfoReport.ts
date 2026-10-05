@@ -69,6 +69,10 @@ export function useInfoReport(report: IssueReport) {
     return () => { isActive = false; };
   }, [report.issueId]);
 
+  const displayImage = image?.startsWith('file://') && Capacitor.isNativePlatform() 
+    ? Capacitor.convertFileSrc(image) 
+    : image;
+
   const handleOpenFullImage = async () => {
     if (!image || isOpeningImage) return;
     if (!Capacitor.isNativePlatform()) {
@@ -78,11 +82,15 @@ export function useInfoReport(report: IssueReport) {
 
     setIsOpeningImage(true);
     try {
-      const { mimeType, extension, base64 } = getImageData(image);
-      const path = `report-photos/report-${report.issueId}.${extension}`;
-      await Filesystem.writeFile({ path, data: base64, directory: Directory.Cache, recursive: true });
-      const { uri } = await Filesystem.getUri({ path, directory: Directory.Cache });
-      await FileOpener.open({ filePath: uri, contentType: mimeType, openWithDefault: true });
+      if (image.startsWith('file://')) {
+        await FileOpener.open({ filePath: image, contentType: 'image/webp', openWithDefault: true });
+      } else {
+        const { mimeType, extension, base64 } = getImageData(image);
+        const path = `report-photos/report-${report.issueId}.${extension}`;
+        await Filesystem.writeFile({ path, data: base64, directory: Directory.Cache, recursive: true });
+        const { uri } = await Filesystem.getUri({ path, directory: Directory.Cache });
+        await FileOpener.open({ filePath: uri, contentType: mimeType, openWithDefault: true });
+      }
     } catch (error) {
       console.error('No se pudo abrir la fotografía en Android.', error);
       setImageDialogOpen(true);
@@ -92,7 +100,8 @@ export function useInfoReport(report: IssueReport) {
   };
 
   return {
-    image,
+    image: displayImage, // Devuelve el displayImage para que el <img> de React lo pueda renderizar sin bloqueos de seguridad
+    rawImage: image, // Por si se necesita el original
     isLoadingImage,
     isOpeningImage,
     imageDialogOpen,
