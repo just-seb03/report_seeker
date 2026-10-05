@@ -28,7 +28,7 @@ import {
   DialogActions, 
   Button, 
   TextField,
-  useTheme
+  Typography
 } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { t } from '../control/i18n';
@@ -46,7 +46,6 @@ interface DateFilterWidgetProps {
 }
 
 export default function DateFilterWidget({ currentFilter, customRange, onChange }: DateFilterWidgetProps) {
-  const theme = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [tempRange, setTempRange] = useState<DateRange>(customRange || { from: '', to: '' });
 
@@ -108,28 +107,36 @@ export default function DateFilterWidget({ currentFilter, customRange, onChange 
       <Dialog 
         open={dialogOpen} 
         onClose={() => setDialogOpen(false)}
-        PaperProps={{ sx: { borderRadius: '24px', p: 1 } }}
+        sx={{ '& .MuiDialog-paper': { borderRadius: '24px', p: 1 } }}
       >
         <DialogTitle sx={{ fontWeight: 700, color: 'text.primary' }}>
           {t.summary.filterCustom}
         </DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
-          <TextField
-            label={t.summary.dateFrom}
-            type="date"
-            value={tempRange.from}
-            onChange={(e) => setTempRange(prev => ({ ...prev, from: e.target.value }))}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-          <TextField
-            label={t.summary.dateTo}
-            type="date"
-            value={tempRange.to}
-            onChange={(e) => setTempRange(prev => ({ ...prev, to: e.target.value }))}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
+          <Box>
+            <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+              {t.summary.dateFrom}
+            </Typography>
+            <TextField
+              type="date"
+              value={tempRange.from}
+              onChange={(e) => setTempRange(prev => ({ ...prev, from: e.target.value }))}
+              fullWidth
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+            />
+          </Box>
+          <Box>
+            <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', ml: 1, mb: 0.5, display: 'block' }}>
+              {t.summary.dateTo}
+            </Typography>
+            <TextField
+              type="date"
+              value={tempRange.to}
+              onChange={(e) => setTempRange(prev => ({ ...prev, to: e.target.value }))}
+              fullWidth
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+            />
+          </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setDialogOpen(false)} color="inherit" sx={{ fontWeight: 600 }}>
