@@ -215,6 +215,7 @@ export const TEXTS = {
       greeting: 'Hola, soy',
       aiName: 'Seekie AI',
       help: '¿En qué te puedo ayudar hoy?',
+      dummyResponse: 'Hola, aun no existo, asi que esto es solo una prueba de componentes.',
       inputPlaceholder: 'Escribe tu mensaje...',
     }
   },
@@ -423,6 +424,7 @@ export const TEXTS = {
       greeting: 'Hi, I am',
       aiName: 'Seekie AI',
       help: 'How can I help you today?',
+      dummyResponse: 'Hello, I do not exist yet, so this is just a component test.',
       inputPlaceholder: 'Type your message...',
     }
   }

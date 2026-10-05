@@ -21,10 +21,28 @@ import { t } from '../control/i18n';
 import { Box, InputBase, IconButton } from '@mui/material';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import MicRoundedIcon from '@mui/icons-material/MicRounded';
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 
-export default function SeekieAIInputBox() {
+type SeekieAIInputBoxProps = {
+  onSendMessage?: (text: string) => void;
+};
+
+export default function SeekieAIInputBox({ onSendMessage }: SeekieAIInputBoxProps) {
   const [text, setText] = useState('');
+
+  const handleSend = () => {
+    if (text.trim() && onSendMessage) {
+      onSendMessage(text);
+      setText('');
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   return (
     <Box sx={{ width: '100%', maxWidth: '800px', mx: 'auto', pointerEvents: 'auto' }}>
@@ -47,10 +65,12 @@ export default function SeekieAIInputBox() {
           placeholder={t.seekie.inputPlaceholder}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
           multiline
           maxRows={5}
         />
         <IconButton 
+          onClick={text.trim() ? handleSend : undefined}
           sx={{ 
             mb: '4px', ml: 1, width: 44, height: 44, flexShrink: 0,
             bgcolor: text.trim() ? 'primary.main' : 'transparent', 

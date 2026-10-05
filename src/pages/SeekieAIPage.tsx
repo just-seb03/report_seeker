@@ -22,14 +22,17 @@ import SeekieAIChatArea from '../components/SeekieAIChatArea';
 import SeekieAIInputBox from '../components/SeekieAIInputBox';
 import GlobalTopBar from '../components/GlobalTopBar';
 import { t } from '../control/i18n';
+import { useSeekieChat } from '../control/useSeekieChat';
 
 export default function SeekieAIPage() {
+  const { messages, sendMessage } = useSeekieChat();
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', position: 'absolute', inset: 0, bgcolor: 'background.default', pb: '90px' }}>
       <GlobalTopBar title={t.seekie.title} />
-      <SeekieAIChatArea />
+      <SeekieAIChatArea messages={messages} />
       <Box sx={{ px: 2, pb: 1, pt: 1, position: 'relative', zIndex: 2 }}>
-        <SeekieAIInputBox />
+        <SeekieAIInputBox onSendMessage={sendMessage} />
       </Box>
     </Box>
   );
