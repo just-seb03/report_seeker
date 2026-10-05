@@ -131,6 +131,10 @@ export const TEXTS = {
       title: 'Gestión del reporte',
       reportLabel: 'Reporte',
       descriptionLabel: 'Descripción',
+      severityLabel: 'Severidad',
+      saveSeverity: 'Guardar severidad',
+      saveSeverityError: 'No se pudo guardar la severidad. Inténtalo de nuevo.',
+      severityOffline: 'Conéctate a internet para cambiar la severidad del reporte.',
       followUpTitle: 'Seguimiento',
       followUpPlaceholder: 'Esta vista inicial prepara el espacio para registrar estados, instrucciones y cierre. Esas acciones se habilitarán en una siguiente etapa.'
     },
@@ -374,6 +378,10 @@ export const TEXTS = {
       title: 'Report management',
       reportLabel: 'Report',
       descriptionLabel: 'Description',
+      severityLabel: 'Severity',
+      saveSeverity: 'Save severity',
+      saveSeverityError: 'The severity could not be saved. Please try again.',
+      severityOffline: 'Connect to the internet to change this report’s severity.',
       followUpTitle: 'Follow-up',
       followUpPlaceholder: 'This initial view prepares the space for tracking status, instructions, and closure. Those actions will be enabled in a later stage.'
     },
