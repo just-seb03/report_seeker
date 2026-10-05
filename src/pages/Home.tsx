@@ -29,13 +29,13 @@ import InfoReport from './InfoReport';
 import Report from './Report';
 import Profile from './profile';
 import Queue from './Queue';
+import Sumario from './Sumario';
 import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/HomeScene';
 import ViewTransition from '../components/ViewTransition';
 import { useHome, type NavigationView } from '../control/useHome';
-
-
 import { useQueue } from '../control/useQueue';
+import { getCurrentUser } from '../control/authControl';
 
 interface HomeProps {
   isDarkMode: boolean;
@@ -86,6 +86,9 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
 
   const { reports: pendingReports, loading: loadingQueue } = useQueue();
   const hasPendingReports = !loadingQueue && pendingReports.length > 0;
+  
+  const user = getCurrentUser();
+  const isPrevencionista = user?.es_prevencionista ?? false;
 
   const renderView = (view: NavigationView) => {
     if (view === 'configuration') {
@@ -121,6 +124,9 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     if (view === 'profile') return <Profile onSettingsClick={handleOpenConfiguration} />;
     if (view === 'queue') {
       return <Queue onReportClick={handleOpenReport} />;
+    }
+    if (view === 'sumario') {
+      return <Sumario />;
     }
     if (view === 'seekie') {
       return <SeekieAIPage />;
@@ -190,13 +196,16 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
               activeView === 'report' ? 'report' : 
               activeView === 'profile' || activeView === 'configuration' ? 'profile' : 
               activeView === 'queue' ? 'cola' : 
+              activeView === 'sumario' ? 'sumario' : 
               activeView === 'seekie' ? 'seekie' : 
               'home'
             }
+            isPrevencionista={isPrevencionista}
             onHomeClick={handleHomeClick}
             onReportClick={handleReportClick}
             onProfileClick={() => requestNavigation('profile')}
             onColaClick={() => requestNavigation('queue')}
+            onSumarioClick={() => requestNavigation('sumario')}
             onSeekieClick={() => requestNavigation('seekie')}
           />
         </Box>

@@ -26,23 +26,27 @@ import PersonIcon from '@mui/icons-material/Person';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import AssessmentOutlinedIcon from '@mui/icons-material/AssessmentOutlined';
 import { t } from '../control/i18n';
 
 type BottomNavProps = {
-  activeView: 'home' | 'report' | 'profile' | 'cola' | 'seekie';
+  activeView: 'home' | 'report' | 'profile' | 'cola' | 'seekie' | 'sumario';
+  isPrevencionista?: boolean;
   onHomeClick?: () => void;
   onReportClick?: () => void;
   onProfileClick?: () => void;
   onColaClick?: () => void;
   onSeekieClick?: () => void;
+  onSumarioClick?: () => void;
 };
 
-export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick, onColaClick, onSeekieClick }: BottomNavProps) {
+export default function BottomNav({ activeView, isPrevencionista, onHomeClick, onReportClick, onProfileClick, onColaClick, onSeekieClick, onSumarioClick }: BottomNavProps) {
   
   const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
     switch (newValue) {
       case 'report': onReportClick?.(); break;
       case 'cola': onColaClick?.(); break;
+      case 'sumario': onSumarioClick?.(); break;
       case 'home': onHomeClick?.(); break;
       case 'seekie': onSeekieClick?.(); break;
       case 'profile': onProfileClick?.(); break;
@@ -100,7 +104,11 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
         }}
       >
         <BottomNavigationAction label={t.home.bottomNav.report} value="report" icon={<AssignmentOutlinedIcon />} />
-        <BottomNavigationAction label={t.home.bottomNav.queue} value="cola" icon={<AccessTimeOutlinedIcon />} />
+        {isPrevencionista ? (
+          <BottomNavigationAction label={t.home.bottomNav.sumario || 'Sumario'} value="sumario" icon={<AssessmentOutlinedIcon />} />
+        ) : (
+          <BottomNavigationAction label={t.home.bottomNav.queue} value="cola" icon={<AccessTimeOutlinedIcon />} />
+        )}
         <BottomNavigationAction label={t.home.bottomNav.home} value="home" icon={<HomeIcon />} />
         <BottomNavigationAction label={t.home.bottomNav.seekie} value="seekie" icon={<ChatOutlinedIcon />} />
         <BottomNavigationAction label={t.home.bottomNav.profile} value="profile" icon={<PersonIcon />} />

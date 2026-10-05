@@ -33,11 +33,11 @@ import { sendReportNotification } from './systemNotificationsControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
-export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue' | 'seekie';
+export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue' | 'seekie' | 'sumario';
 export type TransitionDirection = 'forward' | 'backward';
 export type ConfigMenuState = 'none' | 'pin' | 'email';
 
-export const viewOrder: NavigationView[] = ['report', 'queue', 'home', 'seekie', 'info-report', 'profile', 'configuration'];
+export const viewOrder: NavigationView[] = ['report', 'queue', 'sumario', 'home', 'seekie', 'info-report', 'profile', 'configuration'];
 const notificationPageSize = 5;
 
 export function useHome() {
