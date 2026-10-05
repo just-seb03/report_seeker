@@ -31,10 +31,16 @@ type SeekieAIChatAreaProps = {
 
 export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (isInitialMount.current) {
+        bottomRef.current.scrollIntoView({ behavior: 'auto' });
+        isInitialMount.current = false;
+      } else {
+        bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }, [messages]);
 
