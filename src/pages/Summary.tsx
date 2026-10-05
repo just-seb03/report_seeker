@@ -28,7 +28,7 @@ export default function Summary() {
   const { data, loading } = useSummary();
 
   return (
-    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'background.default', pb: 10, overflowY: 'auto' }}>
+    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'background.default', pb: 10, pt: 'calc(80px + env(safe-area-inset-top))', overflowY: 'auto' }}>
       <GlobalTopBar title={t.summary.title} />
       
       {loading ? (
