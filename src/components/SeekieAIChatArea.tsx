@@ -39,10 +39,11 @@ export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProp
   }, [messages]);
 
   return (
-    <Box sx={{ flex: 1, position: 'relative', overflowY: 'auto' }}>
+    <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
       <SeekieAIDoodles />
       
-      <Box sx={{ position: 'relative', zIndex: 1, minHeight: '100%', pt: 10, p: 3, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 1 }}>
+        <Box sx={{ minHeight: '100%', pt: 10, p: 3, display: 'flex', flexDirection: 'column' }}>
         {messages.length === 0 ? (
           <Box sx={{ textAlign: 'center', mt: 'auto', mb: 'auto' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
@@ -62,6 +63,7 @@ export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProp
             <div ref={bottomRef} />
           </Box>
         )}
+      </Box>
       </Box>
     </Box>
   );
