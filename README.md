@@ -134,7 +134,10 @@ El proyecto Android registra el dominio de Firebase Authentication como Android 
 
 ##  Historial de Cambios (Changelog)
 
-### v0.7.2 (Actual) - Preparación para IA
+### v0.8.0 (Actual) - Material Design 3
+- Estandarización del diseño a uno cómodo y predecible.
+- Implementación del idioma ingles.
+### v0.7.2 - Preparación para IA
 - Adaptación del diseño de pestaña y menú para el asistente inteligente.
 - Creación de la estructura visual de "Seekie AI" al estilo moderno y conversacional.
 
@@ -164,7 +167,7 @@ El proyecto Android registra el dominio de Firebase Authentication como Android 
 - Cambios menores al diseño y organización de la lista de notificaciones.
 
 ### v0.3.0 - Perfil y Ubicación
-- Se agregó el guardado de ubicación GPS en el *notification card*.
+- Se agregó el guardado de ubicación en el *notification card*.
 - Mejoras en la visualización e interacciones de las notificaciones por fecha.
 - Menú de perfil rediseñado para soportar funciones extendidas.
 - Creación de archivos relacionados a la gestión avanzada del perfil del usuario.
