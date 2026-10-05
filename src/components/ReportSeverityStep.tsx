@@ -96,7 +96,7 @@ export default function ReportSeverityStep({ severity, options, onChange, onConf
         fullWidth
         sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
       >
-        Confirmar
+        {t.common.confirm}
       </Button>
     </Box>
   );

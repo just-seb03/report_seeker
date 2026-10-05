@@ -18,6 +18,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import CloudOffIcon from '@mui/icons-material/CloudOff';
+import { t } from '../control/i18n';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 
 type SyncErrorDialogProps = {
@@ -41,7 +42,7 @@ export default function SyncErrorDialog({ open, message, onClose }: SyncErrorDia
         <Box className="report-cancel-icon" aria-hidden="true">
           <CloudOffIcon color="warning" />
         </Box>
-        Problema de Conexión
+        {t.sync.errorTitle}
       </DialogTitle>
       <DialogContent>
         <Typography id="sync-error-description" className="report-cancel-description">
@@ -50,7 +51,7 @@ export default function SyncErrorDialog({ open, message, onClose }: SyncErrorDia
       </DialogContent>
       <DialogActions className="report-cancel-actions">
         <Button className="report-cancel-keep" onClick={onClose} autoFocus>
-          Entendido
+          {t.sync.understood}
         </Button>
       </DialogActions>
     </Dialog>

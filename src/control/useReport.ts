@@ -26,6 +26,7 @@
  *        reporte en la base de datos.                                                         *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { useState } from 'react';
 import { insertOrUpdateTrabajadorLocal, saveIssueReport } from '../database';
 import { syncPendingReports } from './sincronizador';
@@ -33,7 +34,7 @@ import { type ReportPhoto } from '../pages/Report';
 import { type EditableReportStep } from '../components/ReportSummaryStep';
 import { getCurrentUser } from './authControl';
 
-const severityOptions = ['Leve', 'Moderada', 'Grave'] as const;
+const getSeverityOptions = () => [t.report.severityLow, t.report.severityMedium, t.report.severityHigh];
 export type ReportStep = EditableReportStep | 'summary' | 'ready';
 
 interface UseReportProps {
@@ -92,7 +93,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
         title: title.trim(),
         description: description.trim(),
         location: location.trim(),
-        priority: severityOptions[severity],
+        priority: getSeverityOptions()[severity],
         image: currentPhoto.blob,
         trabajador_id: user?.trabajador_id,
         trabajador_nombre: user?.nombre
@@ -106,7 +107,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
         title: title.trim(),
         description: description.trim(),
         location: location.trim(),
-        priority: severityOptions[severity],
+        priority: getSeverityOptions()[severity],
       });
       setStep('ready');
     } catch (error) {
@@ -128,7 +129,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
     isSaving,
     isRetakingPhoto,
     errorMessage,
-    severityOptions,
+    severityOptions: getSeverityOptions(),
     setSeverity,
     setTitle,
     setDescription,

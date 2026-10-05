@@ -83,7 +83,7 @@ export default function ReportPhotoStep({
           fullWidth
           sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
         >
-          Sí
+          {t.report.photoYes}
         </Button>
       </Stack>
     </Box>

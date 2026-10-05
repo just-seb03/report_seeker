@@ -36,11 +36,11 @@ type ReportSummaryStepProps = {
   onConfirm: () => void;
 };
 
-const summaryFields: { step: EditableReportStep; label: string; valueKey: 'title' | 'severity' | 'description' | 'location' }[] = [
-  { step: 'title', label: 'Título', valueKey: 'title' },
-  { step: 'severity', label: 'Gravedad', valueKey: 'severity' },
-  { step: 'description', label: 'Descripción', valueKey: 'description' },
-  { step: 'location', label: 'Ubicación', valueKey: 'location' },
+const getSummaryFields = (): { step: EditableReportStep; label: string; valueKey: 'title' | 'severity' | 'description' | 'location' }[] => [
+  { step: 'title', label: t.report.titleHeading, valueKey: 'title' },
+  { step: 'severity', label: t.report.summarySeverity, valueKey: 'severity' },
+  { step: 'description', label: t.report.summaryDesc, valueKey: 'description' },
+  { step: 'location', label: t.report.summaryLocation, valueKey: 'location' },
 ];
 
 export default function ReportSummaryStep({
@@ -55,11 +55,12 @@ export default function ReportSummaryStep({
   onConfirm,
 }: ReportSummaryStepProps) {
   const values = { title, severity, description, location };
+  const summaryFields = getSummaryFields();
 
   return (
     <Box component="section" sx={{ display: 'flex', flexDirection: 'column', pb: 2 }} aria-labelledby="report-summary-heading">
       <Typography variant="h5" id="report-summary-heading" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, mt: 4 }}>
-        Revisa tu reporte
+        {t.report.reviewReport}
       </Typography>
 
       <Card sx={{ mb: 3, borderRadius: 2, overflow: 'hidden' }} variant="outlined">
@@ -102,7 +103,7 @@ export default function ReportSummaryStep({
         fullWidth
         sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
       >
-        {isSaving ? 'Guardando...' : 'Confirmar reporte'}
+        {isSaving ? t.report.textSaving : t.report.confirmReport}
       </Button>
     </Box>
   );

@@ -18,6 +18,7 @@
  *        de los reportes que se encuentran en la cola (offline-first).                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { useState } from 'react';
@@ -36,7 +37,7 @@ export default function SyncQueueButton() {
     try {
       const status = await Network.getStatus();
       if (!status.connected) {
-        setErrorDialogOptions({ open: true, message: 'No hay conexión a internet disponible para sincronizar los reportes.' });
+        setErrorDialogOptions({ open: true, message: t.sync.noInternet });
         setIsSyncing(false);
         return;
       }
@@ -49,7 +50,7 @@ export default function SyncQueueButton() {
 
     } catch (e) {
       console.error('Error durante la sincronización manual:', e);
-      setErrorDialogOptions({ open: true, message: 'Ocurrió un error al intentar sincronizar la cola. Por favor, inténtalo de nuevo más tarde.' });
+      setErrorDialogOptions({ open: true, message: t.sync.syncFailed });
     } finally {
       setIsSyncing(false);
     }
@@ -88,7 +89,7 @@ export default function SyncQueueButton() {
           <CloudUploadOutlinedIcon sx={{ fontSize: 24 }} />
         )}
         <Typography sx={{ fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.3px' }}>
-          {isSyncing ? 'Sincronizando...' : 'Sincronizar Cola'}
+          {isSyncing ? t.sync.syncing : t.sync.syncQueue}
         </Typography>
       </Box>
     </Box>

@@ -76,7 +76,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
           <ArrowBackRoundedIcon />
         </IconButton>
         <Box sx={{ display: 'grid', minWidth: 0, gap: '2px', color: 'inherit' }}>
-          <Typography component="span" sx={{ color: 'primary.main', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Reporte de riesgo</Typography>
+          <Typography component="span" sx={{ color: 'primary.main', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t.infoReport.subtitle}</Typography>
           <Typography component="h1" sx={{ m: 0, overflowWrap: 'anywhere', fontSize: '24px', fontWeight: 700, lineHeight: 1.2 }}>{report.title}</Typography>
         </Box>
       </Box>
@@ -108,7 +108,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
             <Box component="img" src={image} alt={`Fotografía del riesgo: ${report.title}`} sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', animation: 'info-report-photo-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both' }} />
           ) : (
             <Typography component="span" sx={{ p: 2.5, fontSize: '13px', fontWeight: 600 }}>
-              {isLoadingImage ? 'Cargando fotografía...' : 'Este reporte no tiene fotografía'}
+              {isLoadingImage ? '{t.notification.loadingPhoto}' : '{t.infoReport.noPhotoInfo}'}
             </Typography>
           )}
         </Box>
@@ -120,7 +120,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
                 <PriorityHighRoundedIcon sx={{ fontSize: 24 }} />
               </Box>
               <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
-                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>Gravedad</Typography>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>{t.infoReport.infoSeverity}</Typography>
                 <Typography component="p" sx={{ m: 0, color: `${severityPalette}.main`, fontSize: '14px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.priority}</Typography>
               </Box>
             </Box>
@@ -129,17 +129,17 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
                 <LocationOnOutlinedIcon sx={{ fontSize: 24 }} />
               </Box>
               <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
-                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>Ubicación</Typography>
-                <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '14px', fontWeight: 500, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || 'No especificada'}</Typography>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>{t.infoReport.infoLocation}</Typography>
+                <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '14px', fontWeight: 500, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || t.infoReport.noLocationInfo}</Typography>
               </Box>
             </Box>
           </Box>
           <Box sx={{ p: 2.5, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
             <Typography component="h2" sx={{ m: 0, mb: 1, color: 'primary.main', fontSize: '13px', fontWeight: 600, letterSpacing: '0.2px' }}>{t.infoReport.descriptionSection}</Typography>
-            <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '15px', fontWeight: 400, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || 'Sin descripción'}</Typography>
+            <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '15px', fontWeight: 400, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || t.infoReport.noDescriptionInfo}</Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '8px 4px', color: 'text.secondary', fontSize: '13px', fontWeight: 500, '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 1 }, '& svg': { flex: '0 0 auto', fontSize: 18 } }}>
-            <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || 'Trabajador Desconocido'}</span>
+            <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || t.notification.unknownWorker}</span>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.25 }}>
               <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <CalendarMonthOutlinedIcon aria-hidden="true" sx={{ fontSize: 18 }} />

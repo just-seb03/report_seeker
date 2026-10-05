@@ -25,6 +25,7 @@ import ReportSummaryStep from '../components/ReportSummaryStep';
 import ReportTextStep from '../components/ReportTextStep';
 import ReportProgressBar from '../components/ReportProgressBar';
 import { useReport } from '../control/useReport';
+import { t } from '../control/i18n';
 import { Box } from '@mui/material';
 
 
@@ -93,9 +94,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'description' && (
             <ReportTextStep
               field="description"
-              heading="Describe lo que has visto"
+              heading={t.report.descHeading}
               value={description}
-              placeholder="Escribe la descripción"
+              placeholder={t.report.descPlaceholder}
               maxLength={1000}
               multiline
               onChange={setDescription}
@@ -105,9 +106,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'location' && (
             <ReportTextStep
               field="location"
-              heading="¿En dónde está localizado el riesgo?"
+              heading={t.report.locationHeading}
               value={location}
-              placeholder="Ingresa la ubicación"
+              placeholder={t.report.locationPlaceholder}
               maxLength={200}
               onChange={setLocation}
               onConfirm={() => continueTo('title')}
@@ -116,9 +117,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'title' && (
             <ReportTextStep
               field="title"
-              heading="Ponle un título al riesgo"
+              heading={t.report.titleHeading}
               value={title}
-              placeholder="Escribe un título"
+              placeholder={t.report.titlePlaceholder}
               maxLength={100}
               errorMessage={errorMessage}
               onChange={setTitle}

@@ -27,6 +27,7 @@
  *        notificación.                                                                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t, currentLanguage } from '../control/i18n';
 import { useEffect, useState, type KeyboardEvent } from 'react';
 import { Box, Typography, Collapse, Avatar, alpha, useTheme } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -45,12 +46,12 @@ interface NotificationCardProps {
 
 function formatRelativeTime(fecha: string, currentTime: number): string {
   const publishedAt = Date.parse(fecha);
-  if (Number.isNaN(publishedAt)) return 'ahora';
+  if (Number.isNaN(publishedAt)) return t.notification.now;
 
   const elapsedMinutes = Math.floor(Math.max(0, currentTime - publishedAt) / 60_000);
-  if (elapsedMinutes === 0) return 'ahora';
+  if (elapsedMinutes === 0) return t.notification.now;
 
-  const relativeTime = new Intl.RelativeTimeFormat('es-CL', { numeric: 'auto' });
+  const relativeTime = new Intl.RelativeTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-CL', { numeric: 'auto' });
   if (elapsedMinutes < 60) return relativeTime.format(-elapsedMinutes, 'minute');
 
   const elapsedHours = Math.floor(elapsedMinutes / 60);
@@ -66,8 +67,8 @@ function formatRelativeTime(fecha: string, currentTime: number): string {
 }
 
 function formatPublicationDate(fecha?: string): string {
-  if (!fecha || Number.isNaN(Date.parse(fecha))) return 'Fecha desconocida';
-  return new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
+  if (!fecha || Number.isNaN(Date.parse(fecha))) return t.notification.unknownDate;
+  return new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
 }
 
 export default function NotificationCard({
@@ -198,7 +199,7 @@ export default function NotificationCard({
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                 <InsertPhotoOutlinedIcon color="disabled" sx={{ fontSize: 48 }} />
                 <Typography variant="caption" color="text.disabled">
-                  {imageLoading ? 'Cargando fotografía...' : 'Sin fotografía asociada'}
+                  {imageLoading ? t.notification.loadingPhoto : t.notification.noPhoto}
                 </Typography>
               </Box>
             )}
@@ -207,7 +208,7 @@ export default function NotificationCard({
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, minWidth: 0, flex: 1 }}>
               <LocationOnOutlinedIcon color="action" fontSize="small" sx={{ flexShrink: 0 }} />
               <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: 'anywhere' }}>
-                {ubicacion || 'Ubicación no especificada'}
+                {ubicacion || t.notification.noLocation}
               </Typography>
             </Box>
             <Typography
@@ -238,7 +239,7 @@ export default function NotificationCard({
                 {workerName ? workerName.charAt(0).toUpperCase() : '?'}
               </Avatar>
               <Typography variant="caption" color="text.secondary">
-                {workerName || 'Trabajador Desconocido'}
+                {workerName || t.notification.unknownWorker}
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">{formatPublicationDate(fecha)}</Typography>

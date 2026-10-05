@@ -27,7 +27,7 @@ import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import { IconButton, Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import ChangePinDialog from '../components/ChangePinDialog';
 import ChangeEmailDialog from '../components/ChangeEmailDialog';
-import { t } from '../control/i18n';
+import { t, currentLanguage, setLanguage } from '../control/i18n';
 
 type ConfigurationProps = {
   onBack: () => void;
@@ -40,7 +40,6 @@ type ConfigurationProps = {
 export default function Configuration({ onBack, isDarkMode, onToggleTheme, configMenuState, setConfigMenuState }: ConfigurationProps) {
   const [renderPin, setRenderPin] = useState(configMenuState === 'pin');
   const [renderEmail, setRenderEmail] = useState(configMenuState === 'email');
-  const [demoLang, setDemoLang] = useState<'es' | 'en'>('es');
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -105,13 +104,13 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
             </ListItem>
 
             <ListItem disablePadding divider>
-              <ListItemButton onClick={() => setDemoLang(prev => prev === 'es' ? 'en' : 'es')} sx={{ py: 2 }}>
+              <ListItemButton onClick={() => setLanguage(currentLanguage === 'es' ? 'en' : 'es')} sx={{ py: 2 }}>
                 <ListItemIcon sx={{ color: 'primary.main' }}>
                   <TranslateOutlinedIcon />
                 </ListItemIcon>
                 <ListItemText 
                   primary={<Typography sx={{ fontWeight: 500 }}>{t.config.language}</Typography>}
-                  secondary={demoLang === 'es' ? t.config.langEs : t.config.langEn} 
+                  secondary={currentLanguage === 'es' ? t.config.langEs : t.config.langEn} 
                 />
               </ListItemButton>
             </ListItem>

@@ -17,6 +17,7 @@
  *   SeekAIInputBox -- Caja de texto inferior estilo Gemini para enviar mensajes a Seek AI.    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { Box, InputBase, IconButton } from '@mui/material';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import MicRoundedIcon from '@mui/icons-material/MicRounded';
@@ -43,7 +44,7 @@ export default function SeekieAIInputBox() {
       >
         <InputBase
           sx={{ flex: 1, py: 1.5, typography: 'body1', maxHeight: '120px', overflowY: 'auto' }}
-          placeholder="Pregúntale a Seekie AI..."
+          placeholder={t.seekie.inputPlaceholder}
           value={text}
           onChange={(e) => setText(e.target.value)}
           multiline

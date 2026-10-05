@@ -63,6 +63,12 @@ function App() {
       setActionLinkLaunch((launch) => launch + 1);
     };
 
+    const handleLanguageChange = () => {
+      // Forzar un re-render global sin desmontar los componentes
+      setActionLinkLaunch(l => l + 1);
+    };
+    window.addEventListener('languagechange', handleLanguageChange);
+
     resetPushNotificationCount();
     const sub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) resetPushNotificationCount();
@@ -91,6 +97,7 @@ function App() {
       sub.then(listener => listener.remove());
       actionLinkSub.then(listener => listener.remove());
       window.removeEventListener('user_logout', handleLogout);
+      window.removeEventListener('languagechange', handleLanguageChange);
     };
   }, []);
 

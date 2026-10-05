@@ -17,6 +17,7 @@
  *   ChangePinDialog -- Componente de pantalla completa para cambiar el PIN.                   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { useState } from 'react';
 import PinPad from './PinPad';
 import LoginErrorDialog from './LoginErrorDialog';
@@ -62,7 +63,7 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
               setStep('enter_new');
             }, 600);
           } else {
-            setErrorMsg('PIN actual incorrecto');
+            setErrorMsg(t.changePin.errorIncorrect);
             setPinInput('');
           }
         } else if (step === 'enter_new') {
@@ -140,8 +141,8 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
         }}
       >
         <PinPad
-          title="Confirma tu PIN actual"
-          subtitle="Para continuar, verifica tu identidad"
+          title={t.changePin.confirmTitle}
+          subtitle={t.changePin.confirmSubtitle}
           maxLength={4}
           currentValue={step === 'confirm_current' ? pinInput : ''}
           onKeyPress={handleKeyPress}
@@ -158,8 +159,8 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
         }}
       >
         <PinPad
-          title="Ingresa tu nuevo PIN"
-          subtitle="4 dígitos"
+          title={t.changePin.newTitle}
+          subtitle={t.changePin.newSubtitle}
           maxLength={4}
           currentValue={step === 'enter_new' ? pinInput : ''}
           onKeyPress={handleKeyPress}
@@ -182,7 +183,7 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
           opacity: step === 'success' ? 1 : 0, pointerEvents: step === 'success' ? 'auto' : 'none'
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 500 }}>PIN actualizado con éxito</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 500 }}>{t.changePin.success}</Typography>
       </Box>
 
       <LoginErrorDialog 

@@ -17,6 +17,7 @@
  *   ChangeEmailDialog -- Solicita un cambio de correo mediante un enlace de confirmación.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { useState } from 'react';
 import PinPad from './PinPad';
 import LoginErrorDialog from './LoginErrorDialog';
@@ -59,7 +60,7 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
             setStep('enter_new');
           }, 600);
         } else {
-          setErrorMsg('PIN actual incorrecto');
+          setErrorMsg(t.changePin.errorIncorrect);
           setPinInput('');
         }
       }
@@ -71,7 +72,7 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
     
     // Simple email validation
     if (!/^\S+@\S+\.\S+$/.test(emailInput)) {
-      setErrorMsg('Formato de correo inválido');
+      setErrorMsg(t.changeEmail.invalidFormat);
       return;
     }
 
@@ -115,8 +116,8 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
         }}
       >
         <PinPad
-          title="Confirma tu PIN"
-          subtitle="Para cambiar el correo, verifica tu identidad"
+          title={t.changeEmail.confirmTitle}
+          subtitle={t.changeEmail.confirmSubtitle}
           maxLength={4}
           currentValue={step === 'confirm_current' ? pinInput : ''}
           onKeyPress={handleKeyPress}
@@ -133,12 +134,12 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
             : { opacity: 0, pointerEvents: 'none', transform: 'translateY(100px) scale(0.95)' })
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 500, mb: 1, textAlign: 'center' }}>Nuevo Correo</Typography>
-        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, textAlign: 'center' }}>Ingresa tu nueva dirección de correo de recuperación</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 500, mb: 1, textAlign: 'center' }}>{t.changeEmail.newTitle}</Typography>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mb: 4, textAlign: 'center' }}>{t.changeEmail.newSubtitle}</Typography>
         
         <TextField 
           fullWidth
-          label="Correo Electrónico"
+          label={t.changeEmail.emailLabel}
           type="email"
           variant="outlined"
           value={emailInput}
@@ -153,7 +154,7 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
           onClick={handleUpdateEmail}
           sx={{ borderRadius: '24px', padding: '12px', textTransform: 'none', fontSize: '16px' }}
         >
-          Actualizar Correo
+          {t.changeEmail.updateBtn}
         </Button>
       </Box>
 
@@ -173,8 +174,8 @@ export default function ChangeEmailDialog({ onClose, isClosing }: ChangeEmailDia
           opacity: step === 'success' ? 1 : 0, pointerEvents: step === 'success' ? 'auto' : 'none'
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>Enlace enviado a {emailInput}</Typography>
-        <Typography variant="body1" sx={{ opacity: 0.85, mb: 2 }}>El correo actual se mantendrá hasta que confirmes el enlace.</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 600 }}>{t.changeEmail.successSent} {emailInput}</Typography>
+        <Typography variant="body1" sx={{ opacity: 0.85, mb: 2 }}>{t.changeEmail.successDesc}</Typography>
         <Button
           variant="contained"
           fullWidth
