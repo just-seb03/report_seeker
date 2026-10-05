@@ -67,8 +67,11 @@ export default function Summary() {
         <SmoothScrollContainer 
           ref={scrollRef} 
           onScroll={checkScroll} 
-          sx={{ pt: 'calc(80px + env(safe-area-inset-top))', pb: 4 }}
+          sx={{ pb: 4 }}
         >
+          {/* Spacer dinámico que toma el lugar del padding-top y permite scrollear hacia la zona del fade superior */}
+          <Box sx={{ height: 'calc(80px + env(safe-area-inset-top))', flexShrink: 0, width: '100%' }} />
+
           <DateFilterWidget 
             currentFilter={filterType}
             customRange={customRange}

@@ -42,10 +42,10 @@ const SmoothScrollContainer = forwardRef<HTMLDivElement, SmoothScrollContainerPr
         // Desplazamiento suave para anclas
         scrollBehavior: 'smooth',
         
-        // Efecto de desvanecimiento (fade) en la parte inferior del contenedor
-        // para indicar visualmente que hay más contenido hacia abajo
-        WebkitMaskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
-        maskImage: 'linear-gradient(to bottom, black 85%, transparent 100%)',
+        // Efecto de desvanecimiento (fade) tanto en la parte superior como en la inferior
+        // El fade superior ocupa aprox el espacio del TopBar, por lo que solo se nota al hacer scroll hacia arriba
+        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black calc(60px + env(safe-area-inset-top)), black 85%, transparent 100%)',
+        maskImage: 'linear-gradient(to bottom, transparent 0%, black calc(60px + env(safe-area-inset-top)), black 85%, transparent 100%)',
         
         // Estilización elegante de la barra de scroll (Webkit)
         '&::-webkit-scrollbar': {
