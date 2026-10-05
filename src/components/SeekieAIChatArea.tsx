@@ -18,6 +18,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography } from '@mui/material';
+import { useEffect, useRef } from 'react';
 import SeekieAIDoodles from './SeekieAIDoodles';
 import UserChatMessage from './UserChatMessage';
 import SeekieChatMessage from './SeekieChatMessage';
@@ -29,6 +30,14 @@ type SeekieAIChatAreaProps = {
 };
 
 export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProps) {
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+
   return (
     <Box sx={{ flex: 1, position: 'relative', overflowY: 'auto' }}>
       <SeekieAIDoodles />
@@ -50,6 +59,7 @@ export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProp
                 <UserChatMessage key={msg.id} text={msg.text} /> :
                 <SeekieChatMessage key={msg.id} text={msg.text} />
             ))}
+            <div ref={bottomRef} />
           </Box>
         )}
       </Box>
