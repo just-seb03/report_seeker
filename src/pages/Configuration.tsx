@@ -85,7 +85,7 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
             REPORT<Box component="span" sx={{ color: 'text.primary' }}>SEEKER</Box>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t.config.version} 0.04a
+            {t.config.version} 0.8.1a
           </Typography>
         </Box>
 
@@ -96,9 +96,9 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                 <ListItemIcon sx={{ color: 'primary.main' }}>
                   {isDarkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={<Typography sx={{ fontWeight: 500 }}>{t.config.appTheme}</Typography>}
-                  secondary={isDarkMode ? t.config.darkMode : t.config.lightMode} 
+                  secondary={isDarkMode ? t.config.darkMode : t.config.lightMode}
                 />
               </ListItemButton>
             </ListItem>
@@ -108,9 +108,9 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                 <ListItemIcon sx={{ color: 'primary.main' }}>
                   <TranslateOutlinedIcon />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={<Typography sx={{ fontWeight: 500 }}>{t.config.language}</Typography>}
-                  secondary={currentLanguage === 'es' ? t.config.langEs : t.config.langEn} 
+                  secondary={currentLanguage === 'es' ? t.config.langEs : t.config.langEn}
                 />
               </ListItemButton>
             </ListItem>
@@ -120,7 +120,7 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                 <ListItemIcon sx={{ color: 'primary.main' }}>
                   <LockOutlinedIcon />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={<Typography sx={{ fontWeight: 500 }}>{t.config.changePin}</Typography>}
                   secondary={t.config.changePinDesc}
                 />
@@ -132,7 +132,7 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                 <ListItemIcon sx={{ color: 'primary.main' }}>
                   <AlternateEmailOutlinedIcon />
                 </ListItemIcon>
-                <ListItemText 
+                <ListItemText
                   primary={<Typography sx={{ fontWeight: 500 }}>{t.config.changeEmail}</Typography>}
                   secondary={t.config.changeEmailDesc}
                 />
