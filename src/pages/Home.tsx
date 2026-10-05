@@ -75,6 +75,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     handleHomeClick,
     handleReportComplete,
     handleOpenReport,
+    handleCloseInfoReport,
     handleOpenConfiguration,
     handleReportClick,
     handleRetakeReportPhoto,
@@ -103,7 +104,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         <InfoReport
           key={selectedReport.issueId}
           report={selectedReport}
-          onBack={() => navigateTo('home')}
+          onBack={handleCloseInfoReport}
         />
       ) : null;
     }

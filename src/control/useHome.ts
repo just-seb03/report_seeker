@@ -55,6 +55,7 @@ export function useHome() {
   const [isNavEntering, setIsNavEntering] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [configMenuState, setConfigMenuState] = useState<ConfigMenuState>('none');
+  const [infoReportSource, setInfoReportSource] = useState<NavigationView>('home');
   const [pendingView, setPendingView] = useState<NavigationView | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
@@ -239,8 +240,13 @@ export function useHome() {
   const handleOpenReport = useCallback((report: IssueReport) => {
     handleMarkAsRead(report.issueId);
     setSelectedReport(report);
+    setInfoReportSource(activeView);
     navigateTo('info-report');
-  }, [handleMarkAsRead, navigateTo]);
+  }, [activeView, handleMarkAsRead, navigateTo]);
+
+  const handleCloseInfoReport = useCallback(() => {
+    navigateTo(infoReportSource);
+  }, [infoReportSource, navigateTo]);
 
   const handleOpenConfiguration = useCallback(() => navigateTo('configuration'), [navigateTo]);
 
@@ -316,7 +322,7 @@ export function useHome() {
       return true;
     }
     if (activeView === 'info-report') {
-      navigateTo('home');
+      navigateTo(infoReportSource);
       return true;
     }
     if (activeView === 'configuration') {
@@ -392,6 +398,7 @@ export function useHome() {
     handleHomeClick,
     handleReportComplete,
     handleOpenReport,
+    handleCloseInfoReport,
     handleOpenConfiguration,
     handleReportClick,
     handleRetakeReportPhoto,
