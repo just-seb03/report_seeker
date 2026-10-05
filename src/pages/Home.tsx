@@ -30,6 +30,7 @@ import Report from './Report';
 import Profile from './profile';
 import Queue from './Queue';
 import Summary from './Summary';
+import ReportManagement from './ReportManagement';
 import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/HomeScene';
 import ViewTransition from '../components/ViewTransition';
@@ -76,6 +77,8 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     handleReportComplete,
     handleOpenReport,
     handleCloseInfoReport,
+    handleManageReport,
+    handleCloseReportManagement,
     handleOpenConfiguration,
     handleReportClick,
     handleRetakeReportPhoto,
@@ -107,7 +110,18 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
         <InfoReport
           key={selectedReport.issueId}
           report={selectedReport}
+          isPrevencionista={isPrevencionista}
           onBack={handleCloseInfoReport}
+          onManageReport={isPrevencionista ? () => handleManageReport(selectedReport) : undefined}
+        />
+      ) : null;
+    }
+    if (view === 'report-management') {
+      return selectedReport && isPrevencionista ? (
+        <ReportManagement
+          key={selectedReport.issueId}
+          report={selectedReport}
+          onBack={handleCloseReportManagement}
         />
       ) : null;
     }
