@@ -25,9 +25,9 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import { IconButton, Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
-import ChangePinDialog from '../components/ChangePinDialog';
-import ChangeEmailDialog from '../components/ChangeEmailDialog';
-import { t, currentLanguage, setLanguage } from '../control/i18n';
+import ChangePinDialog from '../components/Configuration/ChangePinDialog';
+import ChangeEmailDialog from '../components/Configuration/ChangeEmailDialog';
+import { t, currentLanguage, setLanguage } from '../control/global/i18n';
 
 type ConfigurationProps = {
   onBack: () => void;

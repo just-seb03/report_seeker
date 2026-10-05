@@ -24,13 +24,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
-import App from './App.tsx';
+import App from './App';
 import { initializeDatabase } from './database';
 import './index.css';
 
 
 
-import { startListeningForNewReports, initPushNotifications } from './control/sincronizador';
+import { startListeningForNewReports, initPushNotifications } from './control/global/sincronizador';
 
 if (Capacitor.isNativePlatform()) {
   void initializeDatabase().then(() => {

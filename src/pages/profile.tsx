@@ -24,9 +24,9 @@ import EmailOutlined from '@mui/icons-material/EmailOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import { Box, Typography, Button, Card, List, ListItem, ListItemIcon, ListItemText, Avatar } from '@mui/material';
-import { getCurrentUser, logout, type Trabajador } from '../control/authControl';
-import GlobalTopBar from '../components/GlobalTopBar';
-import { t } from '../control/i18n';
+import { getCurrentUser, logout, type Trabajador } from '../control/global/authControl';
+import GlobalTopBar from '../components/global/GlobalTopBar';
+import { t } from '../control/global/i18n';
 
 interface ProfileProps {
 	onSettingsClick?: () => void;

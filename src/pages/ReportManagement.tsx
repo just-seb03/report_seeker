@@ -31,8 +31,8 @@ import {
   useTheme
 } from '@mui/material';
 import { type IssueReport } from '../database';
-import { formatReportDate } from '../control/useInfoReport';
-import { getTranslatedSeverity, t } from '../control/i18n';
+import { formatReportDate } from '../control/global/useInfoReport';
+import { getTranslatedSeverity, t } from '../control/global/i18n';
 
 interface ReportManagementProps {
   report: IssueReport;

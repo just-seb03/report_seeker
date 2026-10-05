@@ -18,14 +18,14 @@
  *        useReport.                                                                           *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import ReportPhotoStep from '../components/ReportPhotoStep';
-import ReportReadyStep from '../components/ReportReadyStep';
-import ReportSeverityStep from '../components/ReportSeverityStep';
-import ReportSummaryStep from '../components/ReportSummaryStep';
-import ReportTextStep from '../components/ReportTextStep';
-import ReportProgressBar from '../components/ReportProgressBar';
-import { useReport } from '../control/useReport';
-import { t } from '../control/i18n';
+import ReportPhotoStep from '../components/Report/ReportPhotoStep';
+import ReportReadyStep from '../components/Report/ReportReadyStep';
+import ReportSeverityStep from '../components/Report/ReportSeverityStep';
+import ReportSummaryStep from '../components/Report/ReportSummaryStep';
+import ReportTextStep from '../components/Report/ReportTextStep';
+import ReportProgressBar from '../components/Report/ReportProgressBar';
+import { useReport } from '../control/Report/useReport';
+import { t } from '../control/global/i18n';
 import { Box } from '@mui/material';
 
 

@@ -22,8 +22,8 @@
 
 
 import { Box } from '@mui/material';
-import BottomNav from '../components/BottomNav';
-import ReportCancelDialog from '../components/ReportCancelDialog';
+import BottomNav from '../components/global/BottomNav';
+import ReportCancelDialog from '../components/Home/ReportCancelDialog';
 import Configuration from './Configuration';
 import InfoReport from './InfoReport';
 import Report from './Report';
@@ -32,11 +32,11 @@ import Queue from './Queue';
 import Summary from './Summary';
 import ReportManagement from './ReportManagement';
 import SeekieAIPage from './SeekieAIPage';
-import HomeScene from '../components/HomeScene';
-import ViewTransition from '../components/ViewTransition';
-import { useHome, type NavigationView } from '../control/useHome';
-import { useQueue } from '../control/useQueue';
-import { getCurrentUser } from '../control/authControl';
+import HomeScene from '../components/Home/HomeScene';
+import ViewTransition from '../components/Home/ViewTransition';
+import { useHome, type NavigationView } from '../control/Home/useHome';
+import { useQueue } from '../control/global/useQueue';
+import { getCurrentUser } from '../control/global/authControl';
 
 interface HomeProps {
   isDarkMode: boolean;

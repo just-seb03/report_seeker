@@ -24,8 +24,8 @@ import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Box, Button, Dialog, IconButton, Typography, alpha } from '@mui/material';
 import { type IssueReport } from '../database';
-import { useInfoReport, formatReportDate } from '../control/useInfoReport';
-import { t, getTranslatedSeverity } from '../control/i18n';
+import { useInfoReport, formatReportDate } from '../control/global/useInfoReport';
+import { t, getTranslatedSeverity } from '../control/global/i18n';
 
 type InfoReportProps = {
   report: IssueReport;

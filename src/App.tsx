@@ -22,20 +22,20 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
-import { resetPushNotificationCount } from './control/systemNotificationsControl';
+import { resetPushNotificationCount } from './control/global/systemNotificationsControl';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import { getCurrentUser, logout, type Trabajador } from './control/authControl';
+import { getCurrentUser, logout, type Trabajador } from './control/global/authControl';
 import {
   isPinRecoveryLink,
   savePendingNativePinRecoveryLink
-} from './control/pinRecoveryControl';
-import { createAppTheme } from './control/theme';
+} from './control/global/pinRecoveryControl';
+import { createAppTheme } from './control/global/theme';
 import {
   isEmailChangeLink,
   savePendingNativeEmailChangeLink
-} from './control/emailChangeControl';
+} from './control/global/emailChangeControl';
 
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/700.css';

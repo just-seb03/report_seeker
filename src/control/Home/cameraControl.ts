@@ -4,36 +4,39 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAIPage.tsx                                                *
+ *                  Archivo : cameraControl.ts                                              *
  *                                                                                             *
  *              Programador :Sebastian Arredondo                                           *
  *                                                                                             *
- *          Fecha de Inicio : 04 de Octubre de 2026                                         *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización :04 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización :02 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   SeekAIPage -- Página principal de la interfaz visual del chat con Seek AI.                *
+ *   captureReportPhoto -- Utiliza el hardware de la cámara para capturar y leer una           *
+ *        fotografía como un Blob, comprimiéndola a WebP y reteniendo el path del archivo.     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box } from '@mui/material';
-import SeekieAIChatArea from '../components/SeekieAIPage/SeekieAIChatArea';
-import SeekieAIInputBox from '../components/SeekieAIPage/SeekieAIInputBox';
-import GlobalTopBar from '../components/global/GlobalTopBar';
-import { t } from '../control/global/i18n';
-import { useSeekieChat } from '../control/SeekieAIPage/useSeekieChat';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { type ReportPhoto } from '../../pages/Report';
+import { compressImageToWebp } from './imageCompressionControl';
 
-export default function SeekieAIPage() {
-  const { messages, sendMessage } = useSeekieChat();
+export async function captureReportPhoto(): Promise<ReportPhoto | null> {
+  try {
+    const capturedPhoto = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri,
+      source: CameraSource.Camera,
+    });
+    if (!capturedPhoto.webPath) throw new Error('La cámara no devolvió una ruta para la fotografía.');
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', position: 'absolute', inset: 0, bgcolor: 'background.default', pb: '90px' }}>
-      <GlobalTopBar title={t.seekie.title} />
-      <SeekieAIChatArea messages={messages} />
-      <Box sx={{ px: 2, pb: 1, pt: 1, position: 'relative', zIndex: 2 }}>
-        <SeekieAIInputBox onSendMessage={sendMessage} />
-      </Box>
-    </Box>
-  );
+    const compressedBlob = await compressImageToWebp(capturedPhoto.webPath);
+
+    return { blob: compressedBlob, webPath: capturedPhoto.webPath, path: capturedPhoto.path };
+  } catch (error) {
+    console.error('No se pudo capturar la fotografía del reporte.', error);
+    return null;
+  }
 }

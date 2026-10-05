@@ -18,12 +18,12 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
-import { useQueue } from '../control/useQueue';
+import { useQueue } from '../control/global/useQueue';
 import { type IssueReport } from '../database';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
-import SyncQueueButton from '../components/SyncQueueButton';
-import GlobalTopBar from '../components/GlobalTopBar';
-import { t } from '../control/i18n';
+import SyncQueueButton from '../components/Queue/SyncQueueButton';
+import GlobalTopBar from '../components/global/GlobalTopBar';
+import { t } from '../control/global/i18n';
 
 interface QueueProps {
   onReportClick: (report: IssueReport) => void;

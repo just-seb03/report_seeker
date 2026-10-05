@@ -19,24 +19,24 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState } from 'react';
-import { type Trabajador } from '../control/authControl';
-import { useIntroFlow } from '../control/useIntroFlow';
+import { type Trabajador } from '../control/global/authControl';
+import { useIntroFlow } from '../control/Login/useIntroFlow';
 import {
   getPendingNativeEmailChangeLink,
   isEmailChangeLink,
-} from '../control/emailChangeControl';
+} from '../control/global/emailChangeControl';
 import {
   getPendingNativePinRecoveryLink,
   isPinRecoveryLink,
-} from '../control/pinRecoveryControl';
+} from '../control/global/pinRecoveryControl';
 
 import { Box, Button, Typography } from '@mui/material';
-import PinPad from '../components/PinPad';
-import LoginErrorDialog from '../components/LoginErrorDialog';
-import { t } from '../control/i18n';
+import PinPad from '../components/global/PinPad';
+import LoginErrorDialog from '../components/global/LoginErrorDialog';
+import { t } from '../control/global/i18n';
 
-import EmailChangeFlow from '../components/EmailChangeFlow';
-import PinRecoveryFlow from '../components/PinRecoveryFlow';
+import EmailChangeFlow from '../components/Login/EmailChangeFlow';
+import PinRecoveryFlow from '../components/Login/PinRecoveryFlow';
 
 interface LoginProps {
   onLoginSuccess: (user: Trabajador) => void;

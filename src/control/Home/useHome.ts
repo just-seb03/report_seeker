@@ -1,0 +1,427 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : useHome.ts                                                    *
+ *                                                                                             *
+ *              Programador :Sebastian Arredondo                                           *
+ *                                                                                             *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                         *
+ *                                                                                             *
+ *     Última Actualización :04 de Octubre de 2026 [SA]                                    *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   useHome -- Custom hook que centraliza y provee toda la lógica de estado y navegación del  *
+ *        Home, incluida la actualización de notificaciones.                                   *
+ *   handleRefreshNotifications -- Actualiza los cinco reportes más recientes, reinicia la     *
+ *        paginación y contrae la lista durante el refresco.                                   *
+ *   isRefreshingNotifications -- Indica que está activa la actualización manual para mostrar  *
+ *        el indicador de carga del encabezado.                                                *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Network } from '@capacitor/network';
+import { getIssueReportsPage, type IssueReport } from '../../database';
+import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
+import { captureReportPhoto } from './cameraControl';
+import { useHardwareBackButton } from './backButtonControl';
+import { deletePhotoFile } from './imageCleanupControl';
+import { sendReportNotification } from '../global/systemNotificationsControl';
+import { type ReportPhoto } from '../../pages/Report';
+import { type Notificacion } from '../../components/Home/NotificationSheet';
+
+export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'report-management' | 'configuration' | 'queue' | 'seekie' | 'sumario';
+export type TransitionDirection = 'forward' | 'backward';
+export type ConfigMenuState = 'none' | 'pin' | 'email';
+
+export const viewOrder: NavigationView[] = ['report', 'queue', 'sumario', 'home', 'seekie', 'info-report', 'report-management', 'profile', 'configuration'];
+const notificationPageSize = 5;
+
+export function useHome() {
+  const readNotificationIds = useRef<Set<number>>(getInitialReadNotificationIds());
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
+  const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
+  const [isRefreshingNotifications, setIsRefreshingNotifications] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [activeView, setActiveView] = useState<NavigationView>('home');
+  const [selectedReport, setSelectedReport] = useState<IssueReport | null>(null);
+  const [reportPhoto, setReportPhoto] = useState<ReportPhoto | null>(null);
+  const [reportIsComplete, setReportIsComplete] = useState(false);
+  const [isNavEntering, setIsNavEntering] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [configMenuState, setConfigMenuState] = useState<ConfigMenuState>('none');
+  const [infoReportSource, setInfoReportSource] = useState<NavigationView>('home');
+  const [reportManagementSource, setReportManagementSource] = useState<NavigationView>('home');
+  const [pendingView, setPendingView] = useState<NavigationView | null>(null);
+  const [previousView, setPreviousView] = useState<NavigationView | null>(null);
+  const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
+  const [pullDistance, setPullDistance] = useState(0);
+  const touchStart = useRef<number | null>(null);
+  const isLoadingMoreNotifications = useRef(false);
+  const isRefreshingNotificationsRef = useRef(false);
+  const isMounted = useRef(true);
+  const listRef = useRef<HTMLDivElement>(null);
+  const transitionTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+    };
+  }, []);
+
+  const handleMarkAsRead = useCallback((id: number) => {
+    if (readNotificationIds.current.has(id)) return;
+    readNotificationIds.current.add(id);
+    saveReadNotificationIds(readNotificationIds.current);
+    
+    setNotificaciones((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
+    );
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadInitialReports = () => {
+      getIssueReportsPage(notificationPageSize)
+        .then((page) => {
+          if (!isActive) return;
+          setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
+          setLastNotificationId(page.items[page.items.length - 1]?.issueId);
+          setHasMoreNotifications(page.hasMore);
+        })
+        .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error))
+        .finally(() => {
+          if (isActive) setIsLoadingNotifications(false);
+        });
+    };
+
+    loadInitialReports();
+
+    // Escuchar el evento que dispara el sincronizador cuando entra un reporte nuevo
+    window.addEventListener('reportes_actualizados', loadInitialReports);
+
+    return () => {
+      isActive = false;
+      window.removeEventListener('reportes_actualizados', loadInitialReports);
+    };
+  }, []);
+
+  const handleRefreshNotifications = useCallback(async () => {
+    if (
+      isRefreshingNotificationsRef.current
+      || isLoadingMoreNotifications.current
+      || isLoadingNotifications
+    ) return;
+    isRefreshingNotificationsRef.current = true;
+    setIsRefreshingNotifications(true);
+    setIsLoadingNotifications(true);
+    try {
+      const page = await getIssueReportsPage(notificationPageSize);
+      if (!isMounted.current) return;
+      setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
+      setLastNotificationId(page.items[page.items.length - 1]?.issueId);
+      setHasMoreNotifications(page.hasMore);
+      setIsExpanded(false);
+      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error: unknown) {
+      console.error('No se pudieron actualizar las notificaciones', error);
+    } finally {
+      isRefreshingNotificationsRef.current = false;
+      if (isMounted.current) setIsRefreshingNotifications(false);
+      if (isMounted.current) setIsLoadingNotifications(false);
+    }
+  }, [isLoadingNotifications]);
+
+  const handleLoadMoreNotifications = useCallback(async () => {
+    if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
+
+    const loadingStartedAt = performance.now();
+    isLoadingMoreNotifications.current = true;
+    setIsLoadingNotifications(true);
+    try {
+      const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
+      const notifications = page.items.map((item) => toNotification(item, readNotificationIds.current));
+      setNotificaciones((current) => {
+        const existingIds = new Set(current.map((notification) => notification.issueId));
+        return [...current, ...notifications.filter((notification) => !existingIds.has(notification.issueId))];
+      });
+      setLastNotificationId(page.items[page.items.length - 1]?.issueId ?? lastNotificationId);
+      setHasMoreNotifications(page.hasMore);
+    } catch (error) {
+      console.error('No se pudieron cargar más reportes', error);
+    } finally {
+      const remainingIndicatorTime = 350 - (performance.now() - loadingStartedAt);
+      if (remainingIndicatorTime > 0) {
+        await new Promise<void>((resolve) => window.setTimeout(resolve, remainingIndicatorTime));
+      }
+      isLoadingMoreNotifications.current = false;
+      setIsLoadingNotifications(false);
+    }
+  }, [hasMoreNotifications, isLoadingNotifications, lastNotificationId]);
+
+  const handleCollapse = useCallback(() => {
+    setIsExpanded(false);
+    if (listRef.current) listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+    touchStart.current = clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    if (touchStart.current === null) return;
+    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : (e as React.MouseEvent).clientY;
+    const deltaY = touchStart.current - clientY;
+
+    if (!isExpanded && deltaY > 40) {
+      setIsExpanded(true);
+    } else if (isExpanded && deltaY < -40 && listRef.current && listRef.current.scrollTop <= 0) {
+      setIsExpanded(false); 
+    }
+
+    touchStart.current = null;
+  }, [isExpanded]);
+
+  const navigateTo = useCallback((nextView: NavigationView) => {
+    if (nextView === activeView) return;
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+
+    const direction = viewOrder.indexOf(nextView) > viewOrder.indexOf(activeView) ? 'forward' : 'backward';
+    setTransitionDirection(direction);
+    setPreviousView(activeView);
+    setActiveView(nextView);
+    setPullDistance(0);
+    transitionTimer.current = window.setTimeout(() => {
+      setPreviousView(null);
+      if (nextView !== 'report') {
+        setReportPhoto((current) => {
+          if (current?.path) deletePhotoFile(current.path);
+          return null;
+        });
+        setReportIsComplete(false);
+      }
+      transitionTimer.current = null;
+    }, 380);
+  }, [activeView]);
+
+  const requestNavigation = useCallback((nextView: NavigationView) => {
+    if (nextView === activeView) return;
+    if (activeView === 'report' && !reportIsComplete) {
+      setPendingView(nextView);
+      setCancelDialogOpen(true);
+      return;
+    }
+    navigateTo(nextView);
+  }, [activeView, reportIsComplete, navigateTo]);
+
+  const handleHomeClick = useCallback(() => requestNavigation('home'), [requestNavigation]);
+  const handleReportComplete = useCallback(async () => {
+    setIsNavEntering(true);
+    try {
+      const status = await Network.getStatus();
+      if (!status.connected) {
+        navigateTo('queue');
+        return;
+      }
+    } catch (e) {
+      console.error('Error verificando red', e);
+    }
+    navigateTo('home');
+  }, [navigateTo]);
+
+  const handleOpenReport = useCallback((report: IssueReport) => {
+    handleMarkAsRead(report.issueId);
+    setSelectedReport(report);
+    setInfoReportSource(activeView);
+    navigateTo('info-report');
+  }, [activeView, handleMarkAsRead, navigateTo]);
+
+  const handleCloseInfoReport = useCallback(() => {
+    navigateTo(infoReportSource);
+  }, [infoReportSource, navigateTo]);
+
+  const handleManageReport = useCallback((report: IssueReport) => {
+    handleMarkAsRead(report.issueId);
+    setSelectedReport(report);
+    setReportManagementSource(activeView);
+    navigateTo('report-management');
+  }, [activeView, handleMarkAsRead, navigateTo]);
+
+  const handleCloseReportManagement = useCallback(() => {
+    navigateTo(reportManagementSource);
+  }, [reportManagementSource, navigateTo]);
+
+  const handleOpenConfiguration = useCallback(() => navigateTo('configuration'), [navigateTo]);
+
+  const handleReportClick = useCallback(async () => {
+    if (activeView === 'report') return;
+    const photo = await captureReportPhoto();
+    if (!photo) return;
+
+    setReportIsComplete(false);
+    setReportPhoto(photo);
+    navigateTo('report');
+  }, [activeView, navigateTo]);
+
+  const handleRetakeReportPhoto = useCallback(async () => {
+    const photo = await captureReportPhoto();
+    if (photo) {
+      setReportPhoto((current) => {
+        if (current?.path) deletePhotoFile(current.path);
+        return photo;
+      });
+    }
+    return photo;
+  }, []);
+
+  const handleCancelReport = useCallback(() => {
+    setCancelDialogOpen(false);
+    setPendingView(null);
+  }, []);
+
+  const handleExitReport = useCallback(() => {
+    const destination = pendingView;
+    setCancelDialogOpen(false);
+    setPendingView(null);
+    if (destination) navigateTo(destination);
+  }, [pendingView, navigateTo]);
+
+  const handleReportCreated = useCallback(async (report: { issueId: number; title: string; description: string; location: string; priority: string }) => {
+    setReportIsComplete(true);
+    
+    // Lanzar notificación push local con la imagen actual antes de que se limpie
+    sendReportNotification(report.title, report.description, reportPhoto?.blob);
+
+    try {
+      const status = await Network.getStatus();
+      if (!status.connected) {
+         window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+         return;
+      }
+    } catch(e) {
+      console.error(e);
+    }
+    
+    const notification = toNotification({
+      issueId: report.issueId,
+      title: report.title,
+      description: report.description,
+      location: report.location,
+      priority: report.priority,
+      capturedAt: new Date().toISOString(),
+    }, readNotificationIds.current);
+    setNotificaciones((current) => [
+      notification,
+      ...current.filter((item) => item.issueId !== report.issueId),
+    ]);
+  }, [reportPhoto]);
+
+  const hasUnreadNotifications = notificaciones.some((item) => item.unread);
+
+  const handleHardwareBack = useCallback((): boolean => {
+    if (cancelDialogOpen) {
+      setCancelDialogOpen(false);
+      setPendingView(null);
+      return true;
+    }
+    if (activeView === 'info-report') {
+      navigateTo(infoReportSource);
+      return true;
+    }
+    if (activeView === 'report-management') {
+      navigateTo(reportManagementSource);
+      return true;
+    }
+    if (activeView === 'configuration') {
+      if (configMenuState !== 'none') {
+        setConfigMenuState('none');
+        return true;
+      }
+      navigateTo('profile');
+      return true;
+    }
+    if (activeView === 'profile') {
+      navigateTo('home');
+      return true;
+    }
+    if (activeView === 'queue') {
+      navigateTo('home');
+      return true;
+    }
+    if (activeView === 'seekie') {
+      navigateTo('home');
+      return true;
+    }
+    if (activeView === 'report') {
+      if (reportIsComplete) {
+        navigateTo('home');
+      } else {
+        setPendingView('home');
+        setCancelDialogOpen(true);
+      }
+      return true;
+    }
+    if (activeView === 'home') {
+      if (isExpanded) {
+        handleCollapse();
+        return true;
+      }
+      return false; // Permite que la app se cierre nativamente
+    }
+    return false;
+  }, [cancelDialogOpen, activeView, reportIsComplete, isExpanded, navigateTo, handleCollapse, configMenuState, infoReportSource, reportManagementSource]);
+
+  useHardwareBackButton(handleHardwareBack);
+
+  return {
+    notificaciones,
+    hasMoreNotifications,
+    isLoadingNotifications,
+    isRefreshingNotifications,
+    isExpanded,
+    activeView,
+    selectedReport,
+    reportPhoto,
+    reportIsComplete,
+    isNavEntering,
+    cancelDialogOpen,
+    configMenuState,
+    previousView,
+    transitionDirection,
+    pullDistance,
+    listRef,
+    hasUnreadNotifications,
+    setIsNavEntering,
+    setPullDistance,
+    setConfigMenuState,
+    handleMarkAsRead,
+    handleRefreshNotifications,
+    handleLoadMoreNotifications,
+    handleCollapse,
+    handleTouchStart,
+    handleTouchEnd,
+    navigateTo,
+    requestNavigation,
+    handleHomeClick,
+    handleReportComplete,
+    handleOpenReport,
+    handleCloseInfoReport,
+    handleManageReport,
+    handleCloseReportManagement,
+    handleOpenConfiguration,
+    handleReportClick,
+    handleRetakeReportPhoto,
+    handleCancelReport,
+    handleExitReport,
+    handleReportCreated,
+  };
+}

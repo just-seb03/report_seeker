@@ -20,15 +20,15 @@
 
 import { Box, CircularProgress } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
-import GlobalTopBar from '../components/GlobalTopBar';
-import RiskDonutChart from '../components/RiskDonutChart';
-import TopLocationsWidget from '../components/TopLocationsWidget';
-import TopUsersWidget from '../components/TopUsersWidget';
-import SmoothScrollContainer from '../components/SmoothScrollContainer';
-import DateFilterWidget, { type DateFilterType, type DateRange } from '../components/DateFilterWidget';
+import GlobalTopBar from '../components/global/GlobalTopBar';
+import RiskDonutChart from '../components/Summary/RiskDonutChart';
+import TopLocationsWidget from '../components/Summary/TopLocationsWidget';
+import TopUsersWidget from '../components/Summary/TopUsersWidget';
+import SmoothScrollContainer from '../components/Summary/SmoothScrollContainer';
+import DateFilterWidget, { type DateFilterType, type DateRange } from '../components/Summary/DateFilterWidget';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { useSummary } from '../control/useSummary';
-import { t } from '../control/i18n';
+import { useSummary } from '../control/Summary/useSummary';
+import { t } from '../control/global/i18n';
 
 export default function Summary() {
   const [filterType, setFilterType] = useState<DateFilterType>('all');

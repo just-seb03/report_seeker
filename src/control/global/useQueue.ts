@@ -4,36 +4,54 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : SeekAIPage.tsx                                                *
+ *                  Archivo : useQueue.ts                                                   *
  *                                                                                             *
  *              Programador :Sebastian Arredondo                                           *
  *                                                                                             *
- *          Fecha de Inicio : 04 de Octubre de 2026                                         *
+ *          Fecha de Inicio : 03 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización :04 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización :03 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   SeekAIPage -- Página principal de la interfaz visual del chat con Seek AI.                *
+ *   useQueue -- Hook para manejar la vista de Cola de salida offline.                         *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box } from '@mui/material';
-import SeekieAIChatArea from '../components/SeekieAIPage/SeekieAIChatArea';
-import SeekieAIInputBox from '../components/SeekieAIPage/SeekieAIInputBox';
-import GlobalTopBar from '../components/global/GlobalTopBar';
-import { t } from '../control/global/i18n';
-import { useSeekieChat } from '../control/SeekieAIPage/useSeekieChat';
+import { useState, useEffect } from 'react';
+import { getPendingIssueReports, type IssueReport } from '../../database';
 
-export default function SeekieAIPage() {
-  const { messages, sendMessage } = useSeekieChat();
+export function useQueue() {
+  const [reports, setReports] = useState<IssueReport[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', position: 'absolute', inset: 0, bgcolor: 'background.default', pb: '90px' }}>
-      <GlobalTopBar title={t.seekie.title} />
-      <SeekieAIChatArea messages={messages} />
-      <Box sx={{ px: 2, pb: 1, pt: 1, position: 'relative', zIndex: 2 }}>
-        <SeekieAIInputBox onSendMessage={sendMessage} />
-      </Box>
-    </Box>
-  );
+  useEffect(() => {
+    let isActive = true;
+    
+    const fetchReports = async () => {
+      try {
+        const pending = await getPendingIssueReports();
+        if (isActive) {
+          setReports(pending);
+        }
+      } catch (err) {
+        console.error("Error al obtener reportes pendientes", err);
+      } finally {
+        if (isActive) setLoading(false);
+      }
+    };
+    
+    fetchReports();
+    
+    window.addEventListener('reportes_actualizados', fetchReports);
+    
+    return () => {
+      isActive = false;
+      window.removeEventListener('reportes_actualizados', fetchReports);
+    };
+  }, []);
+
+  return {
+    reports,
+    loading
+  };
 }
