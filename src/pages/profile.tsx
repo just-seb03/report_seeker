@@ -6,11 +6,11 @@
  *                                                                                             *
  *                  Archivo : profile.tsx                                                   *
  *                                                                                             *
- *              Programador : Sebastian Arredondo, Maximiliano Cantuarias                   *
+ *              Programador :Cristian Vega                   *
  *                                                                                             *
  *          Fecha de Inicio : 01 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización :04 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *

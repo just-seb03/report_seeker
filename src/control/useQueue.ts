@@ -6,11 +6,11 @@
  *                                                                                             *
  *                  Archivo : useQueue.ts                                                   *
  *                                                                                             *
- *              Programador : Sebastian Arredondo                                           *
+ *              Programador :Sebastian Arredondo                                           *
  *                                                                                             *
  *          Fecha de Inicio : 03 de Octubre de 2026                                         *
  *                                                                                             *
- *     Última Actualización : 03 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización :03 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *

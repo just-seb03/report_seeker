@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : UserChatMessage.tsx                                              *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                              *
+ *                                                                                             *
+ *          Fecha de Inicio : 04 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   UserChatMessage -- Componente que renderiza un mensaje individual enviado por el usuario  *
+ *        en el chat, con animación y diseño diferenciado de los mensajes del bot.             *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { Box, Typography } from '@mui/material';
 
 type UserChatMessageProps = {

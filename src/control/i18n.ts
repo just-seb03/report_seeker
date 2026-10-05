@@ -1,3 +1,27 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : i18n.ts                                                          *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                              *
+ *                                                                                             *
+ *          Fecha de Inicio : 04 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   getTranslatedSeverity -- Traduce un nivel de gravedad en bruto al texto localizado        *
+ *        correspondiente.                                                                     *
+ *   setLanguage -- Cambia el idioma actual de la aplicación y dispara un evento para          *
+ *        actualizar la interfaz.                                                              *
+ *   t -- Objeto Proxy que proporciona acceso reactivo a los textos localizados según el       *
+ *        idioma seleccionado.                                                                 *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 export function getTranslatedSeverity(raw: string | undefined): string {
   if (!raw) return '';
   const lower = raw.toLowerCase();

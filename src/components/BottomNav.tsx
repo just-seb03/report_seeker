@@ -6,11 +6,11 @@
  *                                                                                             *
  *                  Archivo : BottomNav.tsx                                                 *
  *                                                                                             *
- *              Programador : Sebastian Arredondo, Maximiliano Cantuarias                   *
+ *              Programador :Sebastian Arredondo                   *
  *                                                                                             *
  *          Fecha de Inicio : 29 de Septiembre de 2026                                      *
  *                                                                                             *
- *     Última Actualización : 02 de Octubre de 2026 [SA]                                    *
+ *     Última Actualización :04 de Octubre de 2026 [SA]                                    *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *

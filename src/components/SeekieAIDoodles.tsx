@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : SeekieAIDoodles.tsx                                              *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                              *
+ *                                                                                             *
+ *          Fecha de Inicio : 04 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 04 de Octubre de 2026 [SA]                                       *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   SeekieAIDoodles -- Componente que renderiza un fondo animado decorativo de íconos         *
+ *        (doodles) para la página del asistente de IA.                                        *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useMemo } from 'react';
 import { Box } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
