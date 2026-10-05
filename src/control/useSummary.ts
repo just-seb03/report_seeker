@@ -27,12 +27,14 @@ export interface SummaryData {
   medium: number;
   low: number;
   topLocations: { name: string; count: number }[];
+  topUsers: { name: string; count: number }[];
 }
 
 export function useSummary() {
   const [data, setData] = useState<SummaryData>({ 
     total: 0, high: 0, medium: 0, low: 0, 
-    topLocations: [] 
+    topLocations: [],
+    topUsers: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -49,6 +51,7 @@ export function useSummary() {
         let low = 0;
         
         const locationCounts: Record<string, number> = {};
+        const userCounts: Record<string, number> = {};
 
         reports.forEach((report: IssueReport) => {
           const p = report.priority.toLowerCase();
@@ -66,6 +69,14 @@ export function useSummary() {
               locationCounts[loc] = (locationCounts[loc] || 0) + 1;
             }
           }
+
+          // Contar usuarios
+          if (report.workerName) {
+            const user = report.workerName.trim();
+            if (user !== '') {
+              userCounts[user] = (userCounts[user] || 0) + 1;
+            }
+          }
         });
 
         // Ordenar y sacar el Top 3
@@ -74,9 +85,15 @@ export function useSummary() {
           .sort((a, b) => b.count - a.count)
           .slice(0, 3);
 
+        const topUsers = Object.entries(userCounts)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3);
+
         setData({ 
           total: reports.length, high, medium, low,
-          topLocations
+          topLocations,
+          topUsers
         });
       } catch (error) {
         console.error('Error fetching summary data:', error);
