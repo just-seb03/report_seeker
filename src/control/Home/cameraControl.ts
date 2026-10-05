@@ -28,7 +28,7 @@ export async function captureReportPhoto(): Promise<ReportPhoto | null> {
       quality: 90,
       allowEditing: false,
       resultType: CameraResultType.Uri,
-      source: CameraSource.Camera,
+      source: CameraSource.Prompt,
     });
     if (!capturedPhoto.webPath) throw new Error('La cámara no devolvió una ruta para la fotografía.');
 
