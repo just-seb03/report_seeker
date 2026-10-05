@@ -107,6 +107,10 @@ export const TEXTS = {
     summary: {
       title: 'Sumario',
       underConstruction: 'Esta pantalla está en construcción. Próximamente verás aquí el sumario de riesgos (Exclusivo Prevencionistas).',
+      totalReports: 'Reportes Totales',
+      highRisk: 'Grave',
+      mediumRisk: 'Moderado',
+      lowRisk: 'Leve'
     },
     profile: {
       title: 'Perfil',
@@ -323,6 +327,10 @@ export const TEXTS = {
     summary: {
       title: 'Summary',
       underConstruction: 'This screen is under construction. You will soon see the risk summary here (Exclusive for Preventionists).',
+      totalReports: 'Total Reports',
+      highRisk: 'High',
+      mediumRisk: 'Medium',
+      lowRisk: 'Low'
     },
     profile: {
       title: 'Profile',

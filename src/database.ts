@@ -301,6 +301,16 @@ export async function getPendingIssueReports(): Promise<IssueReport[]> {
   return (result.values ?? []).map(mapIssueReport);
 }
 
+export async function getAllIssueReports(): Promise<IssueReport[]> {
+  if (!Capacitor.isNativePlatform()) return getAllIssueReportsOnWeb();
+
+  const connection = await initializeDatabase();
+  const result = await connection.query(
+    'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos ORDER BY issue_id DESC;'
+  );
+  return (result.values ?? []).map(mapIssueReport);
+}
+
 export async function getIssueReportImage(issueId: number): Promise<string | null> {
   if (!Capacitor.isNativePlatform()) {
     const image = await getIssueReportImageOnWeb(issueId);
@@ -466,6 +476,43 @@ function getPendingIssueReportsOnWeb(): Promise<IssueReport[]> {
       cursorRequest.onerror = () => {
         database.close();
         reject(cursorRequest.error ?? new Error('No se pudieron consultar los reportes pendientes.'));
+      };
+    };
+  });
+}
+
+function getAllIssueReportsOnWeb(): Promise<IssueReport[]> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 2);
+
+    request.onerror = () => reject(request.error ?? new Error('No se pudieron consultar todos los reportes.'));
+    request.onsuccess = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains(webObjectStore)) {
+        database.close();
+        resolve([]);
+        return;
+      }
+
+      const transaction = database.transaction(webObjectStore, 'readonly');
+      const store = transaction.objectStore(webObjectStore);
+      const cursorRequest = store.openCursor(null, 'prev');
+      const reports: Record<string, unknown>[] = [];
+
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (!cursor) {
+          database.close();
+          resolve(reports.map(mapIssueReport));
+          return;
+        }
+
+        reports.push(cursor.value as Record<string, unknown>);
+        cursor.continue();
+      };
+      cursorRequest.onerror = () => {
+        database.close();
+        reject(cursorRequest.error ?? new Error('No se pudieron consultar todos los reportes.'));
       };
     };
   });
