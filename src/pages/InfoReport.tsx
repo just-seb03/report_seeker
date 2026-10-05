@@ -22,10 +22,10 @@ import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { Box, Dialog, IconButton, Typography } from '@mui/material';
+import { Box, Dialog, IconButton, Typography, alpha } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
-import './InfoReport.css';
+import { t, getTranslatedSeverity } from '../control/i18n';
 
 type InfoReportProps = {
   report: IssueReport;
@@ -43,78 +43,131 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
     handleOpenFullImage,
   } = useInfoReport(report);
 
+  const getSeverityPalette = (priorityClass: string) => {
+    switch(priorityClass) {
+      case 'is-low': return 'success';
+      case 'is-medium': return 'warning';
+      case 'is-high': return 'error';
+      default: return 'primary';
+    }
+  };
+  const severityPalette = getSeverityPalette(priorityClass || '');
+
   return (
-    <main className="info-report-screen">
-      <header className="info-report-header">
-        <IconButton className="info-report-back" aria-label="Volver" onClick={onBack}>
+    <Box 
+      component="main" 
+      sx={{
+        position: 'absolute', inset: 0, zIndex: 5, overflowY: 'auto', overflowX: 'hidden', boxSizing: 'border-box',
+        p: 'max(12px, env(safe-area-inset-top)) 18px calc(110px + env(safe-area-inset-bottom))',
+        bgcolor: 'background.default', color: 'text.primary', WebkitOverflowScrolling: 'touch',
+        '@media (max-width: 480px)': { px: '14px' }
+      }}
+    >
+      <Box component="header" sx={{ display: 'flex', minHeight: 64, alignItems: 'center', gap: 2, mx: 'auto', mb: 3, maxWidth: 560 }}>
+        <IconButton 
+          aria-label="Volver" 
+          onClick={onBack}
+          sx={{ 
+            width: 48, height: 48, flex: '0 0 auto',
+            bgcolor: 'transparent', color: 'text.primary',
+            '&:hover': { bgcolor: 'action.hover' }
+          }}
+        >
           <ArrowBackRoundedIcon />
         </IconButton>
-        <Box className="info-report-heading">
-          <Typography component="span">Reporte de riesgo</Typography>
-          <Typography component="h1">{report.title}</Typography>
+        <Box sx={{ display: 'grid', minWidth: 0, gap: '2px', color: 'inherit' }}>
+          <Typography component="span" sx={{ color: 'primary.main', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t.infoReport.subtitle}</Typography>
+          <Typography component="h1" sx={{ m: 0, overflowWrap: 'anywhere', fontSize: '24px', fontWeight: 700, lineHeight: 1.2 }}>{report.title}</Typography>
         </Box>
-      </header>
+      </Box>
 
-      <div className="info-report-content">
-        <button
-          className={`info-report-photo-button${isLoadingImage ? ' is-loading' : ''}`}
+      <Box sx={{ width: 'min(100%, 560px)', mx: 'auto', animation: 'info-report-enter 440ms cubic-bezier(0.2, 0.8, 0.2, 1) both' }}>
+        <Box
+          component="button"
           type="button"
           onClick={handleOpenFullImage}
           disabled={!image || isOpeningImage}
           aria-label="Abrir fotografía completa"
           aria-busy={isLoadingImage || isOpeningImage}
+          sx={{
+            position: 'relative', display: 'grid', width: '100%', height: 'min(55dvh, 520px)', minHeight: 220, placeItems: 'center', p: 0, overflow: 'hidden',
+            borderRadius: '24px', 
+            bgcolor: isLoadingImage ? 'transparent' : 'background.paper', color: 'text.secondary', font: 'inherit', cursor: 'zoom-in',
+            boxShadow: '0 4px 12px rgb(0 0 0 / 5%)',
+            transition: 'transform 180ms ease, box-shadow 180ms ease',
+            '@media (max-width: 480px)': { height: 'min(54dvh, 440px)' },
+            '&:disabled': { cursor: 'default' },
+            '&:not(:disabled):active': { transform: 'scale(0.99)', boxShadow: '0 2px 6px rgb(0 0 0 / 8%)' },
+            ...(isLoadingImage && {
+              background: 'linear-gradient(100deg, #eeeeee 20%, #f7f7f7 38%, #eeeeee 58%)',
+              backgroundSize: '220% 100%', animation: 'info-report-shimmer 1.4s linear infinite'
+            })
+          }}
         >
           {image ? (
-            <img src={image} alt={`Fotografía del riesgo: ${report.title}`} />
+            <Box component="img" src={image} alt={`Fotografía del riesgo: ${report.title}`} sx={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', animation: 'info-report-photo-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both' }} />
           ) : (
-            <span className="info-report-photo-empty">
-              {isLoadingImage ? 'Cargando fotografía...' : 'Este reporte no tiene fotografía'}
-            </span>
+            <Typography component="span" sx={{ p: 2.5, fontSize: '13px', fontWeight: 600 }}>
+              {isLoadingImage ? '{t.notification.loadingPhoto}' : '{t.infoReport.noPhotoInfo}'}
+            </Typography>
           )}
-        </button>
+        </Box>
 
-        <section className="info-report-details" aria-label="Información del reporte">
-          <div className="info-report-detail-grid">
-            <div className="info-report-fact">
-              <span className="info-report-fact-icon" aria-hidden="true"><LocationOnOutlinedIcon /></span>
-              <div className="info-report-fact-copy">
-                <Typography component="h3">Ubicación</Typography>
-                <p>{report.location || 'Ubicación no especificada'}</p>
-              </div>
-            </div>
-            <div className={`info-report-fact info-report-severity ${priorityClass}`}>
-              <span className="info-report-fact-icon" aria-hidden="true"><PriorityHighRoundedIcon /></span>
-              <div className="info-report-fact-copy">
-                <Typography component="h3">Gravedad</Typography>
-                <p>{report.priority}</p>
-              </div>
-            </div>
-          </div>
-          <div className="info-report-description">
-            <Typography component="h2">Descripción</Typography>
-            <p>{report.description || 'Sin descripción'}</p>
-          </div>
-          <div className="info-report-metadata" aria-label="Identificación y fecha del reporte">
-            <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || 'Trabajador Desconocido'}</span>
-            <span><CalendarMonthOutlinedIcon aria-hidden="true" /> {formatReportDate(report.capturedAt)}</span>
-          </div>
-        </section>
-      </div>
+        <Box component="section" aria-label="Información del reporte" sx={{ display: 'grid', gap: 2, mt: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
+              <Box sx={{ display: 'grid', width: 48, height: 48, flex: '0 0 48px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette[severityPalette as 'primary'|'success'|'warning'|'error'].main, 0.12), color: `${severityPalette}.main` }}>
+                <PriorityHighRoundedIcon sx={{ fontSize: 24 }} />
+              </Box>
+              <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>{t.infoReport.infoSeverity}</Typography>
+                <Typography component="p" sx={{ m: 0, color: `${severityPalette}.main`, fontSize: '14px', fontWeight: 600, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{getTranslatedSeverity(report.priority)}</Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', minWidth: 0, minHeight: 88, alignItems: 'center', gap: 2, p: 2, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
+              <Box sx={{ display: 'grid', width: 48, height: 48, flex: '0 0 48px', placeItems: 'center', borderRadius: '50%', bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12), color: 'primary.main' }}>
+                <LocationOnOutlinedIcon sx={{ fontSize: 24 }} />
+              </Box>
+              <Box sx={{ display: 'grid', minWidth: 0, gap: 0.5 }}>
+                <Typography component="h3" sx={{ m: 0, color: 'text.secondary', fontSize: '12px', fontWeight: 600 }}>{t.infoReport.infoLocation}</Typography>
+                <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '14px', fontWeight: 500, lineHeight: 1.35, overflowWrap: 'anywhere' }}>{report.location || t.infoReport.noLocationInfo}</Typography>
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ p: 2.5, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
+            <Typography component="h2" sx={{ m: 0, mb: 1, color: 'primary.main', fontSize: '13px', fontWeight: 600, letterSpacing: '0.2px' }}>{t.infoReport.descriptionSection}</Typography>
+            <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '15px', fontWeight: 400, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || t.infoReport.noDescriptionInfo}</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '8px 4px', color: 'text.secondary', fontSize: '13px', fontWeight: 500, '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 1 }, '& svg': { flex: '0 0 auto', fontSize: 18 } }}>
+            <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || t.notification.unknownWorker}</span>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.25 }}>
+              <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CalendarMonthOutlinedIcon aria-hidden="true" sx={{ fontSize: 18 }} />
+                {formatReportDate(report.capturedAt).date}
+              </Box>
+              <Typography component="span" sx={{ fontSize: '11px', color: 'text.disabled', fontWeight: 600 }}>{formatReportDate(report.capturedAt).time}</Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
 
       <Dialog
-        className="info-report-image-dialog"
         open={imageDialogOpen}
         onClose={() => setImageDialogOpen(false)}
         fullScreen
         aria-label="Fotografía completa del reporte"
+
       >
-        <Box className="info-report-image-viewer" onClick={() => setImageDialogOpen(false)}>
-          <IconButton className="info-report-viewer-close" aria-label="Cerrar fotografía">
+        <Box sx={{ position: 'relative', display: 'grid', width: '100%', height: '100%', placeItems: 'center', bgcolor: '#000000' }} onClick={() => setImageDialogOpen(false)}>
+          <IconButton 
+            aria-label="Cerrar fotografía"
+            sx={{ position: 'absolute', zIndex: 1, top: 'max(12px, env(safe-area-inset-top))', left: 12, color: '#ffffff', bgcolor: 'rgb(255 255 255 / 16%)', '&:hover': { bgcolor: 'rgb(255 255 255 / 24%)' } }}
+          >
             <ArrowBackRoundedIcon />
           </IconButton>
-          {image && <img src={image} alt={`Fotografía completa: ${report.title}`} />}
+          {image && <Box component="img" src={image} alt={`Fotografía completa: ${report.title}`} sx={{ display: 'block', maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />}
         </Box>
       </Dialog>
-    </main>
+    </Box>
   );
 }

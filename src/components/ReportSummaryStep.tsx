@@ -19,6 +19,8 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import { Box, Typography, Button, Card, CardActionArea, CardMedia, CardContent, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { t } from '../control/i18n';
 
 export type EditableReportStep = 'photo' | 'severity' | 'description' | 'location' | 'title';
 
@@ -34,11 +36,11 @@ type ReportSummaryStepProps = {
   onConfirm: () => void;
 };
 
-const summaryFields: { step: EditableReportStep; label: string; valueKey: 'title' | 'severity' | 'description' | 'location' }[] = [
-  { step: 'title', label: 'Título', valueKey: 'title' },
-  { step: 'severity', label: 'Gravedad', valueKey: 'severity' },
-  { step: 'description', label: 'Descripción', valueKey: 'description' },
-  { step: 'location', label: 'Ubicación', valueKey: 'location' },
+const getSummaryFields = (): { step: EditableReportStep; label: string; valueKey: 'title' | 'severity' | 'description' | 'location' }[] => [
+  { step: 'title', label: t.report.titleHeading, valueKey: 'title' },
+  { step: 'severity', label: t.report.summarySeverity, valueKey: 'severity' },
+  { step: 'description', label: t.report.summaryDesc, valueKey: 'description' },
+  { step: 'location', label: t.report.summaryLocation, valueKey: 'location' },
 ];
 
 export default function ReportSummaryStep({
@@ -53,40 +55,56 @@ export default function ReportSummaryStep({
   onConfirm,
 }: ReportSummaryStepProps) {
   const values = { title, severity, description, location };
+  const summaryFields = getSummaryFields();
 
   return (
-    <section className="report-summary-step" aria-labelledby="report-summary-heading">
-      <h1 className="report-step-title" id="report-summary-heading">Revisa tu reporte</h1>
-      <button
-        className="report-summary-photo-button"
-        type="button"
-        onClick={() => onEdit('photo')}
-        aria-label="Editar fotografía"
-      >
-        <img src={photoUrl} alt="Fotografía del riesgo" />
-        <span>Fotografía <EditOutlinedIcon aria-hidden="true" /></span>
-      </button>
-      <div className="report-summary-fields">
+    <Box component="section" sx={{ display: 'flex', flexDirection: 'column', pb: 2 }} aria-labelledby="report-summary-heading">
+      <Typography variant="h5" id="report-summary-heading" sx={{ fontWeight: 800, textAlign: 'center', mb: 4, mt: 4 }}>
+        {t.report.reviewReport}
+      </Typography>
+
+      <Card sx={{ mb: 3, borderRadius: 2, overflow: 'hidden' }} variant="outlined">
+        <CardActionArea onClick={() => onEdit('photo')} aria-label="Editar fotografía">
+          <CardMedia
+            component="img"
+            height="150"
+            image={photoUrl}
+            alt="Fotografía del riesgo"
+            sx={{ backgroundColor: 'action.hover', objectFit: 'cover' }}
+          />
+          <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{t.report.summaryPhoto}</Typography>
+            <EditOutlinedIcon color="action" fontSize="small" />
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <List disablePadding sx={{ borderTop: 1, borderColor: 'divider', mb: 4 }}>
         {summaryFields.map(({ step, label, valueKey }) => (
-          <button
-            className="report-summary-row"
-            key={step}
-            type="button"
-            onClick={() => onEdit(step)}
-            aria-label={`Editar ${label.toLowerCase()}`}
-          >
-            <span className="report-summary-copy">
-              <span className="report-summary-label">{label}</span>
-              <span className="report-summary-value">{values[valueKey]}</span>
-            </span>
-            <EditOutlinedIcon className="report-summary-edit-icon" aria-hidden="true" />
-          </button>
+          <ListItem key={step} disablePadding sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <ListItemButton onClick={() => onEdit(step)} aria-label={`Editar ${label.toLowerCase()}`}>
+              <ListItemText
+                primary={<Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>{label}</Typography>}
+                secondary={<Typography variant="body2" color="text.primary" sx={{ overflowWrap: 'anywhere' }}>{values[valueKey]}</Typography>}
+              />
+              <EditOutlinedIcon color="action" fontSize="small" />
+            </ListItemButton>
+          </ListItem>
         ))}
-      </div>
-      {errorMessage && <p className="report-submit-message" role="alert">{errorMessage}</p>}
-      <button className="report-step-button is-primary" type="button" onClick={onConfirm} disabled={isSaving}>
-        {isSaving ? 'Guardando...' : 'Confirmar reporte'}
-      </button>
-    </section>
+      </List>
+
+      {errorMessage && <Typography color="error" variant="body2" sx={{ textAlign: 'center', mb: 2 }} role="alert">{errorMessage}</Typography>}
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={onConfirm}
+        disabled={isSaving}
+        fullWidth
+        sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
+      >
+        {isSaving ? t.report.textSaving : t.report.confirmReport}
+      </Button>
+    </Box>
   );
 }

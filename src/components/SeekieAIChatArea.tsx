@@ -18,18 +18,58 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography } from '@mui/material';
-import './SeekieAI.css';
+import { useEffect, useRef } from 'react';
+import SeekieAIDoodles from './SeekieAIDoodles';
+import UserChatMessage from './UserChatMessage';
+import SeekieChatMessage from './SeekieChatMessage';
+import { type ChatMessage } from '../control/useSeekieChat';
+import { t } from '../control/i18n';
 
-export default function SeekieAIChatArea() {
+type SeekieAIChatAreaProps = {
+  messages?: ChatMessage[];
+};
+
+export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProps) {
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      if (isInitialMount.current) {
+        bottomRef.current.scrollIntoView({ behavior: 'auto' });
+        isInitialMount.current = false;
+      } else {
+        bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [messages]);
+
   return (
-    <Box className="seekie-chat-area">
-      <Box className="seekie-greeting">
-        <Typography variant="h5" className="seekie-greeting-title">
-          Hola, soy Seekie AI
-        </Typography>
-        <Typography variant="body1" className="seekie-greeting-subtitle">
-          ¿En qué puedo ayudarte?
-        </Typography>
+    <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      <SeekieAIDoodles />
+      
+      <Box sx={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 1 }}>
+        <Box sx={{ minHeight: '100%', pt: 10, p: 3, display: 'flex', flexDirection: 'column' }}>
+        {messages.length === 0 ? (
+          <Box sx={{ textAlign: 'center', mt: 'auto', mb: 'auto' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'text.primary' }}>
+              {t.seekie.greeting} <Box component="span" sx={{ color: 'primary.main', textShadow: '0px 2px 4px rgba(0,0,0,0.2)' }}>{t.seekie.aiName}</Box>
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.9 }}>
+              {t.seekie.help}
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 'max-content' }}>
+            {messages.map(msg => (
+              msg.sender === 'user' ? 
+                <UserChatMessage key={msg.id} text={msg.text} /> :
+                <SeekieChatMessage key={msg.id} text={msg.text} />
+            ))}
+            <div ref={bottomRef} />
+          </Box>
+        )}
+      </Box>
       </Box>
     </Box>
   );

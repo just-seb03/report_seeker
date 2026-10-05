@@ -20,13 +20,13 @@
  *   handleProfileClick -- Navega hacia la pantalla del perfil del usuario.                    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box } from '@mui/material';
+import { Paper, BottomNavigation, BottomNavigationAction } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
-import './BottomNav.css';
+import { t } from '../control/i18n';
 
 type BottomNavProps = {
   activeView: 'home' | 'report' | 'profile' | 'cola' | 'seekie';
@@ -38,116 +38,73 @@ type BottomNavProps = {
 };
 
 export default function BottomNav({ activeView, onHomeClick, onReportClick, onProfileClick, onColaClick, onSeekieClick }: BottomNavProps) {
-  const value = 
-    activeView === 'report' ? 0 : 
-    activeView === 'cola' ? 1 : 
-    activeView === 'home' ? 2 : 
-    activeView === 'seekie' ? 3 : 
-    activeView === 'profile' ? 4 : 2;
-
-  const handleHomeClick = () => {
-    onHomeClick?.();
-  };
-
-  const handleReportClick = () => {
-    onReportClick?.();
-  };
-
-  const handleProfileClick = () => {
-    onProfileClick?.();
+  
+  const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
+    switch (newValue) {
+      case 'report': onReportClick?.(); break;
+      case 'cola': onColaClick?.(); break;
+      case 'home': onHomeClick?.(); break;
+      case 'seekie': onSeekieClick?.(); break;
+      case 'profile': onProfileClick?.(); break;
+    }
   };
 
   return (
-    <Box className="nav-wrapper">
-      <Box className="nav-container">
-        {/* Capa 1: Fondo sólido principal de la barra */}
-        <Box className="nav-pill-bg" />
-
-        <Box className="nav-inner">
-          {/* Capa 2: La "isla líquida" que viaja animada al botón seleccionado */}
-          <Box
-            className="indicator-wrapper"
-            style={{ transform: `translateX(${value * 100}%)` }}
-          >
-            <Box className="nav-indicator" />
-          </Box>
-
-          {/* Capa 3: Contenedor de botones reales */}
-          <Box className="nav-pill-content">
-
-          <Box
-            component="button"
-            type="button"
-            onClick={handleReportClick}
-            className={`nav-item ${activeView === 'report' ? 'active' : ''}`}
-            aria-label="Reportar"
-            aria-pressed={activeView === 'report'}
-          >
-            <Box className="nav-icon-wrap">
-              <AssignmentOutlinedIcon className="nav-icon" sx={{ fontSize: 28 }} />
-            </Box>
-            <span className="nav-item-text">Reportar</span>
-          </Box>
-
-          <Box
-            component="button"
-            type="button"
-            onClick={onColaClick}
-            className={`nav-item ${activeView === 'cola' ? 'active' : ''}`}
-            aria-label="Cola"
-            aria-pressed={activeView === 'cola'}
-          >
-            <Box className="nav-icon-wrap">
-              <AccessTimeOutlinedIcon className="nav-icon" sx={{ fontSize: 26 }} />
-            </Box>
-            <span className="nav-item-text">Cola</span>
-          </Box>
-
-          <Box
-            component="button"
-            type="button"
-            onClick={handleHomeClick}
-            className={`nav-item ${activeView === 'home' ? 'active' : ''}`}
-            aria-label="Inicio"
-            aria-pressed={activeView === 'home'}
-          >
-            <Box className="nav-icon-wrap">
-              <HomeIcon className="nav-icon" sx={{ fontSize: 30 }} />
-            </Box>
-            <span className="nav-item-text">Inicio</span>
-          </Box>
-
-          <Box
-            component="button"
-            type="button"
-            onClick={onSeekieClick}
-            className={`nav-item ${activeView === 'seekie' ? 'active' : ''}`}
-            aria-label="Seekie AI"
-            aria-pressed={activeView === 'seekie'}
-          >
-            <Box className="nav-icon-wrap">
-              <ChatOutlinedIcon className="nav-icon" sx={{ fontSize: 26 }} />
-            </Box>
-            <span className="nav-item-text">Seekie AI</span>
-          </Box>
-
-          <Box
-            component="button"
-            type="button"
-            onClick={handleProfileClick}
-            className={`nav-item ${activeView === 'profile' ? 'active' : ''}`}
-            aria-label="Perfil"
-            aria-pressed={activeView === 'profile'}
-          >
-            <Box className="nav-icon-wrap">
-              <PersonIcon className="nav-icon" sx={{ fontSize: 26 }} />
-            </Box>
-            <span className="nav-item-text">Perfil</span>
-          </Box>
-
-        </Box>
-        </Box>
-      </Box>
-    </Box>
+    <Paper 
+      elevation={8} 
+      sx={{ 
+        position: 'absolute', 
+        bottom: 0, 
+        left: 0, 
+        right: 0,
+        zIndex: 1000,
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        overflow: 'hidden'
+      }}
+    >
+      <BottomNavigation
+        value={activeView}
+        onChange={handleChange}
+        showLabels
+        sx={{
+          height: 80,
+          backgroundColor: 'background.paper',
+          paddingBottom: '16px',
+          alignItems: 'flex-end',
+          '& .MuiBottomNavigationAction-root': {
+            minWidth: 'auto',
+            padding: '12px 0 8px 0',
+            color: 'text.secondary',
+          },
+          '& .Mui-selected': {
+            color: 'primary.main',
+            '& .MuiBottomNavigationAction-label': {
+              fontWeight: 700,
+            }
+          },
+          '& .MuiBottomNavigationAction-label': {
+            marginTop: '4px',
+          },
+          '& .MuiSvgIcon-root': {
+             transition: 'background-color 0.2s, color 0.2s',
+             padding: '4px 16px',
+             borderRadius: '16px',
+             boxSizing: 'content-box',
+             marginBottom: '4px',
+          },
+          '& .Mui-selected .MuiSvgIcon-root': {
+            backgroundColor: 'primary.main',
+            color: 'primary.contrastText',
+          }
+        }}
+      >
+        <BottomNavigationAction label={t.home.bottomNav.report} value="report" icon={<AssignmentOutlinedIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.queue} value="cola" icon={<AccessTimeOutlinedIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.home} value="home" icon={<HomeIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.seekie} value="seekie" icon={<ChatOutlinedIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.profile} value="profile" icon={<PersonIcon />} />
+      </BottomNavigation>
+    </Paper>
   );
 }

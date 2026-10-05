@@ -18,7 +18,7 @@
  *        el flujo de creación de un reporte.                                                  *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import './ReportProgressBar.css';
+import { Box } from '@mui/material';
 import { type ReportStep } from '../control/useReport';
 
 const stepsOrder: ReportStep[] = ['photo', 'severity', 'description', 'location', 'title', 'summary'];
@@ -33,18 +33,42 @@ export default function ReportProgressBar({ currentStep }: ReportProgressBarProp
   const currentIndex = stepsOrder.indexOf(currentStep);
 
   return (
-    <div className="report-progress-bar-container">
-      <div className="report-progress-bar">
+    <Box 
+      sx={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        padding: 'calc(16px + env(safe-area-inset-top)) 24px 16px',
+        zIndex: 20,
+        pointerEvents: 'none',
+        boxSizing: 'border-box'
+      }}
+    >
+      <Box 
+        sx={{
+          display: 'flex',
+          gap: 1,
+          width: 'min(100%, 560px)',
+          mx: 'auto',
+          height: 4
+        }}
+      >
         {stepsOrder.map((step, index) => {
           const isActive = index <= currentIndex;
           return (
-            <div
+            <Box
               key={step}
-              className={`report-progress-segment ${isActive ? 'active' : ''}`}
+              sx={{
+                flex: 1,
+                borderRadius: 1,
+                bgcolor: isActive ? 'primary.main' : 'action.disabledBackground',
+                transition: 'background-color 0.4s ease, transform 0.4s ease'
+              }}
             />
           );
         })}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

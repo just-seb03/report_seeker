@@ -17,12 +17,13 @@
  *   Queue -- Componente que muestra la lista de reportes pendientes de sincronizar.           *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
 import { useQueue } from '../control/useQueue';
 import { type IssueReport } from '../database';
 import CloudOffIcon from '@mui/icons-material/CloudOff';
 import SyncQueueButton from '../components/SyncQueueButton';
-import './Queue.css';
+import GlobalTopBar from '../components/GlobalTopBar';
+import { t } from '../control/i18n';
 
 interface QueueProps {
   onReportClick: (report: IssueReport) => void;
@@ -32,38 +33,39 @@ export default function Queue({ onReportClick }: QueueProps) {
   const { reports, loading } = useQueue();
 
   return (
-    <Box className="queue-container">
-      <Box className="queue-header">
-        <Typography variant="h6" className="queue-title">Bandeja de salida</Typography>
-      </Box>
-
-      <Box className="queue-list">
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', bgcolor: 'background.default', overflow: 'hidden' }}>
+      <GlobalTopBar title={t.queue.title} />
+      <Box sx={{ flex: 1, overflowY: 'auto', pt: 10, pb: 12 }}>
         {loading ? (
-          <Box className="queue-empty-state">
-            <Typography>Cargando...</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300, color: 'text.secondary' }}>
+            <Typography>{t.common.loading}</Typography>
           </Box>
         ) : reports.length === 0 ? (
-          <Box className="queue-empty-state">
+          <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: 300, color: 'text.secondary', p: 3, textAlign: 'center' }}>
             <CloudOffIcon sx={{ fontSize: 48, opacity: 0.5, mb: 2 }} />
-            <Typography>No hay reportes pendientes.</Typography>
+            <Typography>{t.queue.emptyState}</Typography>
           </Box>
         ) : (
-          reports.map((report) => (
-            <Box 
-              key={report.issueId} 
-              className="queue-item"
-              onClick={() => onReportClick(report)}
-            >
-              <Box className="queue-item-content">
-                <Typography className="queue-item-title" noWrap>{report.title}</Typography>
-                <Typography className="queue-item-subtitle" noWrap>{report.location || 'Sin ubicación'}</Typography>
-                <Typography className="queue-item-date">{report.capturedAt ? new Date(report.capturedAt).toLocaleString() : ''}</Typography>
-              </Box>
-              <Box className="queue-item-status">
-                <CloudOffIcon fontSize="small" />
-              </Box>
-            </Box>
-          ))
+          <List disablePadding>
+            {reports.map((report) => (
+              <ListItem key={report.issueId} disablePadding divider>
+                <ListItemButton onClick={() => onReportClick(report)} sx={{ py: 1.5, px: 2.5 }}>
+                  <ListItemText 
+                    primary={<Typography variant="subtitle2" sx={{ fontWeight: 500 }} noWrap>{report.title}</Typography>}
+                    secondary={
+                      <>
+                        <Typography variant="body2" color="text.secondary" noWrap>{report.location || t.queue.noLocation}</Typography>
+                        <Typography variant="caption" color="text.disabled">{report.capturedAt ? new Date(report.capturedAt).toLocaleString() : ''}</Typography>
+                      </>
+                    }
+                  />
+                  <ListItemIcon sx={{ minWidth: 'auto', ml: 2, color: 'warning.main' }}>
+                    <CloudOffIcon fontSize="small" />
+                  </ListItemIcon>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
         )}
       </Box>
 

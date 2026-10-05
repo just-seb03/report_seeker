@@ -23,7 +23,7 @@ import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NotificationCard from './NotificationCard';
 import type { IssueReport } from '../database';
-import './NotificationSheet.css'; // <-- Importamos su CSS exclusivo
+
 
 export interface Notificacion {
   id: number;
@@ -80,18 +80,25 @@ export default function NotificationSheet({
   return (
     <Box
       ref={listRef}
-      // Alternamos la clase en lugar de reescribir CSS en línea
-      className={`sheet-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}
+      sx={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 1,
+        transition: 'all 0.5s cubic-bezier(0.32, 0.72, 0, 1)',
+        overflowY: isExpanded ? 'auto' : 'hidden',
+        transform: isExpanded ? 'translateY(0)' : 'translateY(42vh)',
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none',
+        '&::-webkit-scrollbar': { display: 'none' }
+      }}
     >
-      <Box className="sheet-content">
-
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 4, pt: 6, pb: 24, maxWidth: 400, mx: 'auto' }}>
         {notificaciones.map((noti, index) => {
           const report = noti.reporte;
           return (
             <Box
-              className="sheet-notification-item"
               key={noti.id}
-              style={{ animationDelay: `${(index % 5) * 55}ms` }}
+              sx={{ animation: 'notification-enter 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both', animationDelay: `${(index % 5) * 55}ms` }}
             >
               <NotificationCard
                 titulo={noti.titulo}
@@ -111,29 +118,36 @@ export default function NotificationSheet({
         })}
 
         {!isLoading && notificaciones.length === 0 && (
-          <Typography className="sheet-empty-message">No hay notificaciones</Typography>
+          <Typography sx={{ p: 3, textAlign: 'center', color: 'text.secondary' }}>No hay notificaciones</Typography>
         )}
 
         {hasMore && (
           <Box
             ref={loadMoreSentinelRef}
-            className={`sheet-load-more-sentinel${isLoading && isExpanded ? ' is-loading' : ''}`}
+            sx={{ display: 'flex', minHeight: isLoading && isExpanded ? 64 : 1, alignItems: 'center', justifyContent: 'center' }}
           >
             {isLoading && isExpanded && (
-              <Box className="sheet-load-more-indicator" role="status" aria-label="Cargando reportes">
-                <CircularProgress size={26} thickness={4} />
+              <Box role="status" aria-label="Cargando reportes" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, py: 2, color: 'text.secondary', animation: 'notification-enter 220ms ease-out both' }}>
+                <CircularProgress size={26} thickness={4} color="inherit" />
                 <Typography variant="caption">Cargando reportes</Typography>
               </Box>
             )}
           </Box>
         )}
 
-        <Box className="sheet-action-container">
-          <IconButton onClick={onCollapse} className="sheet-collapse-btn">
-            <KeyboardArrowUpIcon className="sheet-collapse-icon" />
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <IconButton 
+            onClick={onCollapse} 
+            sx={{ 
+              color: 'text.secondary', 
+              p: 1, 
+              bgcolor: 'action.hover', 
+              '&:hover': { bgcolor: 'action.selected' } 
+            }}
+          >
+            <KeyboardArrowUpIcon sx={{ fontSize: 28 }} />
           </IconButton>
         </Box>
-
       </Box>
     </Box>
   );

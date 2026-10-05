@@ -25,7 +25,9 @@ import ReportSummaryStep from '../components/ReportSummaryStep';
 import ReportTextStep from '../components/ReportTextStep';
 import ReportProgressBar from '../components/ReportProgressBar';
 import { useReport } from '../control/useReport';
-import './Report.css';
+import { t } from '../control/i18n';
+import { Box } from '@mui/material';
+
 
 export type ReportPhoto = { blob: Blob; webPath: string; path?: string };
 
@@ -59,9 +61,20 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
   } = useReport({ photo, onRetakePhoto, onReportCreated });
 
   return (
-    <main className="report-screen">
-      <div className="report-content">
-        <div className="report-step-transition" key={step}>
+    <Box 
+      component="main" 
+      sx={{
+        position: 'absolute', inset: 0, zIndex: 5, display: 'block',
+        overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch',
+        overscrollBehaviorY: 'contain', touchAction: 'pan-y', boxSizing: 'border-box',
+        p: 'max(30px, calc(env(safe-area-inset-top) + 18px)) 24px calc(124px + env(safe-area-inset-bottom))',
+        bgcolor: 'background.default', color: 'text.primary', scrollbarWidth: 'thin',
+        transition: 'background-color 0.35s ease, color 0.35s ease',
+        '@media (max-width: 480px)': { px: '20px' }
+      }}
+    >
+      <Box sx={{ width: 'min(100%, 560px)', mx: 'auto', '@media (max-width: 480px)': { width: '100%' } }}>
+        <Box className="report-step-transition" key={step}>
           {step === 'photo' && (
             <ReportPhotoStep
               photoUrl={currentPhoto.webPath}
@@ -81,9 +94,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'description' && (
             <ReportTextStep
               field="description"
-              heading="Describe lo que has visto"
+              heading={t.report.descHeading}
               value={description}
-              placeholder="Escribe la descripción"
+              placeholder={t.report.descPlaceholder}
               maxLength={1000}
               multiline
               onChange={setDescription}
@@ -93,9 +106,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'location' && (
             <ReportTextStep
               field="location"
-              heading="¿En dónde está localizado el riesgo?"
+              heading={t.report.locationHeading}
               value={location}
-              placeholder="Ingresa la ubicación"
+              placeholder={t.report.locationPlaceholder}
               maxLength={200}
               onChange={setLocation}
               onConfirm={() => continueTo('title')}
@@ -104,9 +117,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
           {step === 'title' && (
             <ReportTextStep
               field="title"
-              heading="Ponle un título al riesgo"
+              heading={t.report.titleHeading}
               value={title}
-              placeholder="Escribe un título"
+              placeholder={t.report.titlePlaceholder}
               maxLength={100}
               errorMessage={errorMessage}
               onChange={setTitle}
@@ -127,9 +140,9 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
             />
           )}
           {step === 'ready' && <ReportReadyStep onComplete={onComplete} />}
-        </div>
-      </div>
+        </Box>
+      </Box>
       <ReportProgressBar currentStep={step} />
-    </main>
+    </Box>
   );
 }

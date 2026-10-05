@@ -26,24 +26,29 @@ import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import RefreshIndicator from './RefreshIndicator';
-import './HomeHeader.css';
+import { t } from '../control/i18n';
 
 interface HomeHeaderProps {
   isExpanded: boolean;
   onSwipeDown: () => void;
   onSwipeProgress: (distance: number) => void;
   hasNotifications?: boolean;
+  hasPendingReports?: boolean;
   isLoading?: boolean;
+  isInitialLoading?: boolean;
 }
 
 export default function HomeHeader({ 
   isExpanded, 
   onSwipeDown, 
   onSwipeProgress,
-  hasNotifications = true,
+  hasNotifications = false,
+  hasPendingReports = false,
   isLoading = false,
+  isInitialLoading = false,
 }: HomeHeaderProps) {
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const hasPending = hasPendingReports;
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return;
@@ -69,7 +74,7 @@ export default function HomeHeader({
 
     const deltaY = event.clientY - start.y;
     const deltaX = Math.abs(event.clientX - start.x);
-    if (deltaY > 120 && deltaY > deltaX) onSwipeDown();
+    if (deltaY > 60 && deltaY > deltaX) onSwipeDown();
   };
 
   return (
@@ -94,30 +99,65 @@ export default function HomeHeader({
         transition: 'all 0.5s cubic-bezier(0.32, 0.72, 0, 1)',
       }}
     > 
-      <Box className="header-title-container" sx={{ opacity: isLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
+      <Box sx={{ display: 'grid', placeItems: 'center', mb: 3, opacity: isLoading || isInitialLoading ? 0 : 1, transition: 'opacity 0.3s ease' }}>
         <Typography 
           variant="h3" 
           component="h1" 
-          className={`header-title ${hasNotifications ? 'text-enter' : 'text-exit'}`}
-          aria-hidden={!hasNotifications}
+          aria-hidden={!hasNotifications && !hasPending}
+          sx={{
+            textAlign: 'center', fontWeight: 'bold', color: 'primary.main',
+            transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+            gridArea: '1 / 1',
+            ...(hasNotifications || hasPending ? {
+              opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)'
+            } : {
+              opacity: 0, transform: 'translateY(-16px) scale(0.96)', filter: 'blur(4px)', pointerEvents: 'none'
+            })
+          }}
         >
-          Hay<br />Nuevos<br />Reportes
+          {hasPending ? (
+            t.home.headerPendingReports.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)
+          ) : (
+            t.home.headerNewReports.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)
+          )}
         </Typography>
 
         <Typography 
           variant="h3" 
           component="h1" 
-          className={`header-title ${!hasNotifications ? 'text-enter' : 'text-exit'}`}
-          aria-hidden={hasNotifications}
+          aria-hidden={hasNotifications || hasPending}
+          sx={{
+            textAlign: 'center', fontWeight: 'bold', color: 'primary.main',
+            transition: 'opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+            gridArea: '1 / 1',
+            ...(!hasNotifications && !hasPending ? {
+              opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)'
+            } : {
+              opacity: 0, transform: 'translateY(-16px) scale(0.96)', filter: 'blur(4px)', pointerEvents: 'none'
+            })
+          }}
         >
-          Todo<br />Está en<br />Orden
+          {t.home.headerAllGood.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)}
         </Typography>
       </Box>
       
       {isLoading ? (
-        <RefreshIndicator label="Actualizando reportes" />
+        <RefreshIndicator label={t.home.refreshing} />
       ) : (
-        <KeyboardArrowDownIcon className="header-icon" sx={{ fontSize: 48, pointerEvents: 'none' }} />
+        <KeyboardArrowDownIcon 
+          sx={{ 
+            fontSize: 48, 
+            pointerEvents: 'none', 
+            color: 'primary.main', 
+            opacity: 0.6,
+            '@keyframes muiBounceSwipe': {
+              '0%': { transform: 'translateY(0)', animationTimingFunction: 'ease-in' },
+              '15%': { transform: 'translateY(20px)', animationTimingFunction: 'ease-out' },
+              '100%': { transform: 'translateY(0)' }
+            },
+            animation: 'muiBounceSwipe 2.5s infinite' 
+          }} 
+        />
       )}
     </Box>
   );

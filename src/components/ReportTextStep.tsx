@@ -21,6 +21,9 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import type { FormEvent } from 'react';
+import { Box, Typography, TextField, Button } from '@mui/material';
+import { t } from '../control/i18n';
+
 
 type ReportTextStepProps = {
   field: 'description' | 'location' | 'title';
@@ -53,50 +56,47 @@ export default function ReportTextStep({
   };
 
   return (
-    <section className="report-text-step" aria-labelledby={`report-${field}-heading`}>
-      <h1 className="report-step-title" id={`report-${field}-heading`}>{heading}</h1>
-      <form className="report-step-form" autoComplete="off" onSubmit={handleSubmit}>
-        {multiline ? (
-          <textarea
-            id={`report-${field}`}
-            className="report-description"
-            aria-label={heading}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={placeholder}
-            maxLength={maxLength}
-            rows={5}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            required
-            autoFocus
-          />
-        ) : (
-          <input
-            id={`report-${field}`}
-            className={field === 'location' ? 'report-location-input' : 'report-title-input'}
-            aria-label={heading}
-            type="text"
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={placeholder}
-            maxLength={maxLength}
-            autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck={false}
-            required
-            autoFocus
-          />
-        )}
-        {multiline && <div className="report-character-count" aria-live="polite">{value.length} / {maxLength}</div>}
-        {errorMessage && <p className="report-submit-message" role="alert">{errorMessage}</p>}
-        <button className="report-step-button is-primary" type="submit" disabled={!value.trim() || isBusy}>
-          {isBusy ? 'Guardando...' : 'Aceptar'}
-        </button>
-      </form>
-    </section>
+    <Box component="section" sx={{ display: 'flex', flexDirection: 'column', minHeight: { xs: '66vh', md: 560 }, justifyContent: 'center' }} aria-labelledby={`report-${field}-heading`}>
+      <Typography variant="h5" id={`report-${field}-heading`} sx={{ fontWeight: 800, textAlign: 'center', mb: 4 }}>
+        {heading}
+      </Typography>
+      <Box component="form" autoComplete="off" onSubmit={handleSubmit} sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <TextField
+          id={`report-${field}`}
+          variant="outlined"
+          fullWidth
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          multiline={multiline}
+          rows={multiline ? 5 : 1}
+          required
+          autoFocus
+          slotProps={{ htmlInput: { maxLength } }}
+          error={!!errorMessage}
+          helperText={errorMessage || (multiline ? `${value.length} / ${maxLength}` : undefined)}
+          sx={{ 
+            '& .MuiInputBase-root': { 
+              borderRadius: 2, 
+              backgroundColor: 'background.paper',
+              padding: multiline ? '12px 16px' : undefined
+            },
+            '& .MuiOutlinedInput-input': {
+              paddingLeft: multiline ? undefined : '16px',
+              paddingRight: multiline ? undefined : '16px'
+            }
+          }}
+        />
+        <Button 
+          variant="contained" 
+          color="primary" 
+          type="submit" 
+          disabled={!value.trim() || isBusy}
+          sx={{ mt: 2, py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
+        >
+          {isBusy ? t.report.textSaving : t.report.textAccept}
+        </Button>
+      </Box>
+    </Box>
   );
 }

@@ -18,13 +18,13 @@
  *        de los reportes que se encuentran en la cola (offline-first).                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { useState } from 'react';
 import { Network } from '@capacitor/network';
 import { syncPendingReports } from '../control/sincronizador';
 import SyncErrorDialog from './SyncErrorDialog';
-import './SyncQueueButton.css';
 
 export default function SyncQueueButton() {
   const [isSyncing, setIsSyncing] = useState(false);
@@ -37,7 +37,7 @@ export default function SyncQueueButton() {
     try {
       const status = await Network.getStatus();
       if (!status.connected) {
-        setErrorDialogOptions({ open: true, message: 'No hay conexión a internet disponible para sincronizar los reportes.' });
+        setErrorDialogOptions({ open: true, message: t.sync.noInternet });
         setIsSyncing(false);
         return;
       }
@@ -50,7 +50,7 @@ export default function SyncQueueButton() {
 
     } catch (e) {
       console.error('Error durante la sincronización manual:', e);
-      setErrorDialogOptions({ open: true, message: 'Ocurrió un error al intentar sincronizar la cola. Por favor, inténtalo de nuevo más tarde.' });
+      setErrorDialogOptions({ open: true, message: t.sync.syncFailed });
     } finally {
       setIsSyncing(false);
     }
@@ -58,21 +58,40 @@ export default function SyncQueueButton() {
 
   return (
     <>
-      <Box className="sync-btn-wrapper">
-      <button 
-        className={`sync-fab-btn ${isSyncing ? 'syncing' : ''}`}
+    <Box 
+      sx={{ 
+        position: 'absolute', bottom: 160, left: 0, right: 0, 
+        display: 'flex', justifyContent: 'center', pointerEvents: 'none', zIndex: 40 
+      }}
+    >
+      <Box 
+        component="button"
         onClick={handleSync}
         disabled={isSyncing}
+        sx={{
+          pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5,
+          bgcolor: 'primary.main', color: 'primary.contrastText', border: 'none', borderRadius: '20px',
+          px: 3.5, py: 2, cursor: isSyncing ? 'default' : 'pointer', fontFamily: 'inherit', minWidth: 200,
+          boxShadow: (theme) => theme.palette.mode === 'dark' 
+            ? '0 4px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3)' 
+            : '0 4px 12px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1)',
+          transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+          opacity: isSyncing ? 0.9 : 1,
+          '&:active:not(:disabled)': {
+            transform: 'scale(0.96) translateY(2px)',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.1)'
+          }
+        }}
       >
         {isSyncing ? (
-          <CircularProgress size={24} color="inherit" className="sync-fab-icon" />
+          <CircularProgress size={24} color="inherit" />
         ) : (
-          <CloudUploadOutlinedIcon className="sync-fab-icon" />
+          <CloudUploadOutlinedIcon sx={{ fontSize: 24 }} />
         )}
-        <Typography className="sync-fab-text">
-          {isSyncing ? 'Sincronizando...' : 'Sincronizar Cola'}
+        <Typography sx={{ fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.3px' }}>
+          {isSyncing ? t.sync.syncing : t.sync.syncQueue}
         </Typography>
-      </button>
+      </Box>
     </Box>
     <SyncErrorDialog 
       open={errorDialogOptions.open}

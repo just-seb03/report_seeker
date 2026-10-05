@@ -1,4 +1,4 @@
-﻿/***********************************************************************************************
+/***********************************************************************************************
  ***                               C O N F I D E N T I A L  ---  M C S                       ***
  ***********************************************************************************************
  *                                                                                             *
@@ -20,14 +20,30 @@
 
 import { Box, CircularProgress } from '@mui/material';
 
+
 interface RefreshIndicatorProps {
   label: string;
 }
 
 export default function RefreshIndicator({ label }: RefreshIndicatorProps) {
   return (
-    <Box className="home-refresh-indicator" role="status" aria-label={label}>
-      <CircularProgress size={40} thickness={4} color="inherit" aria-hidden="true" />
+    <Box 
+      role="status" 
+      aria-label={label}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 44,
+        height: 44,
+        borderRadius: '50%',
+        bgcolor: 'background.paper',
+        boxShadow: 3,
+        color: 'primary.main',
+        mx: 'auto',
+      }}
+    >
+      <CircularProgress size={22} thickness={4.5} color="inherit" aria-hidden="true" />
     </Box>
   );
 }

@@ -27,15 +27,15 @@
  *        notificación.                                                                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t, currentLanguage, getTranslatedSeverity } from '../control/i18n';
 import { useEffect, useState, type KeyboardEvent } from 'react';
-import { Box, Typography, Collapse } from '@mui/material';
+import { Box, Typography, Collapse, Avatar, alpha, useTheme } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { getIssueReportImage } from '../database';
-import './NotificationCard.css'; // <-- Importamos su CSS exclusivo
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
@@ -46,12 +46,12 @@ interface NotificationCardProps {
 
 function formatRelativeTime(fecha: string, currentTime: number): string {
   const publishedAt = Date.parse(fecha);
-  if (Number.isNaN(publishedAt)) return 'ahora';
+  if (Number.isNaN(publishedAt)) return t.notification.now;
 
   const elapsedMinutes = Math.floor(Math.max(0, currentTime - publishedAt) / 60_000);
-  if (elapsedMinutes === 0) return 'ahora';
+  if (elapsedMinutes === 0) return t.notification.now;
 
-  const relativeTime = new Intl.RelativeTimeFormat('es-CL', { numeric: 'auto' });
+  const relativeTime = new Intl.RelativeTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-CL', { numeric: 'auto' });
   if (elapsedMinutes < 60) return relativeTime.format(-elapsedMinutes, 'minute');
 
   const elapsedHours = Math.floor(elapsedMinutes / 60);
@@ -67,21 +67,22 @@ function formatRelativeTime(fecha: string, currentTime: number): string {
 }
 
 function formatPublicationDate(fecha?: string): string {
-  if (!fecha || Number.isNaN(Date.parse(fecha))) return 'Fecha desconocida';
-  return new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
+  if (!fecha || Number.isNaN(Date.parse(fecha))) return t.notification.unknownDate;
+  return new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
 }
 
 export default function NotificationCard({
   titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, workerName, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
 
+  const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const isRead = !unread;
   const [image, setImage] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
-  const isHighPriority = ['alta', 'grave'].includes(prioridad.toLowerCase());
+  const isHighPriority = ['alta', 'grave', 'high'].includes(prioridad.toLowerCase());
+  const isModeratePriority = ['media', 'moderada', 'medium', 'warning'].includes(prioridad.toLowerCase());
   const isLowPriority = ['leve', 'baja', 'low'].includes(prioridad.toLowerCase());
-  const priorityClass = isHighPriority ? 'text-error' : isLowPriority ? 'text-success' : 'text-warning';
   const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
 
   useEffect(() => {
@@ -120,11 +121,21 @@ export default function NotificationCard({
     onOpenReport?.();
   };
 
-  // Determinamos las clases CSS a inyectar en el contenedor principal
-  const cardClass = `card-paper ${isRead ? 'read' : 'unread'} ${isHighPriority ? 'high-priority' : ''}`;
-
   return (
-    <Box className={cardClass}>
+    <Box sx={{ 
+      borderRadius: '24px', 
+      overflow: 'hidden', 
+      bgcolor: expanded 
+        ? 'background.paper' 
+        : isHighPriority 
+          ? alpha(theme.palette.error.main, 0.08) 
+          : isModeratePriority
+            ? alpha(theme.palette.warning.main, 0.12)
+            : alpha(theme.palette.primary.main, 0.08),
+      transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
+      border: isRead ? 1 : 0,
+      borderColor: 'divider'
+    }}>
       <Box
         onClick={handleHeaderClick}
         onKeyDown={(event) => activateWithKeyboard(event, handleHeaderClick)}
@@ -132,23 +143,25 @@ export default function NotificationCard({
         tabIndex={0}
         aria-expanded={expanded}
         aria-label={`${expanded ? 'Contraer' : 'Expandir'} notificación: ${titulo}`}
-        sx={{ p: 2, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
+        sx={{ p: 2.5, position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: 3 } }}
       >
         {isHighPriority ? (
-          <ErrorOutlinedIcon className={!isRead ? "icon-error" : "icon-info"} sx={{ mr: 2, flexShrink: 0 }} />
+          <ErrorOutlinedIcon color={!isRead ? "error" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
+        ) : isModeratePriority ? (
+          <InfoOutlinedIcon color={!isRead ? "warning" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
         ) : (
-          <InfoOutlinedIcon className="icon-info" sx={{ mr: 2, flexShrink: 0 }} />
+          <InfoOutlinedIcon color={!isRead ? "primary" : "action"} sx={{ mr: 2, flexShrink: 0 }} />
         )}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, pr: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-            <Typography variant="subtitle2" className="card-title">{titulo}</Typography>
-            <Typography variant="caption" className="card-text-muted card-relative-time" sx={{ flexShrink: 0 }}>{relativeTime}</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: isRead ? 500 : 'bold', whiteSpace: 'nowrap', overflow: 'hidden', flex: 1, mr: 1, maskImage: 'linear-gradient(to right, black 70%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black 70%, transparent 100%)' }}>{titulo}</Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0, position: 'relative', top: 2, lineHeight: 1 }}>{relativeTime}</Typography>
           </Box>
         </Box>
 
         <ExpandMoreIcon
-          className="card-text-muted"
+          color="action"
           sx={{
             position: 'absolute', right: 16, top: '50%', marginTop: '-12px',
             transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -173,47 +186,63 @@ export default function NotificationCard({
           tabIndex={onOpenReport ? 0 : undefined}
           aria-label={onOpenReport ? `Abrir reporte completo: ${titulo}` : undefined}
           sx={{
-            p: 2,
+            p: 2.5,
             pt: 0,
             cursor: onOpenReport ? 'pointer' : 'default',
             '&:focus-visible': { outline: '2px solid currentColor', outlineOffset: -2 },
           }}
         >
-          <Box className="card-placeholder">
+          <Box sx={{ width: '100%', height: 160, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2, border: 1, borderStyle: 'dashed', borderColor: 'divider' }}>
             {image ? (
-              <img className="card-report-image" src={image} alt={`Evidencia del reporte: ${titulo}`} />
+              <Box component="img" src={image} alt={`Evidencia del reporte: ${titulo}`} sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 2 }} />
             ) : (
-              <Box className="card-image-empty">
-                <InsertPhotoOutlinedIcon className="card-placeholder-icon" sx={{ fontSize: 48 }} />
-                <Typography variant="caption" className="card-text-muted">
-                  {imageLoading ? 'Cargando fotografía...' : 'Sin fotografía asociada'}
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                <InsertPhotoOutlinedIcon color="disabled" sx={{ fontSize: 48 }} />
+                <Typography variant="caption" color="text.disabled">
+                  {imageLoading ? t.notification.loadingPhoto : t.notification.noPhoto}
                 </Typography>
               </Box>
             )}
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 1.5, mb: 1.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, minWidth: 0, flex: 1 }}>
-              <LocationOnOutlinedIcon className="card-text-muted" fontSize="small" sx={{ flexShrink: 0 }} />
-              <Typography variant="body2" className="card-text-muted" sx={{ overflowWrap: 'anywhere' }}>
-                {ubicacion || 'Ubicación no especificada'}
+              <LocationOnOutlinedIcon color="action" fontSize="small" sx={{ flexShrink: 0 }} />
+              <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: 'anywhere' }}>
+                {ubicacion || t.notification.noLocation}
               </Typography>
             </Box>
             <Typography
               variant="body2"
-              className={priorityClass}
-              sx={{ flexShrink: 0, textAlign: 'right' }}
+              sx={{ flexShrink: 0, textAlign: 'right', fontWeight: 'bold', color: isHighPriority ? 'error.main' : isLowPriority ? 'success.main' : 'warning.main' }}
             >
-              {prioridad}
+              {getTranslatedSeverity(prioridad)}
             </Typography>
           </Box>
 
-          <Typography variant="body2" className="card-description" sx={{ mb: 2, overflowWrap: 'anywhere' }}>{detalle}</Typography>
+          <Typography variant="body2" sx={{ mb: 2, overflowWrap: 'anywhere', fontWeight: 500, color: 'text.primary', opacity: 0.85 }}>{detalle}</Typography>
 
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
-            <Typography variant="caption" className="card-text-muted">
-              {workerName ? `Por ${workerName}` : 'Por Trabajador Desconocido'}
-            </Typography>
-            <Typography variant="caption" className="card-text-muted">{formatPublicationDate(fecha)}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Avatar 
+                sx={{ 
+                  width: 24, 
+                  height: 24, 
+                  fontSize: '0.75rem', 
+                  bgcolor: isHighPriority 
+                    ? 'error.main' 
+                    : isModeratePriority 
+                      ? 'warning.main' 
+                      : 'primary.main',
+                  fontWeight: 'bold'
+                }}
+              >
+                {workerName ? workerName.charAt(0).toUpperCase() : '?'}
+              </Avatar>
+              <Typography variant="caption" color="text.secondary">
+                {workerName || t.notification.unknownWorker}
+              </Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary">{formatPublicationDate(fecha)}</Typography>
           </Box>
 
         </Box>

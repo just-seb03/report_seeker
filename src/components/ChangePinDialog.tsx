@@ -17,6 +17,7 @@
  *   ChangePinDialog -- Componente de pantalla completa para cambiar el PIN.                   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { t } from '../control/i18n';
 import { useState } from 'react';
 import PinPad from './PinPad';
 import LoginErrorDialog from './LoginErrorDialog';
@@ -24,9 +25,8 @@ import { getCurrentUser, updateUserLocal } from '../control/authControl';
 import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { insertOrUpdateTrabajadorLocal } from '../database';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import './ChangePinDialog.css';
 
 interface ChangePinDialogProps {
   onClose: () => void;
@@ -63,7 +63,7 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
               setStep('enter_new');
             }, 600);
           } else {
-            setErrorMsg('PIN actual incorrecto');
+            setErrorMsg(t.changePin.errorIncorrect);
             setPinInput('');
           }
         } else if (step === 'enter_new') {
@@ -113,38 +113,78 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
   };
 
   return (
-    <Box className={`change-pin-dialog ${isClosing ? 'closing' : ''}`}>
-      <IconButton className="change-pin-close" onClick={onClose} aria-label="Cerrar">
+    <Box 
+      sx={{
+        position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', flexDirection: 'column', 
+        justifyContent: 'center', alignItems: 'center', overflow: 'hidden',
+        bgcolor: 'background.default', color: 'text.primary',
+        animation: isClosing 
+          ? 'slideDownFade 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards' 
+          : 'slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)'
+      }}
+    >
+      <IconButton 
+        onClick={onClose} 
+        aria-label="Cerrar"
+        sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1001 }}
+      >
         <CloseRoundedIcon />
       </IconButton>
 
-      <div className={`change-pin-step ${step === 'confirm_current' ? 'active' : 'hidden'}`}>
+      <Box 
+        sx={{
+          position: 'absolute', width: '100%', display: 'flex', justifyContent: 'center',
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          ...(step === 'confirm_current' 
+            ? { opacity: 1, pointerEvents: 'auto', transform: 'translateY(0) scale(1)' } 
+            : { opacity: 0, pointerEvents: 'none', transform: 'translateY(100px) scale(0.95)' })
+        }}
+      >
         <PinPad
-          title="Confirma tu PIN actual"
-          subtitle="Para continuar, verifica tu identidad"
+          title={t.changePin.confirmTitle}
+          subtitle={t.changePin.confirmSubtitle}
           maxLength={4}
           currentValue={step === 'confirm_current' ? pinInput : ''}
           onKeyPress={handleKeyPress}
         />
-      </div>
+      </Box>
 
-      <div className={`change-pin-step ${step === 'enter_new' ? 'active' : 'hidden'}`}>
+      <Box 
+        sx={{
+          position: 'absolute', width: '100%', display: 'flex', justifyContent: 'center',
+          transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          ...(step === 'enter_new' 
+            ? { opacity: 1, pointerEvents: 'auto', transform: 'translateY(0) scale(1)' } 
+            : { opacity: 0, pointerEvents: 'none', transform: 'translateY(100px) scale(0.95)' })
+        }}
+      >
         <PinPad
-          title="Ingresa tu nuevo PIN"
-          subtitle="4 dígitos"
+          title={t.changePin.newTitle}
+          subtitle={t.changePin.newSubtitle}
           maxLength={4}
           currentValue={step === 'enter_new' ? pinInput : ''}
           onKeyPress={handleKeyPress}
         />
-      </div>
+      </Box>
 
-      <div className={`change-pin-loader ${step === 'loading' ? 'active' : ''}`}>
-        {/* Loading overlay sin texto, oscuro */}
-      </div>
+      <Box 
+        sx={{
+          position: 'absolute', inset: 0, zIndex: 1002, bgcolor: '#121212',
+          transition: 'opacity 0.4s ease',
+          opacity: step === 'loading' ? 1 : 0, pointerEvents: step === 'loading' ? 'auto' : 'none'
+        }}
+      />
 
-      <div className={`change-pin-success ${step === 'success' ? 'active' : ''}`}>
-        <h2>PIN actualizado con éxito</h2>
-      </div>
+      <Box 
+        sx={{
+          position: 'absolute', inset: 0, zIndex: 1003, bgcolor: 'primary.main', color: '#ffffff',
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          transition: 'opacity 0.4s ease',
+          opacity: step === 'success' ? 1 : 0, pointerEvents: step === 'success' ? 'auto' : 'none'
+        }}
+      >
+        <Typography variant="h5" sx={{ fontWeight: 500 }}>{t.changePin.success}</Typography>
+      </Box>
 
       <LoginErrorDialog 
         open={!!errorMsg} 
