@@ -20,6 +20,8 @@
 
 import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import { t } from '../control/i18n';
+
 
 type ReportCancelDialogProps = {
   open: boolean;
@@ -42,16 +44,16 @@ export default function ReportCancelDialog({ open, onCancel, onExit }: ReportCan
         <Box className="report-cancel-icon" aria-hidden="true">
           <HelpOutlineRoundedIcon />
         </Box>
-        ¿Desea cancelar su reporte?
+        {t.report.cancelTitle}
       </DialogTitle>
       <DialogContent>
         <Typography id="report-cancel-description" className="report-cancel-description">
-          Si sale ahora, perderá la información ingresada hasta este paso.
+          {t.report.cancelDesc}
         </Typography>
       </DialogContent>
       <DialogActions className="report-cancel-actions">
-        <Button className="report-cancel-keep" onClick={onCancel}>Cancelar</Button>
-        <Button className="report-cancel-exit" onClick={onExit} autoFocus>Salir</Button>
+        <Button className="report-cancel-keep" onClick={onCancel}>{t.report.cancelKeep}</Button>
+        <Button className="report-cancel-exit" onClick={onExit} autoFocus>{t.report.cancelConfirm}</Button>
       </DialogActions>
     </Dialog>
   );

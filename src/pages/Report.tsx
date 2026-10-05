@@ -27,6 +27,7 @@ import ReportProgressBar from '../components/ReportProgressBar';
 import { useReport } from '../control/useReport';
 import { Box } from '@mui/material';
 
+
 export type ReportPhoto = { blob: Blob; webPath: string; path?: string };
 
 interface ReportProps {

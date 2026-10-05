@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Box } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';

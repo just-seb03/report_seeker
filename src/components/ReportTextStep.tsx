@@ -22,6 +22,8 @@
 
 import type { FormEvent } from 'react';
 import { Box, Typography, TextField, Button } from '@mui/material';
+import { t } from '../control/i18n';
+
 
 type ReportTextStepProps = {
   field: 'description' | 'location' | 'title';
@@ -92,7 +94,7 @@ export default function ReportTextStep({
           disabled={!value.trim() || isBusy}
           sx={{ mt: 2, py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
         >
-          {isBusy ? 'Guardando...' : 'Aceptar'}
+          {isBusy ? t.report.textSaving : t.report.textAccept}
         </Button>
       </Box>
     </Box>

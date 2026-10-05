@@ -21,6 +21,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import BackspaceOutlinedIcon from '@mui/icons-material/BackspaceOutlined';
+import { t } from '../control/i18n';
 
 export interface LoginFormProps {
   isLoading: boolean;
@@ -78,8 +79,8 @@ export default function LoginForm({ isLoading, error, onSubmit }: LoginFormProps
       }
     }
   };
-  const title = step === 1 ? 'Ingresa tu ID de trabajador' : 'Ingresa la clave de acceso de';
-  const subtitle = step === 1 ? '5 dígitos' : workerId;
+  const title = step === 1 ? t.login.step1Title : t.login.step2Title;
+  const subtitle = step === 1 ? t.login.step1Subtitle : workerId;
   const currentLength = step === 1 ? workerId.length : pin.length;
   const maxLength = step === 1 ? 5 : 4;
 
@@ -166,7 +167,7 @@ export default function LoginForm({ isLoading, error, onSubmit }: LoginFormProps
       {isLoading && (
         <Box sx={{ mt: 4, display: 'flex', alignItems: 'center', gap: 1.5, color: 'primary.main', fontWeight: 500, animation: 'fade-in 0.3s ease' }}>
           <CircularProgress size={20} color="inherit" thickness={4} />
-          <Typography component="span" variant="body2" sx={{ fontWeight: 500 }}>Verificando...</Typography>
+          <Typography component="span" variant="body2" sx={{ fontWeight: 500 }}>{t.login.loading}</Typography>
         </Box>
       )}
     </Box>

@@ -23,6 +23,8 @@
 import { useEffect, useState, type AnimationEvent } from 'react';
 import { Box, Typography } from '@mui/material';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import { t } from '../control/i18n';
+
 
 type ReportReadyStepProps = {
   onComplete: () => void;
@@ -51,7 +53,7 @@ export default function ReportReadyStep({ onComplete }: ReportReadyStepProps) {
     >
       <CheckCircleOutlinedIcon color="success" sx={{ fontSize: 64, mb: 2 }} />
       <Typography variant="h5" sx={{ fontWeight: 800, textAlign: 'center' }}>
-        Reporte Listo Para Subir
+        {t.report.readyTitle}
       </Typography>
     </Box>
   );

@@ -43,6 +43,7 @@ import { useIntroFlow } from '../control/useIntroFlow';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import PinPad from '../components/PinPad';
 import LoginErrorDialog from '../components/LoginErrorDialog';
+import { t } from '../control/i18n';
 
 
 interface LoginProps {
@@ -356,7 +357,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               : { opacity: 0, transform: 'translateY(-40px) scale(0.95)', pointerEvents: 'none' })
           }}
         >
-          <Typography variant="h3" sx={{ fontWeight: 400, letterSpacing: 2 }}>Bienvenido</Typography>
+          <Typography variant="h3" sx={{ fontWeight: 400, letterSpacing: 2 }}>{t.login.welcome}</Typography>
         </Box>
 
         {/* Paso: Ingreso de ID */}
@@ -372,8 +373,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           }}
         >
           <PinPad
-            title="Ingrese su ID de trabajador"
-            subtitle="5 dígitos"
+            title={t.login.step1Title}
+            subtitle={t.login.step1Subtitle}
             maxLength={5}
             currentValue={workerId}
             onKeyPress={handleIdKeyPress}
@@ -393,7 +394,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           }}
         >
           <PinPad
-            title="Ingrese su PIN"
+            title={t.login.step2Title}
             subtitle={workerId}
             maxLength={4}
             currentValue={pin}

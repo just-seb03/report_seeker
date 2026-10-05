@@ -24,6 +24,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import NotificationCard from './NotificationCard';
 import type { IssueReport } from '../database';
 
+
 export interface Notificacion {
   id: number;
   titulo: string;

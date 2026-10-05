@@ -26,6 +26,7 @@ import { useRef } from 'react';
 import { Box, Typography } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import RefreshIndicator from './RefreshIndicator';
+import { t } from '../control/i18n';
 
 interface HomeHeaderProps {
   isExpanded: boolean;
@@ -115,9 +116,9 @@ export default function HomeHeader({
           }}
         >
           {hasPending ? (
-            <>Tienes<br />Reportes<br />Pendientes</>
+            t.home.headerPendingReports.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)
           ) : (
-            <>Hay<br />Nuevos<br />Reportes</>
+            t.home.headerNewReports.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)
           )}
         </Typography>
 
@@ -136,12 +137,12 @@ export default function HomeHeader({
             })
           }}
         >
-          Todo<br />En<br />Orden
+          {t.home.headerAllGood.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)}
         </Typography>
       </Box>
       
       {isLoading ? (
-        <RefreshIndicator label="Actualizando reportes" />
+        <RefreshIndicator label={t.home.refreshing} />
       ) : (
         <KeyboardArrowDownIcon 
           sx={{ 

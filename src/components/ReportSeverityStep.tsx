@@ -26,6 +26,8 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography, Button, Slider } from '@mui/material';
+import { t } from '../control/i18n';
+
 
 type ReportSeverityStepProps = {
   severity: number;
@@ -50,7 +52,7 @@ export default function ReportSeverityStep({ severity, options, onChange, onConf
   return (
     <Box component="section" sx={{ display: 'flex', flexDirection: 'column', minHeight: { xs: '66vh', md: 560 }, justifyContent: 'center' }} aria-labelledby="report-severity-heading">
       <Typography variant="h5" id="report-severity-heading" sx={{ fontWeight: 800, textAlign: 'center', mb: 8 }}>
-        ¿Define su gravedad?
+        {t.report.severityHeading}
       </Typography>
       
       <Box sx={{ px: 4, mb: 6 }}>

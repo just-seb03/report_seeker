@@ -26,6 +26,7 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import { IconButton, Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import ChangePinDialog from '../components/ChangePinDialog';
 import ChangeEmailDialog from '../components/ChangeEmailDialog';
+import { t } from '../control/i18n';
 
 type ConfigurationProps = {
   onBack: () => void;
@@ -68,11 +69,11 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
     <Box sx={{ height: '100%', backgroundColor: 'background.default', display: 'flex', flexDirection: 'column' }}>
       <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
         <Toolbar>
-          <IconButton edge="start" onClick={onBack} aria-label="Volver a Profile" sx={{ mr: 2 }}>
+          <IconButton edge="start" onClick={onBack} aria-label={t.common.back} sx={{ mr: 2 }}>
             <ArrowBackRoundedIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-            Configuración
+            {t.config.title}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -83,7 +84,7 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
             REPORT<Box component="span" sx={{ color: 'text.primary' }}>SEEKER</Box>
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Versión 0.04a
+            {t.config.version} 0.04a
           </Typography>
         </Box>
 
@@ -95,8 +96,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                   {isDarkMode ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
                 </ListItemIcon>
                 <ListItemText 
-                  primary={<Typography sx={{ fontWeight: 500 }}>Tema de la Aplicación</Typography>}
-                  secondary={isDarkMode ? 'Modo Oscuro' : 'Modo Claro'} 
+                  primary={<Typography sx={{ fontWeight: 500 }}>{t.config.appTheme}</Typography>}
+                  secondary={isDarkMode ? t.config.darkMode : t.config.lightMode} 
                 />
               </ListItemButton>
             </ListItem>
@@ -107,8 +108,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                   <LockOutlinedIcon />
                 </ListItemIcon>
                 <ListItemText 
-                  primary={<Typography sx={{ fontWeight: 500 }}>Cambiar PIN</Typography>}
-                  secondary="Actualiza tu código de acceso"
+                  primary={<Typography sx={{ fontWeight: 500 }}>{t.config.changePin}</Typography>}
+                  secondary={t.config.changePinDesc}
                 />
               </ListItemButton>
             </ListItem>
@@ -119,8 +120,8 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                   <AlternateEmailOutlinedIcon />
                 </ListItemIcon>
                 <ListItemText 
-                  primary={<Typography sx={{ fontWeight: 500 }}>Cambiar correo de recuperación</Typography>}
-                  secondary="Actualiza el email asociado a tu cuenta"
+                  primary={<Typography sx={{ fontWeight: 500 }}>{t.config.changeEmail}</Typography>}
+                  secondary={t.config.changeEmailDesc}
                 />
               </ListItemButton>
             </ListItem>

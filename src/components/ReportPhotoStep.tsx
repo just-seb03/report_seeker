@@ -19,6 +19,8 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography, Button, Paper, Stack } from '@mui/material';
+import { t } from '../control/i18n';
+
 
 type ReportPhotoStepProps = {
   photoUrl: string;
@@ -59,7 +61,7 @@ export default function ReportPhotoStep({
       </Paper>
       
       <Typography variant="h5" id="report-photo-question" sx={{ fontWeight: 800, textAlign: 'center', mt: 4, mb: 3 }}>
-        ¿Confirmas esta fotografía?
+        {t.report.photoConfirm}
       </Typography>
       
       <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
@@ -71,7 +73,7 @@ export default function ReportPhotoStep({
           fullWidth
           sx={{ py: 1.5, borderRadius: 2, fontWeight: 'bold' }}
         >
-          {isRetakingPhoto ? 'Abriendo cámara...' : 'No'}
+          {isRetakingPhoto ? t.report.photoOpening : t.report.photoNo}
         </Button>
         <Button 
           variant="contained" 

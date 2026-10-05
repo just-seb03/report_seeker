@@ -26,6 +26,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import { t } from '../control/i18n';
 
 type BottomNavProps = {
   activeView: 'home' | 'report' | 'profile' | 'cola' | 'seekie';
@@ -98,11 +99,11 @@ export default function BottomNav({ activeView, onHomeClick, onReportClick, onPr
           }
         }}
       >
-        <BottomNavigationAction label="Reportar" value="report" icon={<AssignmentOutlinedIcon />} />
-        <BottomNavigationAction label="Cola" value="cola" icon={<AccessTimeOutlinedIcon />} />
-        <BottomNavigationAction label="Inicio" value="home" icon={<HomeIcon />} />
-        <BottomNavigationAction label="Seekie AI" value="seekie" icon={<ChatOutlinedIcon />} />
-        <BottomNavigationAction label="Perfil" value="profile" icon={<PersonIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.report} value="report" icon={<AssignmentOutlinedIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.queue} value="cola" icon={<AccessTimeOutlinedIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.home} value="home" icon={<HomeIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.seekie} value="seekie" icon={<ChatOutlinedIcon />} />
+        <BottomNavigationAction label={t.home.bottomNav.profile} value="profile" icon={<PersonIcon />} />
       </BottomNavigation>
     </Paper>
   );

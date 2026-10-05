@@ -20,6 +20,7 @@
 
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Box, Typography, Button, Card, CardActionArea, CardMedia, CardContent, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { t } from '../control/i18n';
 
 export type EditableReportStep = 'photo' | 'severity' | 'description' | 'location' | 'title';
 
@@ -71,7 +72,7 @@ export default function ReportSummaryStep({
             sx={{ backgroundColor: 'action.hover', objectFit: 'cover' }}
           />
           <CardContent sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>Fotografía</Typography>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>{t.report.summaryPhoto}</Typography>
             <EditOutlinedIcon color="action" fontSize="small" />
           </CardContent>
         </CardActionArea>

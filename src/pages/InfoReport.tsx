@@ -25,6 +25,7 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import { Box, Dialog, IconButton, Typography, alpha } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
+import { t } from '../control/i18n';
 
 type InfoReportProps = {
   report: IssueReport;
@@ -134,7 +135,7 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
             </Box>
           </Box>
           <Box sx={{ p: 2.5, borderRadius: '24px', bgcolor: 'background.paper', boxShadow: '0 2px 8px rgb(0 0 0 / 4%)' }}>
-            <Typography component="h2" sx={{ m: 0, mb: 1, color: 'primary.main', fontSize: '13px', fontWeight: 600, letterSpacing: '0.2px' }}>Descripción</Typography>
+            <Typography component="h2" sx={{ m: 0, mb: 1, color: 'primary.main', fontSize: '13px', fontWeight: 600, letterSpacing: '0.2px' }}>{t.infoReport.descriptionSection}</Typography>
             <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '15px', fontWeight: 400, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || 'Sin descripción'}</Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '8px 4px', color: 'text.secondary', fontSize: '13px', fontWeight: 500, '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 1 }, '& svg': { flex: '0 0 auto', fontSize: 18 } }}>
