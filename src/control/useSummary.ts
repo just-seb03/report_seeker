@@ -26,7 +26,6 @@ export interface SummaryData {
   high: number;
   medium: number;
   low: number;
-  low: number;
   topLocations: { name: string; count: number }[];
 }
 

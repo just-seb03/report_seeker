@@ -50,12 +50,12 @@ export default function RiskDonutChart({ data }: RiskDonutChartProps) {
         flexDirection: 'column', 
         alignItems: 'center', 
         position: 'relative',
-        borderRadius: 6,
+        borderRadius: '24px',
         backgroundColor: 'background.paper',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.04)'
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)'
       }}
     >
-      <Typography variant="body1" gutterBottom align="center" sx={{ mb: 1, fontWeight: 600, color: 'text.secondary' }}>
+      <Typography variant="body1" gutterBottom align="center" sx={{ mb: 3, fontWeight: 600, color: 'text.secondary' }}>
         {t.summary.totalReports}
       </Typography>
 
@@ -101,16 +101,16 @@ export default function RiskDonutChart({ data }: RiskDonutChartProps) {
       </Box>
 
       {/* Custom Legend for Mobile */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-around', width: '100%', mt: 2, px: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, width: '100%', mt: 2, px: 1 }}>
         {chartData.map((item) => (
           <Box key={item.id} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
-              <Box sx={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: item.color }} />
-              <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+              <Box sx={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: item.color }} />
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 {item.label}
               </Typography>
             </Box>
-            <Typography component="div" sx={{ fontWeight: 700, color: 'text.secondary', fontSize: '1.1rem' }}>
+            <Typography component="div" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.25rem' }}>
               {item.value}
             </Typography>
           </Box>

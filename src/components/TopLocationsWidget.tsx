@@ -18,7 +18,7 @@
  *            más afectados, es decir, con mayor cantidad de reportes registrados.             *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { Card, Typography, List, ListItem, ListItemIcon, ListItemText, Box, alpha, useTheme } from '@mui/material';
+import { Card, Typography, List, ListItem, ListItemText, Box, alpha, useTheme } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 import { t } from '../control/i18n';
 import type { SummaryData } from '../control/useSummary';
@@ -38,52 +38,76 @@ export default function TopLocationsWidget({ locations }: TopLocationsWidgetProp
         m: 2, 
         display: 'flex', 
         flexDirection: 'column', 
-        borderRadius: 6,
+        borderRadius: '24px',
         backgroundColor: 'background.paper',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.04)'
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)'
       }}
     >
-      <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.secondary', mb: 2 }}>
+      <Typography variant="body1" align="center" sx={{ fontWeight: 600, color: 'text.secondary', mb: 3 }}>
         {t.summary.topLocations}
       </Typography>
 
       {locations.length > 0 ? (
         <List disablePadding>
-          {locations.map((loc, index) => (
-            <ListItem 
-              key={loc.name} 
-              disableGutters
-              sx={{ 
-                mb: index < locations.length - 1 ? 1 : 0,
-                backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                borderRadius: 3,
-                px: 2,
-                py: 1
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <PlaceIcon color="primary" fontSize="small" />
-              </ListItemIcon>
-              <ListItemText 
-                primary={loc.name} 
-                primaryTypographyProps={{ fontWeight: 600, color: 'text.primary' }}
-              />
-              <Box 
+          {locations.map((loc, index) => {
+            // Opacidad de fondo disminuye según la posición
+            const opacities = [0.15, 0.08, 0.03];
+            const bgOpacity = opacities[index] || 0.02;
+
+            return (
+              <ListItem 
+                key={loc.name} 
+                disableGutters
                 sx={{ 
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  color: 'primary.main',
-                  fontWeight: 800,
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 2,
-                  minWidth: 32,
-                  textAlign: 'center'
+                  mb: index < locations.length - 1 ? 2 : 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: alpha(theme.palette.error.main, bgOpacity),
+                  borderRadius: '16px',
+                  p: 1.5,
                 }}
               >
-                {loc.count}
-              </Box>
-            </ListItem>
-          ))}
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    width: 40,
+                    height: 40,
+                    borderRadius: '12px',
+                    backgroundColor: 'background.paper',
+                    mr: 2,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  <PlaceIcon color="error" fontSize="small" />
+                </Box>
+                
+                <ListItemText 
+                  primary={<Typography sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.95rem' }}>{loc.name}</Typography>}
+                />
+                
+                <Box 
+                  sx={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: 32,
+                    height: 32,
+                    borderRadius: '16px',
+                    backgroundColor: 'background.paper',
+                    color: 'error.main',
+                    fontWeight: 800,
+                    fontSize: '0.85rem',
+                    px: 1.5,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                  }}
+                >
+                  {loc.count}
+                </Box>
+              </ListItem>
+            );
+          })}
         </List>
       ) : (
         <Box sx={{ py: 3, textAlign: 'center' }}>
