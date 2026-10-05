@@ -33,11 +33,11 @@ import { sendReportNotification } from './systemNotificationsControl';
 import { type ReportPhoto } from '../pages/Report';
 import { type Notificacion } from '../components/NotificationSheet';
 
-export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'configuration' | 'queue' | 'seekie' | 'sumario';
+export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'report-management' | 'configuration' | 'queue' | 'seekie' | 'sumario';
 export type TransitionDirection = 'forward' | 'backward';
 export type ConfigMenuState = 'none' | 'pin' | 'email';
 
-export const viewOrder: NavigationView[] = ['report', 'queue', 'sumario', 'home', 'seekie', 'info-report', 'profile', 'configuration'];
+export const viewOrder: NavigationView[] = ['report', 'queue', 'sumario', 'home', 'seekie', 'info-report', 'report-management', 'profile', 'configuration'];
 const notificationPageSize = 5;
 
 export function useHome() {
@@ -56,6 +56,7 @@ export function useHome() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [configMenuState, setConfigMenuState] = useState<ConfigMenuState>('none');
   const [infoReportSource, setInfoReportSource] = useState<NavigationView>('home');
+  const [reportManagementSource, setReportManagementSource] = useState<NavigationView>('home');
   const [pendingView, setPendingView] = useState<NavigationView | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
@@ -248,6 +249,17 @@ export function useHome() {
     navigateTo(infoReportSource);
   }, [infoReportSource, navigateTo]);
 
+  const handleManageReport = useCallback((report: IssueReport) => {
+    handleMarkAsRead(report.issueId);
+    setSelectedReport(report);
+    setReportManagementSource(activeView);
+    navigateTo('report-management');
+  }, [activeView, handleMarkAsRead, navigateTo]);
+
+  const handleCloseReportManagement = useCallback(() => {
+    navigateTo(reportManagementSource);
+  }, [reportManagementSource, navigateTo]);
+
   const handleOpenConfiguration = useCallback(() => navigateTo('configuration'), [navigateTo]);
 
   const handleReportClick = useCallback(async () => {
@@ -325,6 +337,10 @@ export function useHome() {
       navigateTo(infoReportSource);
       return true;
     }
+    if (activeView === 'report-management') {
+      navigateTo(reportManagementSource);
+      return true;
+    }
     if (activeView === 'configuration') {
       if (configMenuState !== 'none') {
         setConfigMenuState('none');
@@ -362,7 +378,7 @@ export function useHome() {
       return false; // Permite que la app se cierre nativamente
     }
     return false;
-  }, [cancelDialogOpen, activeView, reportIsComplete, isExpanded, navigateTo, handleCollapse, configMenuState]);
+  }, [cancelDialogOpen, activeView, reportIsComplete, isExpanded, navigateTo, handleCollapse, configMenuState, infoReportSource, reportManagementSource]);
 
   useHardwareBackButton(handleHardwareBack);
 
@@ -399,6 +415,8 @@ export function useHome() {
     handleReportComplete,
     handleOpenReport,
     handleCloseInfoReport,
+    handleManageReport,
+    handleCloseReportManagement,
     handleOpenConfiguration,
     handleReportClick,
     handleRetakeReportPhoto,

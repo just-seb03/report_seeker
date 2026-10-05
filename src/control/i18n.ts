@@ -113,6 +113,13 @@ export const TEXTS = {
       lowRisk: 'Leve',
       topLocations: 'Lugares más afectados'
     },
+    reportManagement: {
+      title: 'Gestión del reporte',
+      reportLabel: 'Reporte',
+      descriptionLabel: 'Descripción',
+      followUpTitle: 'Seguimiento',
+      followUpPlaceholder: 'Esta vista inicial prepara el espacio para registrar estados, instrucciones y cierre. Esas acciones se habilitarán en una siguiente etapa.'
+    },
     profile: {
       title: 'Perfil',
       unknownUser: 'Usuario Desconocido',
@@ -165,6 +172,7 @@ export const TEXTS = {
       noPhoto: 'Sin fotografía asociada',
       noLocation: 'Ubicación no especificada',
       unknownWorker: 'Trabajador Desconocido',
+      manageReport: 'Gestionar',
     },
     report: {
       photoConfirm: '¿Confirmas esta fotografía?',
@@ -334,6 +342,13 @@ export const TEXTS = {
       lowRisk: 'Low',
       topLocations: 'Most Affected Locations'
     },
+    reportManagement: {
+      title: 'Report management',
+      reportLabel: 'Report',
+      descriptionLabel: 'Description',
+      followUpTitle: 'Follow-up',
+      followUpPlaceholder: 'This initial view prepares the space for tracking status, instructions, and closure. Those actions will be enabled in a later stage.'
+    },
     profile: {
       title: 'Profile',
       unknownUser: 'Unknown User',
@@ -386,6 +401,7 @@ export const TEXTS = {
       noPhoto: 'No photo associated',
       noLocation: 'Location not specified',
       unknownWorker: 'Unknown Worker',
+      manageReport: 'Manage',
     },
     report: {
       photoConfirm: 'Confirm this photo?',

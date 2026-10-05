@@ -22,17 +22,19 @@ import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { Box, Dialog, IconButton, Typography, alpha } from '@mui/material';
+import { Box, Button, Dialog, IconButton, Typography, alpha } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/useInfoReport';
 import { t, getTranslatedSeverity } from '../control/i18n';
 
 type InfoReportProps = {
   report: IssueReport;
+  isPrevencionista?: boolean;
   onBack: () => void;
+  onManageReport?: () => void;
 };
 
-export default function InfoReport({ report, onBack }: InfoReportProps) {
+export default function InfoReport({ report, isPrevencionista = false, onBack, onManageReport }: InfoReportProps) {
   const {
     image,
     isLoadingImage,
@@ -148,6 +150,17 @@ export default function InfoReport({ report, onBack }: InfoReportProps) {
               <Typography component="span" sx={{ fontSize: '11px', color: 'text.disabled', fontWeight: 600 }}>{formatReportDate(report.capturedAt).time}</Typography>
             </Box>
           </Box>
+          {isPrevencionista && onManageReport && (
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={onManageReport}
+              sx={{ mt: 2, minHeight: 48, borderRadius: 3, textTransform: 'none', fontWeight: 700 }}
+            >
+              {t.notification.manageReport}
+            </Button>
+          )}
         </Box>
       </Box>
 
