@@ -14,13 +14,15 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
+ *   updateSyncedReportPriority -- Actualiza la severidad de un reporte existente en Firestore. *
+ *   verifyReportManagementConnection -- Comprueba que Firestore responda desde el servidor.  *
  *   syncPendingReports -- Busca reportes locales pendientes y los sube a Firebase             *
  *   convertWebPToBase64 -- Convierte archivo WebP físico a texto Base64 en memoria viva       *
  *   convertBase64ToWebP -- Convierte texto Base64 a archivo físico WebP local                 *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { db } from '../../firebase';
-import { collection, setDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, setDoc, doc, onSnapshot, updateDoc, getDocsFromServer, limit, query } from 'firebase/firestore';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Network } from '@capacitor/network';
 import { Capacitor } from '@capacitor/core';
@@ -40,6 +42,14 @@ export interface IssueReportFirebase {
   trabajador_id: number;
   trabajador_nombre?: string;
   fotografiaBase64: string | null;
+}
+
+export async function updateSyncedReportPriority(firebaseId: string, priority: string): Promise<void> {
+    await updateDoc(doc(db, "reportes_sincronizados", firebaseId), { prioridad: priority });
+}
+
+export async function verifyReportManagementConnection(): Promise<void> {
+    await getDocsFromServer(query(collection(db, "reportes_sincronizados"), limit(1)));
 }
 
 /**
@@ -181,6 +191,26 @@ export function startListeningForNewReports() {
         const sqlite = await initializeDatabase();
         
         for (const change of snapshot.docChanges()) {
+            if (change.type === "modified") {
+                try {
+                    const localReport = await sqlite.query(
+                        `SELECT issue_id FROM issues_riesgos WHERE firebase_id = ? LIMIT 1`,
+                        [change.doc.id]
+                    );
+                    if (!localReport.values?.length) continue;
+
+                    const data = change.doc.data() as IssueReportFirebase;
+                    await sqlite.run(
+                        `UPDATE issues_riesgos SET prioridad = ? WHERE firebase_id = ?`,
+                        [data.prioridad || 'Normal', change.doc.id]
+                    );
+                    window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+                } catch (error) {
+                    console.error(`[Sincronizador] Error actualizando el reporte modificado ${change.doc.id}:`, error);
+                }
+                continue;
+            }
+
             // Solo nos importan los reportes NUEVOS que entran a Firebase
             if (change.type === "added") {
                 const data = change.doc.data() as IssueReportFirebase;

@@ -23,6 +23,8 @@
  *        datos.                                                                               *
  *   getIssueReportsPage -- Recupera una lista paginada de reportes ordenados de forma         *
  *        descendente.                                                                         *
+ *   updateIssueReportPriority -- Actualiza la severidad de un reporte en el almacenamiento     *
+ *        local SQLite o IndexedDB.                                                            *
  *   getIssueReportImage -- Carga el blob de la imagen específica de un reporte almacenado.    *
  *   saveIssueReportOnWeb -- Alternativa web (IndexedDB/LocalStorage) para guardar el reporte  *
  *        (mocking fallback).                                                                  *
@@ -194,6 +196,7 @@ let databasePromise: Promise<SQLiteDBConnection> | null = null;
 
 export interface IssueReport {
   issueId: number;
+  firebaseId?: string;
   title: string;
   description: string;
   location: string;
@@ -275,11 +278,11 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   const connection = await initializeDatabase();
   const result = beforeIssueId === undefined
     ? await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? ORDER BY issue_id DESC LIMIT ?;',
+      'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? ORDER BY issue_id DESC LIMIT ?;',
       ['pendiente', limit + 1],
     )
     : await connection.query(
-      'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? AND issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
+      'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? AND issue_id < ? ORDER BY issue_id DESC LIMIT ?;',
       ['pendiente', beforeIssueId, limit + 1],
     );
   const reports = result.values ?? [];
@@ -290,12 +293,31 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   };
 }
 
+export async function updateIssueReportPriority(issueId: number, priority: string): Promise<void> {
+  if (!Capacitor.isNativePlatform()) {
+    await updateIssueReportPriorityOnWeb(issueId, priority);
+    return;
+  }
+
+  const connection = await initializeDatabase();
+  const report = await connection.query(
+    'SELECT issue_id FROM issues_riesgos WHERE issue_id = ? LIMIT 1;',
+    [issueId],
+  );
+  if (!report.values?.length) throw new Error(`No se encontró el reporte #${issueId}.`);
+
+  await connection.run(
+    'UPDATE issues_riesgos SET prioridad = ? WHERE issue_id = ?;',
+    [priority, issueId],
+  );
+}
+
 export async function getPendingIssueReports(): Promise<IssueReport[]> {
   if (!Capacitor.isNativePlatform()) return getPendingIssueReportsOnWeb();
 
   const connection = await initializeDatabase();
   const result = await connection.query(
-    'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync = ? ORDER BY issue_id DESC;',
+    'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync = ? ORDER BY issue_id DESC;',
     ['pendiente']
   );
   return (result.values ?? []).map(mapIssueReport);
@@ -306,7 +328,7 @@ export async function getAllIssueReports(): Promise<IssueReport[]> {
 
   const connection = await initializeDatabase();
   const result = await connection.query(
-    'SELECT issue_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos ORDER BY issue_id DESC;'
+    'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos ORDER BY issue_id DESC;'
   );
   return (result.values ?? []).map(mapIssueReport);
 }
@@ -324,6 +346,49 @@ export async function getIssueReportImage(issueId: number): Promise<string | nul
   );
   const image = result.values?.[0]?.fotografia_url;
   return typeof image === 'string' ? image : null;
+}
+
+function updateIssueReportPriorityOnWeb(issueId: number, priority: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 2);
+
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(webObjectStore)) {
+        request.result.createObjectStore(webObjectStore, { keyPath: 'issue_id', autoIncrement: true });
+      }
+    };
+    request.onerror = () => reject(request.error ?? new Error('No se pudo abrir el almacenamiento web.'));
+    request.onsuccess = () => {
+      const database = request.result;
+      const transaction = database.transaction(webObjectStore, 'readwrite');
+      const store = transaction.objectStore(webObjectStore);
+      const getRequest = store.get(issueId);
+      let reportFound = false;
+
+      getRequest.onsuccess = () => {
+        if (!getRequest.result) return;
+        reportFound = true;
+        store.put({ ...getRequest.result, prioridad: priority });
+      };
+      getRequest.onerror = () => {
+        database.close();
+        reject(getRequest.error ?? new Error('No se pudo consultar el reporte web.'));
+      };
+      transaction.oncomplete = () => {
+        database.close();
+        if (reportFound) resolve();
+        else reject(new Error(`No se encontró el reporte #${issueId}.`));
+      };
+      transaction.onerror = () => {
+        database.close();
+        reject(transaction.error ?? new Error('No se pudo actualizar la severidad del reporte.'));
+      };
+      transaction.onabort = () => {
+        database.close();
+        reject(transaction.error ?? new Error('Se canceló la actualización de la severidad.'));
+      };
+    };
+  });
 }
 
 function saveIssueReportOnWeb(report: {
@@ -521,6 +586,7 @@ function getAllIssueReportsOnWeb(): Promise<IssueReport[]> {
 function mapIssueReport(report: Record<string, unknown>): IssueReport {
   return {
     issueId: Number(report.issue_id),
+    firebaseId: typeof report.firebase_id === 'string' ? report.firebase_id : undefined,
     title: String(report.titulo ?? ''),
     description: String(report.descripcion ?? ''),
     location: String(report.ubicacion ?? ''),

@@ -11,7 +11,8 @@
  *                 Última Actualización :05 de Octubre de 2026 [SA]                            *
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
- *   ReportManagement -- Vista inicial de gestión de un reporte para prevención.              *
+ *   ReportManagement -- Muestra los datos del reporte y coordina la edición de severidad.    *
+ *        Al guardar correctamente, solicita volver a la vista de inicio.                     *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
@@ -33,18 +34,22 @@ import {
 import { type IssueReport } from '../database';
 import { formatReportDate } from '../control/global/useInfoReport';
 import { getTranslatedSeverity, t } from '../control/global/i18n';
+import SeverityEditor from '../components/ReportManagement/SeverityEditor';
+import { useReportManagement } from '../control/ReportManagement/useReportManagement';
 
 interface ReportManagementProps {
   report: IssueReport;
   onBack: () => void;
+  onSeveritySaved: () => void;
 }
 
-export default function ReportManagement({ report, onBack }: ReportManagementProps) {
+export default function ReportManagement({ report, onBack, onSeveritySaved }: ReportManagementProps) {
   const theme = useTheme();
-  const priority = report.priority.toLowerCase();
-  const severityPalette = ['alta', 'grave', 'high'].includes(priority)
+  const { priority, isOnline, isSavingSeverity, severitySaveError, saveSeverity } = useReportManagement(report);
+  const normalizedPriority = priority.toLowerCase();
+  const severityPalette = ['alta', 'grave', 'high'].includes(normalizedPriority)
     ? 'error'
-    : ['media', 'moderada', 'medium', 'warning'].includes(priority)
+    : ['media', 'moderada', 'medium', 'warning'].includes(normalizedPriority)
       ? 'warning'
       : 'success';
   const capturedDate = formatReportDate(report.capturedAt);
@@ -94,9 +99,18 @@ export default function ReportManagement({ report, onBack }: ReportManagementPro
 
             <Chip
               icon={<PriorityHighRoundedIcon />}
-              label={getTranslatedSeverity(report.priority)}
+              label={getTranslatedSeverity(priority)}
               color={severityPalette}
               sx={{ alignSelf: 'flex-start', fontWeight: 600 }}
+            />
+
+            <SeverityEditor
+              priority={priority}
+              isOnline={isOnline}
+              isSaving={isSavingSeverity}
+              error={severitySaveError}
+              onSave={saveSeverity}
+              onSaved={onSeveritySaved}
             />
 
             <Stack spacing={1.5}>

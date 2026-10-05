@@ -14,8 +14,8 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Home -- Contenedor principal de la pantalla de inicio; enruta componentes utilizando el   *
- *        hook useHome y conecta el gesto de actualización de notificaciones.                  *
+ *   Home -- Contenedor principal; enruta vistas con useHome y coordina la navegación después  *
+ *        de guardar correctamente la severidad de un reporte.                                 *
  *   renderView -- Devuelve el JSX correspondiente al componente que está actualmente visible  *
  *        (Home, Report, etc.).                                                                *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -27,7 +27,7 @@ import ReportCancelDialog from '../components/Home/ReportCancelDialog';
 import Configuration from './Configuration';
 import InfoReport from './InfoReport';
 import Report from './Report';
-import Profile from './Profile';
+import Profile from './profile';
 import Queue from './Queue';
 import Summary from './Summary';
 import ReportManagement from './ReportManagement';
@@ -122,6 +122,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
           key={selectedReport.issueId}
           report={selectedReport}
           onBack={handleCloseReportManagement}
+          onSeveritySaved={() => navigateTo('home')}
         />
       ) : null;
     }
