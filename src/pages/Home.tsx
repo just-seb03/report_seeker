@@ -27,7 +27,7 @@ import ReportCancelDialog from '../components/Home/ReportCancelDialog';
 import Configuration from './Configuration';
 import InfoReport from './InfoReport';
 import Report from './Report';
-import Profile from './profile';
+import Profile from './Profile';
 import Queue from './Queue';
 import Summary from './Summary';
 import ReportManagement from './ReportManagement';
