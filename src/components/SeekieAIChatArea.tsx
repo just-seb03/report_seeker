@@ -30,16 +30,17 @@ type SeekieAIChatAreaProps = {
 };
 
 export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    if (bottomRef.current) {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
       if (isInitialMount.current) {
-        bottomRef.current.scrollIntoView({ behavior: 'auto' });
+        container.scrollTop = container.scrollHeight;
         isInitialMount.current = false;
       } else {
-        bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
       }
     }
   }, [messages]);
@@ -48,7 +49,7 @@ export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProp
     <Box sx={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
       <SeekieAIDoodles />
       
-      <Box sx={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 1 }}>
+      <Box ref={scrollContainerRef} sx={{ position: 'absolute', inset: 0, overflowY: 'auto', zIndex: 1 }}>
         <Box sx={{ minHeight: '100%', pt: 10, p: 3, display: 'flex', flexDirection: 'column' }}>
         {messages.length === 0 ? (
           <Box sx={{ textAlign: 'center', mt: 'auto', mb: 'auto' }}>
@@ -66,7 +67,6 @@ export default function SeekieAIChatArea({ messages = [] }: SeekieAIChatAreaProp
                 <UserChatMessage key={msg.id} text={msg.text} /> :
                 <SeekieChatMessage key={msg.id} text={msg.text} />
             ))}
-            <div ref={bottomRef} />
           </Box>
         )}
       </Box>
