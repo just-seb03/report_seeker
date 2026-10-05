@@ -195,10 +195,10 @@ export function startListeningForNewReports() {
                 console.log(`[Sincronizador] 📥 ¡Nuevo reporte recibido de la nube! (ID: ${cloudId})`);
 
                 try {
-                    // 2. Insertamos en nuestro SQLite (Convertimos undefined a null para que SQLite no colapse)
+                    // 2. Insertamos en nuestro SQLite respetando la fecha original del reporte
                     await sqlite.run(
-                        `INSERT INTO issues_riesgos (firebase_id, titulo, descripcion, ubicacion, prioridad, estado, fotografia_url, estado_sync, trabajador_id, trabajador_nombre) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, 'sincronizado', ?, ?)`,
+                        `INSERT INTO issues_riesgos (firebase_id, titulo, descripcion, ubicacion, prioridad, estado, fotografia_url, estado_sync, trabajador_id, trabajador_nombre, fecha_captura) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, 'sincronizado', ?, ?, ?)`,
                         [
                             cloudId, 
                             data.titulo || 'Sin título', 
@@ -208,17 +208,18 @@ export function startListeningForNewReports() {
                             data.estado || 'capturado', 
                             data.fotografiaBase64 || null, 
                             data.trabajador_id || null,
-                            data.trabajador_nombre || null
+                            data.trabajador_nombre || null,
+                            data.fecha_captura || new Date().toISOString()
                         ]
                     );
 
-                    // 3. Lanzamos la Notificación Nativa en el celular
+                    // 3. Lanzamos la Notificación Nativa en el celular con un ID verdaderamente único
                     await LocalNotifications.schedule({
                         notifications: [
                             {
                                 title: `🚨 Nuevo Riesgo: ${data.prioridad?.toUpperCase() || 'NORMAL'}`,
                                 body: `${data.titulo} en ${data.ubicacion || 'Ubicación no especificada'}`,
-                                id: new Date().getTime(),
+                                id: Math.floor(Math.random() * 2147483647), // Evita que se sobreescriban al llegar al mismo tiempo
                                 schedule: { at: new Date(Date.now() + 1000) }
                             }
                         ]
