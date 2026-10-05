@@ -94,7 +94,8 @@ export const TEXTS = {
         queue: 'Cola',
         report: 'Reportar',
         seekie: 'Seekie',
-        profile: 'Perfil'
+        profile: 'Perfil',
+        sumario: 'Sumario'
       }
     },
     queue: {
@@ -102,6 +103,10 @@ export const TEXTS = {
       emptyState: 'No hay reportes pendientes.',
       syncButton: 'Sincronizar reportes pendientes',
       noLocation: 'Sin ubicación',
+    },
+    summary: {
+      title: 'Sumario',
+      underConstruction: 'Esta pantalla está en construcción. Próximamente verás aquí el sumario de riesgos (Exclusivo Prevencionistas).',
     },
     profile: {
       title: 'Perfil',
@@ -305,7 +310,8 @@ export const TEXTS = {
         queue: 'Queue',
         report: 'Report',
         seekie: 'Seekie',
-        profile: 'Profile'
+        profile: 'Profile',
+        sumario: 'Summary'
       }
     },
     queue: {
@@ -313,6 +319,10 @@ export const TEXTS = {
       emptyState: 'No pending reports.',
       syncButton: 'Sync pending reports',
       noLocation: 'No location',
+    },
+    summary: {
+      title: 'Summary',
+      underConstruction: 'This screen is under construction. You will soon see the risk summary here (Exclusive for Preventionists).',
     },
     profile: {
       title: 'Profile',

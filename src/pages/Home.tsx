@@ -29,7 +29,7 @@ import InfoReport from './InfoReport';
 import Report from './Report';
 import Profile from './profile';
 import Queue from './Queue';
-import Sumario from './Sumario';
+import Summary from './Summary';
 import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/HomeScene';
 import ViewTransition from '../components/ViewTransition';
@@ -126,7 +126,7 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
       return <Queue onReportClick={handleOpenReport} />;
     }
     if (view === 'sumario') {
-      return <Sumario />;
+      return <Summary />;
     }
     if (view === 'seekie') {
       return <SeekieAIPage />;

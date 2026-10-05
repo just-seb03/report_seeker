@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : Sumario.tsx                                                      *
+ *                  Archivo : Summary.tsx                                                      *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                              *
  *                                                                                             *
@@ -14,21 +14,22 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   Sumario -- Pantalla exclusiva para prevencionistas donde podrán visualizar el resumen de  *
+ *   Summary -- Pantalla exclusiva para prevencionistas donde podrán visualizar el resumen de  *
  *            riesgos reportados por todos los trabajadores.                                   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { Box, Typography } from '@mui/material';
 import GlobalTopBar from '../components/GlobalTopBar';
+import { t } from '../control/i18n';
 
-export default function Sumario() {
+export default function Summary() {
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'background.default', pb: 10 }}>
-      <GlobalTopBar title="Sumario" />
+      <GlobalTopBar title={t.summary.title} />
       
       <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3 }}>
         <Typography variant="body1" color="text.secondary" align="center">
-          Esta pantalla está en construcción. Próximamente verás aquí el sumario de riesgos (Exclusivo Prevencionistas).
+          {t.summary.underConstruction}
         </Typography>
       </Box>
     </Box>
