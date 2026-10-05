@@ -26,10 +26,19 @@ export interface SummaryData {
   high: number;
   medium: number;
   low: number;
+  today: {
+    total: number;
+    high: number;
+    medium: number;
+    low: number;
+  };
 }
 
 export function useSummary() {
-  const [data, setData] = useState<SummaryData>({ total: 0, high: 0, medium: 0, low: 0 });
+  const [data, setData] = useState<SummaryData>({ 
+    total: 0, high: 0, medium: 0, low: 0, 
+    today: { total: 0, high: 0, medium: 0, low: 0 } 
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,19 +52,35 @@ export function useSummary() {
         let high = 0;
         let medium = 0;
         let low = 0;
+        
+        let todayHigh = 0;
+        let todayMedium = 0;
+        let todayLow = 0;
+
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
         reports.forEach((report: IssueReport) => {
           const p = report.priority.toLowerCase();
-          if (['alta', 'grave', 'high'].includes(p)) {
-            high++;
-          } else if (['media', 'moderada', 'medium', 'warning'].includes(p)) {
-            medium++;
-          } else {
-            low++; // 'leve', 'baja', 'low', 'normal', or unknown
+          const isHigh = ['alta', 'grave', 'high'].includes(p);
+          const isMedium = ['media', 'moderada', 'medium', 'warning'].includes(p);
+          
+          if (isHigh) high++;
+          else if (isMedium) medium++;
+          else low++;
+
+          // Parse report date (assuming ISO string or similar)
+          if (report.capturedAt && report.capturedAt.startsWith(todayStr)) {
+            if (isHigh) todayHigh++;
+            else if (isMedium) todayMedium++;
+            else todayLow++;
           }
         });
 
-        setData({ total: reports.length, high, medium, low });
+        setData({ 
+          total: reports.length, high, medium, low,
+          today: { total: todayHigh + todayMedium + todayLow, high: todayHigh, medium: todayMedium, low: todayLow }
+        });
       } catch (error) {
         console.error('Error fetching summary data:', error);
       } finally {

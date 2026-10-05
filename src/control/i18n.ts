@@ -110,7 +110,8 @@ export const TEXTS = {
       totalReports: 'Índices de gravedad',
       highRisk: 'Grave',
       mediumRisk: 'Moderado',
-      lowRisk: 'Leve'
+      lowRisk: 'Leve',
+      todayReports: 'Reportes Hoy'
     },
     profile: {
       title: 'Perfil',
@@ -330,7 +331,8 @@ export const TEXTS = {
       totalReports: 'Severity Indices',
       highRisk: 'High',
       mediumRisk: 'Medium',
-      lowRisk: 'Low'
+      lowRisk: 'Low',
+      todayReports: 'Today\'s Reports'
     },
     profile: {
       title: 'Profile',

@@ -21,6 +21,7 @@
 import { Box, Typography, CircularProgress } from '@mui/material';
 import GlobalTopBar from '../components/GlobalTopBar';
 import RiskDonutChart from '../components/RiskDonutChart';
+import TodayReportsWidget from '../components/TodayReportsWidget';
 import { useSummary } from '../control/useSummary';
 import { t } from '../control/i18n';
 
@@ -39,7 +40,19 @@ export default function Summary() {
         <>
           <RiskDonutChart data={data} />
           
-          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, mt: 4 }}>
+          {/* Fila de widgets (2 columnas) */}
+          <Box sx={{ display: 'flex', gap: 2, px: 2, mt: 1 }}>
+            <TodayReportsWidget data={data.today} />
+            
+            {/* Espacio para el segundo widget que me vas a describir */}
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, border: '2px dashed', borderColor: 'divider' }}>
+              <Typography variant="caption" color="text.secondary" align="center">
+                Segundo Widget
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, mt: 2 }}>
             <Typography variant="body1" color="text.secondary" align="center">
               {t.summary.underConstruction}
             </Typography>
