@@ -21,8 +21,7 @@
 import { Box, Typography, CircularProgress } from '@mui/material';
 import GlobalTopBar from '../components/GlobalTopBar';
 import RiskDonutChart from '../components/RiskDonutChart';
-import TodayReportsWidget from '../components/TodayReportsWidget';
-import HighRiskWidget from '../components/HighRiskWidget';
+import TopLocationsWidget from '../components/TopLocationsWidget';
 import { useSummary } from '../control/useSummary';
 import { t } from '../control/i18n';
 
@@ -41,11 +40,7 @@ export default function Summary() {
         <>
           <RiskDonutChart data={data} />
           
-          {/* Fila de widgets (2 columnas) */}
-          <Box sx={{ display: 'flex', gap: 2, px: 2, mt: 1 }}>
-            <TodayReportsWidget data={data.today} />
-            <HighRiskWidget count={data.high} />
-          </Box>
+          <TopLocationsWidget locations={data.topLocations} />
           
           <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', p: 3, mt: 2 }}>
             <Typography variant="body1" color="text.secondary" align="center">

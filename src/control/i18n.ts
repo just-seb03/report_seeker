@@ -111,8 +111,7 @@ export const TEXTS = {
       highRisk: 'Grave',
       mediumRisk: 'Moderado',
       lowRisk: 'Leve',
-      todayReports: 'Reportes Hoy',
-      highRiskReports: 'Reportes Graves'
+      topLocations: 'Lugares más afectados'
     },
     profile: {
       title: 'Perfil',
@@ -333,8 +332,7 @@ export const TEXTS = {
       highRisk: 'High',
       mediumRisk: 'Medium',
       lowRisk: 'Low',
-      todayReports: 'Today\'s Reports',
-      highRiskReports: 'High-Risk Reports'
+      topLocations: 'Most Affected Locations'
     },
     profile: {
       title: 'Profile',
