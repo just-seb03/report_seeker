@@ -25,12 +25,16 @@ import RiskDonutChart from '../components/RiskDonutChart';
 import TopLocationsWidget from '../components/TopLocationsWidget';
 import TopUsersWidget from '../components/TopUsersWidget';
 import SmoothScrollContainer from '../components/SmoothScrollContainer';
+import DateFilterWidget, { type DateFilterType, type DateRange } from '../components/DateFilterWidget';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useSummary } from '../control/useSummary';
 import { t } from '../control/i18n';
 
 export default function Summary() {
-  const { data, loading } = useSummary();
+  const [filterType, setFilterType] = useState<DateFilterType>('all');
+  const [customRange, setCustomRange] = useState<DateRange>({ from: '', to: '' });
+
+  const { data, loading } = useSummary(filterType, customRange);
   const [showArrow, setShowArrow] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -65,6 +69,15 @@ export default function Summary() {
           onScroll={checkScroll} 
           sx={{ pt: 'calc(80px + env(safe-area-inset-top))', pb: 4 }}
         >
+          <DateFilterWidget 
+            currentFilter={filterType}
+            customRange={customRange}
+            onChange={(newFilter, newRange) => {
+              setFilterType(newFilter);
+              if (newRange) setCustomRange(newRange);
+            }}
+          />
+
           <RiskDonutChart data={data} />
           
           <TopLocationsWidget locations={data.topLocations} />

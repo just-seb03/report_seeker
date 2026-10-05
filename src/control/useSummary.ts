@@ -20,6 +20,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAllIssueReports, type IssueReport } from '../database';
+import type { DateFilterType, DateRange } from '../components/DateFilterWidget';
 
 export interface SummaryData {
   total: number;
@@ -30,7 +31,7 @@ export interface SummaryData {
   topUsers: { name: string; count: number }[];
 }
 
-export function useSummary() {
+export function useSummary(filterType: DateFilterType = 'all', customRange?: DateRange) {
   const [data, setData] = useState<SummaryData>({ 
     total: 0, high: 0, medium: 0, low: 0, 
     topLocations: [],
@@ -43,8 +44,58 @@ export function useSummary() {
 
     async function fetchData() {
       try {
-        const reports = await getAllIssueReports();
+        const allReports = await getAllIssueReports();
         if (!mounted) return;
+
+        let filteredReports = allReports;
+
+        if (filterType !== 'all') {
+          const now = new Date();
+          const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          
+          const startOfYesterday = new Date(startOfToday);
+          startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+          
+          const dayOfWeek = now.getDay() || 7;
+          const startOfWeek = new Date(startOfToday);
+          startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek + 1);
+
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+          filteredReports = allReports.filter(r => {
+            if (!r.capturedAt) return false;
+            const rDate = new Date(r.capturedAt);
+            
+            switch (filterType) {
+              case 'today':
+                return rDate >= startOfToday;
+              case 'yesterday':
+                return rDate >= startOfYesterday && rDate < startOfToday;
+              case 'week':
+                return rDate >= startOfWeek;
+              case 'month':
+                return rDate >= startOfMonth;
+              case 'custom':
+                if (!customRange) return true;
+                if (!customRange.from && !customRange.to) return true;
+                
+                if (customRange.from) {
+                  const fromDate = new Date(customRange.from);
+                  if (rDate < new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate() + 1)) return false;
+                }
+                if (customRange.to) {
+                  const toDate = new Date(customRange.to);
+                  const endOfDay = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate() + 1, 23, 59, 59, 999);
+                  if (rDate > endOfDay) return false;
+                }
+                return true;
+              default:
+                return true;
+            }
+          });
+        }
+
+        const reports = filteredReports;
 
         let high = 0;
         let medium = 0;
@@ -107,7 +158,7 @@ export function useSummary() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [filterType, customRange]);
 
   return { data, loading };
 }

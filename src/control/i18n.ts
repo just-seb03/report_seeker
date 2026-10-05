@@ -112,7 +112,17 @@ export const TEXTS = {
       mediumRisk: 'Moderado',
       lowRisk: 'Leve',
       topLocations: 'Lugares más afectados',
-      topUsers: 'Usuarios con más reportes'
+      topUsers: 'Usuarios con más reportes',
+      filterToday: 'Hoy',
+      filterYesterday: 'Ayer',
+      filterWeek: 'Esta semana',
+      filterMonth: 'Este mes',
+      filterAll: 'Siempre',
+      filterCustom: 'Personalizado',
+      dateFrom: 'Desde',
+      dateTo: 'Hasta',
+      apply: 'Aplicar',
+      cancel: 'Cancelar'
     },
     reportManagement: {
       title: 'Gestión del reporte',
@@ -342,7 +352,17 @@ export const TEXTS = {
       mediumRisk: 'Medium',
       lowRisk: 'Low',
       topLocations: 'Most Affected Locations',
-      topUsers: 'Most Active Users'
+      topUsers: 'Most Active Users',
+      filterToday: 'Today',
+      filterYesterday: 'Yesterday',
+      filterWeek: 'This week',
+      filterMonth: 'This month',
+      filterAll: 'All time',
+      filterCustom: 'Custom',
+      dateFrom: 'From',
+      dateTo: 'To',
+      apply: 'Apply',
+      cancel: 'Cancel'
     },
     reportManagement: {
       title: 'Report management',
