@@ -150,7 +150,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
             sx={{ mt: 2 }}
             onClick={() => setIsRecoveryOpen(true)}
           >
-            Olvidé mi PIN
+            {t.login.forgotPin}
           </Button>
         </Box>
 

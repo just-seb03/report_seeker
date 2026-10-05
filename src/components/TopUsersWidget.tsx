@@ -45,7 +45,7 @@ export default function TopUsersWidget({ users }: TopUsersWidgetProps) {
         </Typography>
         <Box sx={{ py: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            No hay información de usuarios.
+            {t.summary.noUsers}
           </Typography>
         </Box>
       </Card>
@@ -89,7 +89,7 @@ export default function TopUsersWidget({ users }: TopUsersWidgetProps) {
           {top1.name}
         </Typography>
         <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.main' }}>
-          {top1.count} reportes
+          {top1.count} {t.summary.reports}
         </Typography>
       </Box>
 

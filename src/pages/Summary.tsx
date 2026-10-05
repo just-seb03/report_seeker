@@ -67,25 +67,42 @@ export default function Summary() {
         <SmoothScrollContainer 
           ref={scrollRef} 
           onScroll={checkScroll} 
-          sx={{ pb: 4 }}
+          sx={{ 
+            pb: 4,
+            '& .summary-stagger': {
+              animation: 'summaryFadeInUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards'
+            },
+            '@keyframes summaryFadeInUp': {
+              '0%': { opacity: 0, transform: 'translateY(30px) scale(0.98)' },
+              '100%': { opacity: 1, transform: 'translateY(0) scale(1)' }
+            }
+          }}
         >
           {/* Spacer dinámico que toma el lugar del padding-top y permite scrollear hacia la zona del fade superior */}
           <Box sx={{ height: 'calc(80px + env(safe-area-inset-top))', flexShrink: 0, width: '100%' }} />
 
-          <DateFilterWidget 
-            currentFilter={filterType}
-            customRange={customRange}
-            onChange={(newFilter, newRange) => {
-              setFilterType(newFilter);
-              if (newRange) setCustomRange(newRange);
-            }}
-          />
+          <Box className="summary-stagger" sx={{ animationDelay: '0ms' }}>
+            <DateFilterWidget 
+              currentFilter={filterType}
+              customRange={customRange}
+              onChange={(newFilter, newRange) => {
+                setFilterType(newFilter);
+                if (newRange) setCustomRange(newRange);
+              }}
+            />
+          </Box>
 
-          <RiskDonutChart data={data} />
+          <Box className="summary-stagger" sx={{ animationDelay: '150ms' }}>
+            <RiskDonutChart data={data} />
+          </Box>
           
-          <TopLocationsWidget locations={data.topLocations} />
+          <Box className="summary-stagger" sx={{ animationDelay: '300ms' }}>
+            <TopLocationsWidget locations={data.topLocations} />
+          </Box>
 
-          <TopUsersWidget users={data.topUsers} />
+          <Box className="summary-stagger" sx={{ animationDelay: '450ms' }}>
+            <TopUsersWidget users={data.topUsers} />
+          </Box>
         </SmoothScrollContainer>
       )}
 

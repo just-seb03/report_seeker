@@ -112,7 +112,7 @@ export default function TopLocationsWidget({ locations }: TopLocationsWidgetProp
       ) : (
         <Box sx={{ py: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            No hay información de ubicaciones.
+            {t.summary.noLocations}
           </Typography>
         </Box>
       )}

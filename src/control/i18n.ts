@@ -122,7 +122,10 @@ export const TEXTS = {
       dateFrom: 'Desde',
       dateTo: 'Hasta',
       apply: 'Aplicar',
-      cancel: 'Cancelar'
+      cancel: 'Cancelar',
+      noLocations: 'No hay información de ubicaciones.',
+      noUsers: 'No hay información de usuarios.',
+      reports: 'reportes'
     },
     reportManagement: {
       title: 'Gestión del reporte',
@@ -362,7 +365,10 @@ export const TEXTS = {
       dateFrom: 'From',
       dateTo: 'To',
       apply: 'Apply',
-      cancel: 'Cancel'
+      cancel: 'Cancel',
+      noLocations: 'No location data available.',
+      noUsers: 'No user data available.',
+      reports: 'reports'
     },
     reportManagement: {
       title: 'Report management',
