@@ -23,6 +23,7 @@ import AlternateEmailOutlinedIcon from '@mui/icons-material/AlternateEmailOutlin
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import { IconButton, Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import ChangePinDialog from '../components/ChangePinDialog';
 import ChangeEmailDialog from '../components/ChangeEmailDialog';
@@ -39,6 +40,7 @@ type ConfigurationProps = {
 export default function Configuration({ onBack, isDarkMode, onToggleTheme, configMenuState, setConfigMenuState }: ConfigurationProps) {
   const [renderPin, setRenderPin] = useState(configMenuState === 'pin');
   const [renderEmail, setRenderEmail] = useState(configMenuState === 'email');
+  const [demoLang, setDemoLang] = useState<'es' | 'en'>('es');
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
@@ -98,6 +100,18 @@ export default function Configuration({ onBack, isDarkMode, onToggleTheme, confi
                 <ListItemText 
                   primary={<Typography sx={{ fontWeight: 500 }}>{t.config.appTheme}</Typography>}
                   secondary={isDarkMode ? t.config.darkMode : t.config.lightMode} 
+                />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding divider>
+              <ListItemButton onClick={() => setDemoLang(prev => prev === 'es' ? 'en' : 'es')} sx={{ py: 2 }}>
+                <ListItemIcon sx={{ color: 'primary.main' }}>
+                  <TranslateOutlinedIcon />
+                </ListItemIcon>
+                <ListItemText 
+                  primary={<Typography sx={{ fontWeight: 500 }}>{t.config.language}</Typography>}
+                  secondary={demoLang === 'es' ? t.config.langEs : t.config.langEn} 
                 />
               </ListItemButton>
             </ListItem>

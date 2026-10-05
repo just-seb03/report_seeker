@@ -80,6 +80,9 @@ export const TEXTS = {
       changePinDesc: 'Actualiza tu código de acceso',
       changeEmail: 'Cambiar correo de recuperación',
       changeEmailDesc: 'Actualiza el email asociado a tu cuenta',
+      language: 'Idioma',
+      langEs: 'Español',
+      langEn: 'Inglés',
       version: 'Versión',
     },
     report: {
