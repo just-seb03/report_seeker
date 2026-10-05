@@ -20,7 +20,7 @@
  *        interfaz.                                                                            *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { resetPushNotificationCount } from './control/systemNotificationsControl';
 import { ThemeProvider, CssBaseline } from '@mui/material';
@@ -31,7 +31,7 @@ import {
   isPinRecoveryLink,
   savePendingNativePinRecoveryLink
 } from './control/pinRecoveryControl';
-import { appTheme } from './control/theme';
+import { createAppTheme } from './control/theme';
 import {
   isEmailChangeLink,
   savePendingNativeEmailChangeLink
@@ -44,6 +44,13 @@ import '@fontsource/inter/800.css';
 function App() {
   const [currentUser, setCurrentUser] = useState<Trabajador | null>(getCurrentUser());
   const [actionLinkLaunch, setActionLinkLaunch] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(
+    () => window.localStorage.getItem('report-seeker-theme') === 'dark',
+  );
+  const appTheme = useMemo(
+    () => createAppTheme(isDarkMode ? 'dark' : 'light'),
+    [isDarkMode],
+  );
 
   useEffect(() => {
     let handledActionUrl = '';
@@ -101,16 +108,22 @@ function App() {
     };
   }, []);
 
-  const handleToggleManualTheme = () => {
-    // Disabled for now, as requested.
-  };
+  const handleToggleManualTheme = () => setIsDarkMode((isDark) => !isDark);
+
+  useEffect(() => {
+    const mode = isDarkMode ? 'dark' : 'light';
+    window.localStorage.setItem('report-seeker-theme', mode);
+    document.documentElement.style.colorScheme = mode;
+    document.documentElement.style.setProperty('--app-background', appTheme.palette.background.default);
+    document.documentElement.style.setProperty('--app-text', appTheme.palette.text.primary);
+  }, [appTheme, isDarkMode]);
 
   return (
     <ThemeProvider theme={appTheme}>
       <CssBaseline />
       {currentUser ? (
         <Home
-          isDarkMode={false}
+          isDarkMode={isDarkMode}
           onToggleManualTheme={handleToggleManualTheme}
         />
       ) : (
