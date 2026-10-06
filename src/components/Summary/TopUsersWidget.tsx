@@ -75,6 +75,7 @@ export default function TopUsersWidget({ users }: TopUsersWidgetProps) {
       {/* Podium: Usuario #1 */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
         <Avatar 
+          src={top1.photo || undefined}
           sx={{ 
             width: 72, 
             height: 72, 
@@ -83,7 +84,7 @@ export default function TopUsersWidget({ users }: TopUsersWidgetProps) {
             mb: 1
           }}
         >
-          <PersonIcon fontSize="large" />
+          {!top1.photo && <PersonIcon fontSize="large" />}
         </Avatar>
         <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', textAlign: 'center' }}>
           {top1.name}
@@ -131,9 +132,23 @@ export default function TopUsersWidget({ users }: TopUsersWidgetProps) {
                   </Typography>
                 </Box>
                 
-                <ListItemText 
-                  primary={<Typography sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.95rem' }}>{user.name}</Typography>}
-                />
+                <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                  <Avatar 
+                    src={user.photo || undefined}
+                    sx={{ 
+                      width: 32, 
+                      height: 32, 
+                      mr: 1.5,
+                      backgroundColor: alpha(theme.palette.warning.main, 0.2),
+                      color: 'warning.main'
+                    }}
+                  >
+                    {!user.photo && <PersonIcon fontSize="small" />}
+                  </Avatar>
+                  <ListItemText 
+                    primary={<Typography sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</Typography>}
+                  />
+                </Box>
                 
                 <Box 
                   sx={{ 

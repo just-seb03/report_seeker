@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS trabajadores (
   email TEXT NOT NULL UNIQUE,
   pin TEXT NOT NULL,
   es_prevencionista INTEGER DEFAULT 0,
-  estado TEXT DEFAULT 'activo'
+  estado TEXT DEFAULT 'activo',
+  foto_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS roles_seguridad (
@@ -183,6 +184,9 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
   if (!workerColumns.values?.some((column) => column.name === 'es_prevencionista')) {
     await connection.execute("ALTER TABLE trabajadores ADD COLUMN es_prevencionista INTEGER DEFAULT 0;");
   }
+  if (!workerColumns.values?.some((column) => column.name === 'foto_url')) {
+    await connection.execute("ALTER TABLE trabajadores ADD COLUMN foto_url TEXT;");
+  }
 
   const issueColumns = await connection.query('PRAGMA table_info(issues_riesgos);');
   if (!issueColumns.values?.some((column) => column.name === 'trabajador_nombre')) {
@@ -203,6 +207,7 @@ export interface IssueReport {
   priority: string;
   capturedAt: string;
   workerName?: string;
+  workerPhoto?: string | null;
 }
 
 export interface IssueReportPage {
@@ -225,7 +230,7 @@ export function initializeDatabase(): Promise<SQLiteDBConnection> {
   return databasePromise;
 }
 
-export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; nombre: string; email: string; pin: string; es_prevencionista?: boolean }) {
+export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; nombre: string; email: string; pin: string; es_prevencionista?: boolean; foto_url?: string | null }) {
   if (!Capacitor.isNativePlatform()) return;
   const connection = await initializeDatabase();
   const existingWorker = await connection.query(
@@ -235,15 +240,15 @@ export async function insertOrUpdateTrabajadorLocal(t: { trabajador_id: number; 
 
   if (existingWorker.values?.length) {
     await connection.run(
-      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ?, es_prevencionista = ? WHERE trabajador_id = ?;',
-      [t.nombre, t.email, t.pin, t.es_prevencionista ? 1 : 0, t.trabajador_id]
+      'UPDATE trabajadores SET nombre = ?, email = ?, pin = ?, es_prevencionista = ?, foto_url = ? WHERE trabajador_id = ?;',
+      [t.nombre, t.email, t.pin, t.es_prevencionista ? 1 : 0, t.foto_url ?? null, t.trabajador_id]
     );
     return;
   }
 
   await connection.run(
-    'INSERT INTO trabajadores (trabajador_id, nombre, email, pin, es_prevencionista) VALUES (?, ?, ?, ?, ?);',
-    [t.trabajador_id, t.nombre, t.email, t.pin, t.es_prevencionista ? 1 : 0]
+    'INSERT INTO trabajadores (trabajador_id, nombre, email, pin, es_prevencionista, foto_url) VALUES (?, ?, ?, ?, ?, ?);',
+    [t.trabajador_id, t.nombre, t.email, t.pin, t.es_prevencionista ? 1 : 0, t.foto_url ?? null]
   );
 }
 
@@ -278,11 +283,11 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   const connection = await initializeDatabase();
   const result = beforeIssueId === undefined
     ? await connection.query(
-      'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? ORDER BY fecha_captura DESC LIMIT ?;',
+      'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync != ? ORDER BY i.fecha_captura DESC LIMIT ?;',
       ['pendiente', limit + 1],
     )
     : await connection.query(
-      'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync != ? AND fecha_captura < (SELECT fecha_captura FROM issues_riesgos WHERE issue_id = ?) ORDER BY fecha_captura DESC LIMIT ?;',
+      'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync != ? AND i.fecha_captura < (SELECT fecha_captura FROM issues_riesgos WHERE issue_id = ?) ORDER BY i.fecha_captura DESC LIMIT ?;',
       ['pendiente', beforeIssueId, limit + 1],
     );
   const reports = result.values ?? [];
@@ -317,7 +322,7 @@ export async function getPendingIssueReports(): Promise<IssueReport[]> {
 
   const connection = await initializeDatabase();
   const result = await connection.query(
-    'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos WHERE estado_sync = ? ORDER BY issue_id DESC;',
+    'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync = ? ORDER BY i.issue_id DESC;',
     ['pendiente']
   );
   return (result.values ?? []).map(mapIssueReport);
@@ -328,7 +333,7 @@ export async function getAllIssueReports(): Promise<IssueReport[]> {
 
   const connection = await initializeDatabase();
   const result = await connection.query(
-    'SELECT issue_id, firebase_id, titulo, descripcion, ubicacion, prioridad, fecha_captura, trabajador_nombre FROM issues_riesgos ORDER BY issue_id DESC;'
+    'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id ORDER BY i.issue_id DESC;'
   );
   return (result.values ?? []).map(mapIssueReport);
 }
@@ -593,6 +598,7 @@ function mapIssueReport(report: Record<string, unknown>): IssueReport {
     priority: String(report.prioridad ?? 'Normal'),
     capturedAt: String(report.fecha_captura ?? ''),
     workerName: report.trabajador_nombre ? String(report.trabajador_nombre) : undefined,
+    workerPhoto: typeof report.trabajador_foto === 'string' ? report.trabajador_foto : undefined,
   };
 }
 

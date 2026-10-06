@@ -20,7 +20,7 @@
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
-import { Box, Card, Stack, Typography } from '@mui/material';
+import { Box, Card, Stack, Typography, Avatar } from '@mui/material';
 import { type IssueReport } from '../../database';
 import { formatReportDate } from '../../control/global/useInfoReport';
 import { t } from '../../control/global/i18n';
@@ -74,7 +74,11 @@ export default function ReportDetailsCard({
             <Typography variant="body2" sx={{ fontWeight: 500 }}>{report.location || t.notification.noLocation}</Typography>
           </Stack>
           <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>
-            <PersonOutlineRoundedIcon color="action" fontSize="small" />
+            {report.workerPhoto ? (
+              <Avatar src={report.workerPhoto} sx={{ width: 20, height: 20 }} />
+            ) : (
+              <PersonOutlineRoundedIcon color="action" fontSize="small" />
+            )}
             <Typography variant="body2" sx={{ fontWeight: 500 }}>{report.workerName || t.notification.unknownWorker}</Typography>
           </Stack>
           <Stack direction="row" spacing={1.25} sx={{ alignItems: 'flex-start' }}>

@@ -40,7 +40,7 @@ import { Capacitor } from '@capacitor/core';
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
-  unread?: boolean; prioridad?: string; issueId?: number; workerName?: string;
+  unread?: boolean; prioridad?: string; issueId?: number; workerName?: string; workerPhoto?: string | null;
   onOpenReport?: () => void;
   onMarkAsRead?: () => void;
 }
@@ -73,7 +73,7 @@ function formatPublicationDate(fecha?: string): string {
 }
 
 export default function NotificationCard({
-  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, workerName, onOpenReport, onMarkAsRead,
+  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, workerName, workerPhoto, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
 
   const theme = useTheme();
@@ -232,6 +232,7 @@ export default function NotificationCard({
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mt: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Avatar 
+                src={workerPhoto || undefined}
                 sx={{ 
                   width: 24, 
                   height: 24, 
@@ -244,7 +245,7 @@ export default function NotificationCard({
                   fontWeight: 'bold'
                 }}
               >
-                {workerName ? workerName.charAt(0).toUpperCase() : '?'}
+                {!workerPhoto && (workerName ? workerName.charAt(0).toUpperCase() : '?')}
               </Avatar>
               <Typography variant="caption" color="text.secondary">
                 {workerName || t.notification.unknownWorker}

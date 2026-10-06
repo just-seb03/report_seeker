@@ -32,7 +32,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ onSettingsClick }: ProfileProps) {
-	const { user } = useProfile();
+	const { user, isUpdatingPhoto, updateProfilePicture } = useProfile();
 
 	const profileName = user?.nombre || t.profile.unknownUser;
 
@@ -45,7 +45,12 @@ export default function Profile({ onSettingsClick }: ProfileProps) {
 		<Box sx={{ minHeight: '100%', backgroundColor: 'background.default', pb: 12 }}>
 			<GlobalTopBar title={t.profile.title} />
 			<Box sx={{ px: 3, pt: 14, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-				<ProfileHeader profileName={profileName} />
+				<ProfileHeader 
+					profileName={profileName} 
+					profilePhoto={user?.foto_url}
+					isUpdatingPhoto={isUpdatingPhoto}
+					onEditPhoto={updateProfilePicture}
+				/>
 				<ProfileActions onSettingsClick={onSettingsClick} />
 				<ProfileDetails details={profileDetails} />
 			</Box>

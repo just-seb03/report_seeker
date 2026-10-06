@@ -65,6 +65,7 @@ export function toNotification(report: IssueReport, readIds: Set<number>): Notif
     unread: !readIds.has(report.issueId),
     prioridad: report.priority,
     workerName: report.workerName,
+    workerPhoto: report.workerPhoto,
     reporte: report,
   };
 }

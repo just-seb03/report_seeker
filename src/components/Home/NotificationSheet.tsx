@@ -35,6 +35,7 @@ export interface Notificacion {
   prioridad?: string;
   issueId?: number;
   workerName?: string;
+  workerPhoto?: string | null;
   reporte?: IssueReport;
 }
 
@@ -110,6 +111,7 @@ export default function NotificationSheet({
                 prioridad={noti.prioridad}
                 issueId={noti.issueId}
                 workerName={noti.workerName}
+                workerPhoto={noti.workerPhoto}
                 onOpenReport={report ? () => onOpenReport(report) : undefined}
                 onMarkAsRead={() => onMarkAsRead?.(noti.id)}
               />

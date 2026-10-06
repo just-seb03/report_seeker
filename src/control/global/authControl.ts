@@ -30,6 +30,7 @@ export interface Trabajador {
   email: string;
   pin: string;
   es_prevencionista?: boolean;
+  foto_url?: string | null;
 }
 
 // Semilla inicial (solo para poblar Firebase por primera vez si no existen)

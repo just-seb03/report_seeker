@@ -28,7 +28,7 @@ export interface SummaryData {
   medium: number;
   low: number;
   topLocations: { name: string; count: number }[];
-  topUsers: { name: string; count: number }[];
+  topUsers: { name: string; count: number; photo?: string | null }[];
 }
 
 export function useSummary(filterType: DateFilterType = 'all', customRange?: DateRange) {
@@ -102,7 +102,7 @@ export function useSummary(filterType: DateFilterType = 'all', customRange?: Dat
         let low = 0;
         
         const locationCounts: Record<string, number> = {};
-        const userCounts: Record<string, number> = {};
+        const userCounts: Record<string, { count: number; photo?: string | null }> = {};
 
         reports.forEach((report: IssueReport) => {
           const p = report.priority.toLowerCase();
@@ -121,11 +121,17 @@ export function useSummary(filterType: DateFilterType = 'all', customRange?: Dat
             }
           }
 
-          // Contar usuarios
+          // Contar usuarios y guardar foto
           if (report.workerName) {
             const user = report.workerName.trim();
             if (user !== '') {
-              userCounts[user] = (userCounts[user] || 0) + 1;
+              if (!userCounts[user]) {
+                userCounts[user] = { count: 0, photo: report.workerPhoto };
+              }
+              userCounts[user].count += 1;
+              if (report.workerPhoto && !userCounts[user].photo) {
+                userCounts[user].photo = report.workerPhoto;
+              }
             }
           }
         });
@@ -137,7 +143,7 @@ export function useSummary(filterType: DateFilterType = 'all', customRange?: Dat
           .slice(0, 3);
 
         const topUsers = Object.entries(userCounts)
-          .map(([name, count]) => ({ name, count }))
+          .map(([name, data]) => ({ name, count: data.count, photo: data.photo }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 3);
 

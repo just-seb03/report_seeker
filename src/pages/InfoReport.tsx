@@ -22,7 +22,7 @@ import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { Box, Button, Dialog, IconButton, Typography, alpha } from '@mui/material';
+import { Box, Button, Dialog, IconButton, Typography, alpha, Avatar } from '@mui/material';
 import { type IssueReport } from '../database';
 import { useInfoReport, formatReportDate } from '../control/global/useInfoReport';
 import { t, getTranslatedSeverity } from '../control/global/i18n';
@@ -141,7 +141,14 @@ export default function InfoReport({ report, isPrevencionista = false, onBack, o
             <Typography component="p" sx={{ m: 0, color: 'text.primary', fontSize: '15px', fontWeight: 400, lineHeight: 1.6, overflowWrap: 'anywhere', whiteSpace: 'pre-wrap' }}>{report.description || t.infoReport.noDescriptionInfo}</Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, p: '8px 4px', color: 'text.secondary', fontSize: '13px', fontWeight: 500, '& > span': { display: 'inline-flex', minWidth: 0, alignItems: 'center', gap: 1 }, '& svg': { flex: '0 0 auto', fontSize: 18 } }}>
-            <span><AccountCircleOutlinedIcon aria-hidden="true" /> {report.workerName || t.notification.unknownWorker}</span>
+            <span>
+              {report.workerPhoto ? (
+                <Avatar src={report.workerPhoto} sx={{ width: 24, height: 24 }} />
+              ) : (
+                <AccountCircleOutlinedIcon aria-hidden="true" />
+              )}
+              {report.workerName || t.notification.unknownWorker}
+            </span>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.25 }}>
               <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <CalendarMonthOutlinedIcon aria-hidden="true" sx={{ fontSize: 18 }} />
