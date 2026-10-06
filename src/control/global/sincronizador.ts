@@ -37,6 +37,7 @@ export interface IssueReportFirebase {
   descripcion: string;
   fecha_captura: string;
   ubicacion: string;
+  ubicacion_id?: number;
   estado: string;
   prioridad: string;
   trabajador_id: number;
@@ -106,6 +107,7 @@ export async function syncPendingReports() {
                 descripcion: reporteLocal.descripcion,
                 fecha_captura: reporteLocal.fecha_captura,
                 ubicacion: reporteLocal.ubicacion,
+                ubicacion_id: reporteLocal.ubicacion_id,
                 estado: reporteLocal.estado,
                 prioridad: reporteLocal.prioridad,
                 trabajador_id: reporteLocal.trabajador_id,

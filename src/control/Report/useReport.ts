@@ -50,6 +50,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [locationId, setLocationId] = useState<number | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const [isRetakingPhoto, setIsRetakingPhoto] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -93,6 +94,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
         title: title.trim(),
         description: description.trim(),
         location: location.trim(),
+        ubicacion_id: locationId,
         priority: getSeverityOptions()[severity],
         image: currentPhoto.blob,
         trabajador_id: user?.trabajador_id,
@@ -126,6 +128,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
     title,
     description,
     location,
+    locationId,
     isSaving,
     isRetakingPhoto,
     errorMessage,
@@ -134,6 +137,7 @@ export function useReport({ photo, onRetakePhoto, onReportCreated }: UseReportPr
     setTitle,
     setDescription,
     setLocation,
+    setLocationId,
     continueTo,
     editSummaryStep,
     handleRetakePhoto,

@@ -93,7 +93,14 @@ CREATE TABLE IF NOT EXISTS issues_riesgos (
   estado TEXT DEFAULT 'capturado',
   estado_sync TEXT DEFAULT 'pendiente',
   prioridad TEXT,
-  FOREIGN KEY (trabajador_id) REFERENCES trabajadores(trabajador_id)
+  ubicacion_id INTEGER,
+  FOREIGN KEY (trabajador_id) REFERENCES trabajadores(trabajador_id),
+  FOREIGN KEY (ubicacion_id) REFERENCES ubicaciones(ubicacion_id)
+);
+
+CREATE TABLE IF NOT EXISTS ubicaciones (
+  ubicacion_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nombre TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS evaluacion_impacto (
@@ -192,6 +199,18 @@ async function openDatabase(): Promise<SQLiteDBConnection> {
   if (!issueColumns.values?.some((column) => column.name === 'trabajador_nombre')) {
     await connection.execute('ALTER TABLE issues_riesgos ADD COLUMN trabajador_nombre TEXT;');
   }
+  if (!issueColumns.values?.some((column) => column.name === 'ubicacion_id')) {
+    await connection.execute('ALTER TABLE issues_riesgos ADD COLUMN ubicacion_id INTEGER REFERENCES ubicaciones(ubicacion_id);');
+  }
+
+  // Seed ubicaciones
+  const locationsCount = await connection.query('SELECT COUNT(*) as count FROM ubicaciones;');
+  if (locationsCount.values && locationsCount.values[0].count === 0) {
+    const defaultLocations = ['Sector Norte', 'Sector Centro', 'Sector Sur', 'Planta de Procesos', 'Mina Subterránea', 'Taller de Mantenimiento', 'Administración'];
+    for (const loc of defaultLocations) {
+      await connection.run('INSERT INTO ubicaciones (nombre) VALUES (?);', [loc]);
+    }
+  }
 
   return connection;
 }
@@ -260,6 +279,7 @@ export async function saveIssueReport(report: {
   image: Blob | null;
   trabajador_id?: number;
   trabajador_nombre?: string;
+  ubicacion_id?: number;
 }): Promise<number> {
   if (!Capacitor.isNativePlatform()) {
     return saveIssueReportOnWeb(report);
@@ -268,8 +288,8 @@ export async function saveIssueReport(report: {
   const connection = await initializeDatabase();
   const imageData = report.image ? await blobToDataUrl(report.image) : null;
   const result = await connection.run(
-    'INSERT INTO issues_riesgos (titulo, descripcion, ubicacion, prioridad, fotografia_url, trabajador_id, trabajador_nombre) VALUES (?, ?, ?, ?, ?, ?, ?);',
-    [report.title, report.description, report.location, report.priority, imageData, report.trabajador_id ?? null, report.trabajador_nombre ?? null],
+    'INSERT INTO issues_riesgos (titulo, descripcion, ubicacion, ubicacion_id, prioridad, fotografia_url, trabajador_id, trabajador_nombre) VALUES (?, ?, ?, ?, ?, ?, ?, ?);',
+    [report.title, report.description, report.location, report.ubicacion_id ?? null, report.priority, imageData, report.trabajador_id ?? null, report.trabajador_nombre ?? null],
   );
   const issueId = result.changes?.lastId;
 
@@ -353,6 +373,30 @@ export async function getIssueReportImage(issueId: number): Promise<string | nul
   return typeof image === 'string' ? image : null;
 }
 
+export interface Ubicacion {
+  id: number;
+  nombre: string;
+}
+
+export async function getUbicaciones(): Promise<Ubicacion[]> {
+  if (!Capacitor.isNativePlatform()) {
+    // Para la versión web/mock, devolvemos ubicaciones estáticas o guardadas en indexedDB
+    return [
+      { id: 1, nombre: 'Sector Norte' },
+      { id: 2, nombre: 'Sector Centro' },
+      { id: 3, nombre: 'Sector Sur' },
+      { id: 4, nombre: 'Planta de Procesos' },
+      { id: 5, nombre: 'Mina Subterránea' },
+      { id: 6, nombre: 'Taller de Mantenimiento' },
+      { id: 7, nombre: 'Administración' }
+    ];
+  }
+
+  const connection = await initializeDatabase();
+  const result = await connection.query('SELECT ubicacion_id as id, nombre FROM ubicaciones ORDER BY nombre ASC;');
+  return (result.values ?? []) as Ubicacion[];
+}
+
 function updateIssueReportPriorityOnWeb(issueId: number, priority: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(databaseName, 2);
@@ -404,6 +448,7 @@ function saveIssueReportOnWeb(report: {
   image: Blob | null;
   trabajador_id?: number;
   trabajador_nombre?: string;
+  ubicacion_id?: number;
 }): Promise<number> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(databaseName, 2);
@@ -421,6 +466,7 @@ function saveIssueReportOnWeb(report: {
         titulo: report.title,
         descripcion: report.description,
         ubicacion: report.location,
+        ubicacion_id: report.ubicacion_id ?? null,
         prioridad: report.priority,
         fotografia: report.image,
         fecha_captura: new Date().toISOString(),

@@ -23,6 +23,7 @@ import ReportReadyStep from '../components/Report/ReportReadyStep';
 import ReportSeverityStep from '../components/Report/ReportSeverityStep';
 import ReportSummaryStep from '../components/Report/ReportSummaryStep';
 import ReportTextStep from '../components/Report/ReportTextStep';
+import ReportLocationStep from '../components/Report/ReportLocationStep';
 import ReportProgressBar from '../components/Report/ReportProgressBar';
 import { useReport } from '../control/Report/useReport';
 import { t } from '../control/global/i18n';
@@ -46,6 +47,7 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
     title,
     description,
     location,
+    locationId,
     isSaving,
     isRetakingPhoto,
     errorMessage,
@@ -54,6 +56,7 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
     setTitle,
     setDescription,
     setLocation,
+    setLocationId,
     continueTo,
     editSummaryStep,
     handleRetakePhoto,
@@ -104,13 +107,13 @@ export default function Report({ photo, onRetakePhoto, onComplete, onReportCreat
             />
           )}
           {step === 'location' && (
-            <ReportTextStep
-              field="location"
-              heading={t.report.locationHeading}
-              value={location}
-              placeholder={t.report.locationPlaceholder}
-              maxLength={200}
-              onChange={setLocation}
+            <ReportLocationStep
+              valueId={locationId}
+              errorMessage={errorMessage}
+              onChange={(id, name) => {
+                setLocationId(id);
+                setLocation(name);
+              }}
               onConfirm={() => continueTo('title')}
             />
           )}
