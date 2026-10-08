@@ -66,6 +66,7 @@ export function toNotification(report: IssueReport, readIds: Set<number>): Notif
     prioridad: report.priority,
     workerName: report.workerName,
     workerPhoto: report.workerPhoto,
+    imagen: report.image,
     reporte: report,
   };
 }

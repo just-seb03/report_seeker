@@ -28,19 +28,19 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { t, currentLanguage, getTranslatedSeverity } from '../../control/global/i18n';
-import { useEffect, useState, type KeyboardEvent } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { Box, Typography, Collapse, Avatar, alpha, useTheme } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import { getIssueReportImage } from '../../database';
 import { useNativeImage } from '../../control/global/useNativeImage';
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
   unread?: boolean; prioridad?: string; issueId?: number; workerName?: string; workerPhoto?: string | null;
+  imagen?: string | null;
   onOpenReport?: () => void;
   onMarkAsRead?: () => void;
 }
@@ -73,43 +73,21 @@ function formatPublicationDate(fecha?: string): string {
 }
 
 export default function NotificationCard({
-  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', issueId, workerName, workerPhoto, onOpenReport, onMarkAsRead,
+  titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', workerName, workerPhoto, imagen, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
 
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const isRead = !unread;
-  const [image, setImage] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState(false);
   const isHighPriority = ['alta', 'grave', 'high'].includes(prioridad.toLowerCase());
   const isModeratePriority = ['media', 'moderada', 'medium', 'warning'].includes(prioridad.toLowerCase());
   const isLowPriority = ['leve', 'baja', 'low'].includes(prioridad.toLowerCase());
   const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
 
-  useEffect(() => {
-    if (!expanded || issueId === undefined || image !== null) return;
-
-    const controller = new AbortController();
-    getIssueReportImage(issueId)
-      .then((reportImage) => {
-        if (!controller.signal.aborted) setImage(reportImage);
-      })
-      .catch((error: any) => {
-        if (error.name === 'AbortError') return;
-        console.error('No se pudo cargar la fotografía del reporte', error);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setImageLoading(false);
-      });
-
-    return () => { controller.abort(); };
-  }, [expanded, image, issueId]);
-
-  const displayImage = useNativeImage(image);
+  const displayImage = useNativeImage(imagen);
 
   const handleHeaderClick = () => {
     const isOpening = !expanded;
-    if (isOpening) setImageLoading(issueId !== undefined);
     setExpanded(isOpening);
     if (unread) {
       onMarkAsRead?.();
@@ -180,10 +158,6 @@ export default function NotificationCard({
         in={expanded}
         timeout={250}
         unmountOnExit
-        onExited={() => {
-          setImage(null);
-          setImageLoading(false);
-        }}
       >
         <Box
           onClick={handleExpandedContentClick}
@@ -205,7 +179,7 @@ export default function NotificationCard({
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                 <InsertPhotoOutlinedIcon color="disabled" sx={{ fontSize: 48 }} />
                 <Typography variant="caption" color="text.disabled">
-                  {imageLoading ? t.notification.loadingPhoto : t.notification.noPhoto}
+                  {t.notification.noPhoto}
                 </Typography>
               </Box>
             )}

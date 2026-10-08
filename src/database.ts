@@ -227,6 +227,7 @@ export interface IssueReport {
   capturedAt: string;
   workerName?: string;
   workerPhoto?: string | null;
+  image?: string | null;
 }
 
 export interface IssueReportPage {
@@ -303,11 +304,11 @@ export async function getIssueReportsPage(limit: number, beforeIssueId?: number)
   const connection = await initializeDatabase();
   const result = beforeIssueId === undefined
     ? await connection.query(
-      'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync != ? ORDER BY i.fecha_captura DESC LIMIT ?;',
+      'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.fotografia_url, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync != ? ORDER BY i.fecha_captura DESC LIMIT ?;',
       ['pendiente', limit + 1],
     )
     : await connection.query(
-      'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync != ? AND i.fecha_captura < (SELECT fecha_captura FROM issues_riesgos WHERE issue_id = ?) ORDER BY i.fecha_captura DESC LIMIT ?;',
+      'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.fotografia_url, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync != ? AND i.fecha_captura < (SELECT fecha_captura FROM issues_riesgos WHERE issue_id = ?) ORDER BY i.fecha_captura DESC LIMIT ?;',
       ['pendiente', beforeIssueId, limit + 1],
     );
   const reports = result.values ?? [];
@@ -342,7 +343,7 @@ export async function getPendingIssueReports(): Promise<IssueReport[]> {
 
   const connection = await initializeDatabase();
   const result = await connection.query(
-    'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync = ? ORDER BY i.issue_id DESC;',
+    'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.fotografia_url, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id WHERE i.estado_sync = ? ORDER BY i.issue_id DESC;',
     ['pendiente']
   );
   return (result.values ?? []).map(mapIssueReport);
@@ -353,7 +354,7 @@ export async function getAllIssueReports(): Promise<IssueReport[]> {
 
   const connection = await initializeDatabase();
   const result = await connection.query(
-    'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id ORDER BY i.issue_id DESC;'
+    'SELECT i.issue_id, i.firebase_id, i.titulo, i.descripcion, i.ubicacion, i.prioridad, i.fecha_captura, i.fotografia_url, i.trabajador_nombre, t.foto_url as trabajador_foto FROM issues_riesgos i LEFT JOIN trabajadores t ON i.trabajador_id = t.trabajador_id ORDER BY i.issue_id DESC;'
   );
   return (result.values ?? []).map(mapIssueReport);
 }
@@ -645,6 +646,9 @@ function mapIssueReport(report: Record<string, unknown>): IssueReport {
     capturedAt: String(report.fecha_captura ?? ''),
     workerName: report.trabajador_nombre ? String(report.trabajador_nombre) : undefined,
     workerPhoto: typeof report.trabajador_foto === 'string' ? report.trabajador_foto : undefined,
+    image: typeof report.fotografia_url === 'string' 
+      ? report.fotografia_url 
+      : (report.fotografia instanceof Blob ? URL.createObjectURL(report.fotografia) : (typeof report.fotografia === 'string' ? report.fotografia : null)),
   };
 }
 
