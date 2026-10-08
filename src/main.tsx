@@ -30,7 +30,8 @@ import './index.css';
 
 
 
-import { startListeningForNewReports, initPushNotifications } from './control/global/sincronizador';
+import { startListeningForNewReports } from './control/global/firebaseRadar';
+import { initPushNotifications } from './control/global/notificationService';
 import { initializeSyncEngine } from './control/global/SyncEngine';
 
 if (Capacitor.isNativePlatform()) {
