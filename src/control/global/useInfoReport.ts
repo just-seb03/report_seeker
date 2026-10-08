@@ -24,12 +24,14 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 import { useState, useEffect } from 'react';
+import { useNativeImage } from './useNativeImage';
 import { Capacitor } from '@capacitor/core';
 import { FileOpener } from '@capacitor-community/file-opener';
 import { Directory, Filesystem } from '@capacitor/filesystem';
 import { getIssueReportImage, type IssueReport } from '../../database';
 
 function getImageData(image: string) {
+  // Helper: Separa el encabezado (ej. data:image/png;base64) de la carga útil Base64 real.
   const [header, data] = image.split(',', 2);
   const mimeType = header.match(/^data:(.+);base64$/)?.[1] ?? 'image/jpeg';
   const extension = mimeType.split('/')[1]?.replace('jpeg', 'jpg') ?? 'jpg';
@@ -46,6 +48,8 @@ export function formatReportDate(capturedAt: string) {
 }
 
 export function useInfoReport(report: IssueReport) {
+  // Hook que administra el estado y acciones al visualizar los detalles de un reporte específico.
+  // Su función principal es cargar asincrónicamente la foto asociada y coordinar su apertura.
   const [image, setImage] = useState<string | null>(null);
   const [isLoadingImage, setIsLoadingImage] = useState(true);
   const [isOpeningImage, setIsOpeningImage] = useState(false);
@@ -56,30 +60,34 @@ export function useInfoReport(report: IssueReport) {
     : ['leve', 'baja'].includes(report.priority.toLowerCase()) ? 'is-low' : 'is-medium';
 
   useEffect(() => {
-    let isActive = true;
+    const controller = new AbortController();
     getIssueReportImage(report.issueId)
       .then((reportImage) => {
-        if (isActive) setImage(reportImage);
+        if (!controller.signal.aborted) setImage(reportImage);
       })
-      .catch((error: unknown) => console.error('No se pudo cargar la fotografía del reporte.', error))
+      .catch((error: any) => {
+        if (error.name === 'AbortError') return;
+        console.error('No se pudo cargar la fotografía del reporte.', error);
+      })
       .finally(() => {
-        if (isActive) setIsLoadingImage(false);
+        if (!controller.signal.aborted) setIsLoadingImage(false);
       });
 
-    return () => { isActive = false; };
+    return () => { controller.abort(); };
   }, [report.issueId]);
 
-  const displayImage = image?.startsWith('file://') && Capacitor.isNativePlatform() 
-    ? Capacitor.convertFileSrc(image) 
-    : image;
+  const displayImage = useNativeImage(image);
 
   const handleOpenFullImage = async () => {
+    // Si estamos en un navegador web, simplemente mostramos la foto en un modal de React.
     if (!image || isOpeningImage) return;
     if (!Capacitor.isNativePlatform()) {
       setImageDialogOpen(true);
       return;
     }
 
+    // Si estamos en nativo (Android), creamos un archivo temporal en caché y le pedimos
+    // al Sistema Operativo que abra la foto usando su galería/visor nativo de imágenes.
     setIsOpeningImage(true);
     try {
       if (image.startsWith('file://')) {

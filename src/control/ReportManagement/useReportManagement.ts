@@ -35,31 +35,33 @@ export function useReportManagement(report: IssueReport) {
   const [severitySaveError, setSeveritySaveError] = useState<SeveritySaveError | null>(null);
 
   useEffect(() => {
-    let isActive = true;
+    const controller = new AbortController();
     let removeNetworkListener: (() => Promise<void>) | undefined;
 
     void Network.getStatus()
       .then((status) => {
-        if (isActive) setIsOnline(status.connected);
+        if (!controller.signal.aborted) setIsOnline(status.connected);
       })
-      .catch((error: unknown) => {
+      .catch((error: any) => {
+        if (error.name === 'AbortError') return;
         console.error('No se pudo comprobar la conexión de red:', error);
-        if (isActive) setIsOnline(false);
+        if (!controller.signal.aborted) setIsOnline(false);
       });
 
     void Network.addListener('networkStatusChange', (status) => {
-      if (isActive) setIsOnline(status.connected);
+      if (!controller.signal.aborted) setIsOnline(status.connected);
     })
       .then((listener) => {
-        if (isActive) removeNetworkListener = () => listener.remove();
+        if (!controller.signal.aborted) removeNetworkListener = () => listener.remove();
         else void listener.remove();
       })
-      .catch((error: unknown) => {
+      .catch((error: any) => {
+        if (error.name === 'AbortError') return;
         console.error('No se pudo escuchar el estado de la conexión:', error);
       });
 
     return () => {
-      isActive = false;
+      controller.abort();
       if (removeNetworkListener) void removeNetworkListener();
     };
   }, []);

@@ -21,31 +21,36 @@ import { useState, useEffect } from 'react';
 import { getPendingIssueReports, type IssueReport } from '../../database';
 
 export function useQueue() {
+  // Hook que se encarga de consultar periódicamente la base de datos local (SQLite)
+  // para obtener todos los reportes que se encuentren en estado 'pendiente' (offline-first).
   const [reports, setReports] = useState<IssueReport[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isActive = true;
+    const controller = new AbortController();
     
     const fetchReports = async () => {
       try {
         const pending = await getPendingIssueReports();
-        if (isActive) {
+        if (!controller.signal.aborted) {
           setReports(pending);
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
         console.error("Error al obtener reportes pendientes", err);
       } finally {
-        if (isActive) setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     
     fetchReports();
     
+    // Escuchamos el evento global para recargar la cola si otro componente
+    // o el Sincronizador en segundo plano llega a subir un reporte y marca todo como limpio.
     window.addEventListener('reportes_actualizados', fetchReports);
     
     return () => {
-      isActive = false;
+      controller.abort();
       window.removeEventListener('reportes_actualizados', fetchReports);
     };
   }, []);

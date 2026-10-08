@@ -87,19 +87,23 @@ export function useHome() {
   }, []);
 
   useEffect(() => {
-    let isActive = true;
+    const controller = new AbortController();
 
     const loadInitialReports = () => {
       getIssueReportsPage(notificationPageSize)
         .then((page) => {
-          if (!isActive) return;
-          setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
-          setLastNotificationId(page.items[page.items.length - 1]?.issueId);
-          setHasMoreNotifications(page.hasMore);
+          if (!controller.signal.aborted) {
+            setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
+            setLastNotificationId(page.items[page.items.length - 1]?.issueId);
+            setHasMoreNotifications(page.hasMore);
+          }
         })
-        .catch((error: unknown) => console.error('No se pudieron cargar los reportes guardados', error))
+        .catch((error: any) => {
+          if (error.name === 'AbortError') return;
+          console.error('No se pudieron cargar los reportes guardados', error);
+        })
         .finally(() => {
-          if (isActive) setIsLoadingNotifications(false);
+          if (!controller.signal.aborted) setIsLoadingNotifications(false);
         });
     };
 
@@ -109,7 +113,7 @@ export function useHome() {
     window.addEventListener('reportes_actualizados', loadInitialReports);
 
     return () => {
-      isActive = false;
+      controller.abort();
       window.removeEventListener('reportes_actualizados', loadInitialReports);
     };
   }, []);
