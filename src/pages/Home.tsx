@@ -35,6 +35,8 @@ import SeekieAIPage from './SeekieAIPage';
 import HomeScene from '../components/Home/HomeScene';
 import ViewTransition from '../components/Home/ViewTransition';
 import { useHome, type NavigationView } from '../control/Home/useHome';
+import { useSwipeGesture } from '../control/Home/useSwipeGesture';
+import { useNotificationFeed } from '../control/Home/useNotificationFeed';
 import { useQueue } from '../control/global/useQueue';
 import { getCurrentUser } from '../control/global/authControl';
 
@@ -45,11 +47,28 @@ interface HomeProps {
 
 export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
   const {
+    isExpanded,
+    pullDistance,
+    listRef,
+    setPullDistance,
+    handleCollapse,
+    handleTouchStart,
+    handleTouchEnd,
+  } = useSwipeGesture();
+
+  const {
     notificaciones,
     hasMoreNotifications,
     isLoadingNotifications,
     isRefreshingNotifications,
-    isExpanded,
+    hasUnreadNotifications,
+    handleMarkAsRead,
+    handleRefreshNotifications,
+    handleLoadMoreNotifications,
+    addNotificationLocally,
+  } = useNotificationFeed(handleCollapse);
+
+  const {
     activeView,
     selectedReport,
     reportPhoto,
@@ -59,18 +78,8 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     configMenuState,
     previousView,
     transitionDirection,
-    pullDistance,
-    listRef,
-    hasUnreadNotifications,
     setIsNavEntering,
-    setPullDistance,
     setConfigMenuState,
-    handleMarkAsRead,
-    handleRefreshNotifications,
-    handleLoadMoreNotifications,
-    handleCollapse,
-    handleTouchStart,
-    handleTouchEnd,
     navigateTo,
     requestNavigation,
     handleHomeClick,
@@ -85,7 +94,12 @@ export default function Home({ isDarkMode, onToggleManualTheme }: HomeProps) {
     handleCancelReport,
     handleExitReport,
     handleReportCreated,
-  } = useHome();
+  } = useHome({
+    isExpanded,
+    handleCollapse,
+    handleMarkAsRead,
+    addNotificationLocally,
+  });
 
   const { reports: pendingReports, loading: loadingQueue } = useQueue();
   const hasPendingReports = !loadingQueue && pendingReports.length > 0;

@@ -1,53 +1,29 @@
-/***********************************************************************************************
- ***                               C O N F I D E N T I A L  ---  M C S                       ***
- ***********************************************************************************************
- *                                                                                             *
- *                 Proyecto : proyecto_minera                                                  *
- *                                                                                             *
- *                  Archivo : useHome.ts                                                    *
- *                                                                                             *
- *              Programador :Sebastian Arredondo                                           *
- *                                                                                             *
- *          Fecha de Inicio : 02 de Octubre de 2026                                         *
- *                                                                                             *
- *     Última Actualización :04 de Octubre de 2026 [SA]                                    *
- *                                                                                             *
- *---------------------------------------------------------------------------------------------*
- * Funciones:                                                                                  *
- *   useHome -- Custom hook que centraliza y provee toda la lógica de estado y navegación del  *
- *        Home, incluida la actualización de notificaciones.                                   *
- *   handleRefreshNotifications -- Actualiza los cinco reportes más recientes, reinicia la     *
- *        paginación y contrae la lista durante el refresco.                                   *
- *   isRefreshingNotifications -- Indica que está activa la actualización manual para mostrar  *
- *        el indicador de carga del encabezado.                                                *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Network } from '@capacitor/network';
-import { getIssueReportsPage, type IssueReport } from '../../database';
-import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
+import { type IssueReport } from '../../database';
 import { captureReportPhoto } from './cameraControl';
 import { useHardwareBackButton } from './backButtonControl';
 import { deletePhotoFile } from './imageCleanupControl';
 import { sendReportNotification } from '../global/systemNotificationsControl';
 import { type ReportPhoto } from '../../pages/Report';
-import { type Notificacion } from '../../components/Home/NotificationSheet';
 
 export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'report-management' | 'configuration' | 'queue' | 'seekie' | 'sumario';
 export type TransitionDirection = 'forward' | 'backward';
 export type ConfigMenuState = 'none' | 'pin' | 'email';
 
 export const viewOrder: NavigationView[] = ['report', 'queue', 'sumario', 'home', 'seekie', 'info-report', 'report-management', 'profile', 'configuration'];
-const notificationPageSize = 50;
 
-export function useHome() {
-  const readNotificationIds = useRef<Set<number>>(getInitialReadNotificationIds());
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
-  const [lastNotificationId, setLastNotificationId] = useState<number | undefined>();
-  const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
-  const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
-  const [isRefreshingNotifications, setIsRefreshingNotifications] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+export function useHome({
+  isExpanded,
+  handleCollapse,
+  handleMarkAsRead,
+  addNotificationLocally,
+}: {
+  isExpanded: boolean;
+  handleCollapse: () => void;
+  handleMarkAsRead: (id: number) => void;
+  addNotificationLocally: (report: { issueId: number; title: string; description: string; location: string; priority: string }) => void;
+}) {
   const [activeView, setActiveView] = useState<NavigationView>('home');
   const [selectedReport, setSelectedReport] = useState<IssueReport | null>(null);
   const [reportPhoto, setReportPhoto] = useState<ReportPhoto | null>(null);
@@ -60,140 +36,14 @@ export function useHome() {
   const [pendingView, setPendingView] = useState<NavigationView | null>(null);
   const [previousView, setPreviousView] = useState<NavigationView | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<TransitionDirection>('forward');
-  const [pullDistance, setPullDistance] = useState(0);
-  const touchStart = useRef<number | null>(null);
-  const isLoadingMoreNotifications = useRef(false);
-  const isRefreshingNotificationsRef = useRef(false);
-  const isMounted = useRef(true);
-  const listRef = useRef<HTMLDivElement>(null);
+  
   const transitionTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    isMounted.current = true;
     return () => {
-      isMounted.current = false;
       if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
     };
   }, []);
-
-  const handleMarkAsRead = useCallback((id: number) => {
-    if (readNotificationIds.current.has(id)) return;
-    readNotificationIds.current.add(id);
-    saveReadNotificationIds(readNotificationIds.current);
-    
-    setNotificaciones((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
-    );
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadInitialReports = () => {
-      getIssueReportsPage(notificationPageSize)
-        .then((page) => {
-          if (!controller.signal.aborted) {
-            setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
-            setLastNotificationId(page.items[page.items.length - 1]?.issueId);
-            setHasMoreNotifications(page.hasMore);
-          }
-        })
-        .catch((error: any) => {
-          if (error.name === 'AbortError') return;
-          console.error('No se pudieron cargar los reportes guardados', error);
-        })
-        .finally(() => {
-          if (!controller.signal.aborted) setIsLoadingNotifications(false);
-        });
-    };
-
-    loadInitialReports();
-
-    // Escuchar el evento que dispara el sincronizador cuando entra un reporte nuevo
-    window.addEventListener('reportes_actualizados', loadInitialReports);
-
-    return () => {
-      controller.abort();
-      window.removeEventListener('reportes_actualizados', loadInitialReports);
-    };
-  }, []);
-
-  const handleRefreshNotifications = useCallback(async () => {
-    if (
-      isRefreshingNotificationsRef.current
-      || isLoadingMoreNotifications.current
-      || isLoadingNotifications
-    ) return;
-    isRefreshingNotificationsRef.current = true;
-    setIsRefreshingNotifications(true);
-    setIsLoadingNotifications(true);
-    try {
-      const page = await getIssueReportsPage(notificationPageSize);
-      if (!isMounted.current) return;
-      setNotificaciones(page.items.map((item) => toNotification(item, readNotificationIds.current)));
-      setLastNotificationId(page.items[page.items.length - 1]?.issueId);
-      setHasMoreNotifications(page.hasMore);
-      setIsExpanded(false);
-      listRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error: unknown) {
-      console.error('No se pudieron actualizar las notificaciones', error);
-    } finally {
-      isRefreshingNotificationsRef.current = false;
-      if (isMounted.current) setIsRefreshingNotifications(false);
-      if (isMounted.current) setIsLoadingNotifications(false);
-    }
-  }, [isLoadingNotifications]);
-
-  const handleLoadMoreNotifications = useCallback(async () => {
-    if (!hasMoreNotifications || isLoadingNotifications || isLoadingMoreNotifications.current || lastNotificationId === undefined) return;
-
-    const loadingStartedAt = performance.now();
-    isLoadingMoreNotifications.current = true;
-    setIsLoadingNotifications(true);
-    try {
-      const page = await getIssueReportsPage(notificationPageSize, lastNotificationId);
-      const notifications = page.items.map((item) => toNotification(item, readNotificationIds.current));
-      setNotificaciones((current) => {
-        const existingIds = new Set(current.map((notification) => notification.issueId));
-        return [...current, ...notifications.filter((notification) => !existingIds.has(notification.issueId))];
-      });
-      setLastNotificationId(page.items[page.items.length - 1]?.issueId ?? lastNotificationId);
-      setHasMoreNotifications(page.hasMore);
-    } catch (error) {
-      console.error('No se pudieron cargar más reportes', error);
-    } finally {
-      const remainingIndicatorTime = 350 - (performance.now() - loadingStartedAt);
-      if (remainingIndicatorTime > 0) {
-        await new Promise<void>((resolve) => window.setTimeout(resolve, remainingIndicatorTime));
-      }
-      isLoadingMoreNotifications.current = false;
-      setIsLoadingNotifications(false);
-    }
-  }, [hasMoreNotifications, isLoadingNotifications, lastNotificationId]);
-
-  const handleCollapse = useCallback(() => {
-    setIsExpanded(false);
-    if (listRef.current) listRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
-    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    touchStart.current = clientY;
-  }, []);
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent | React.MouseEvent) => {
-    if (touchStart.current === null) return;
-    const clientY = 'changedTouches' in e ? e.changedTouches[0].clientY : (e as React.MouseEvent).clientY;
-    const deltaY = touchStart.current - clientY;
-
-    if (!isExpanded && deltaY > 40) {
-      setIsExpanded(true);
-    } else if (isExpanded && deltaY < -40 && listRef.current && listRef.current.scrollTop <= 0) {
-      setIsExpanded(false); 
-    }
-
-    touchStart.current = null;
-  }, [isExpanded]);
 
   const navigateTo = useCallback((nextView: NavigationView) => {
     if (nextView === activeView) return;
@@ -203,7 +53,6 @@ export function useHome() {
     setTransitionDirection(direction);
     setPreviousView(activeView);
     setActiveView(nextView);
-    setPullDistance(0);
     transitionTimer.current = window.setTimeout(() => {
       setPreviousView(null);
       if (nextView !== 'report') {
@@ -315,21 +164,8 @@ export function useHome() {
       console.error(e);
     }
     
-    const notification = toNotification({
-      issueId: report.issueId,
-      title: report.title,
-      description: report.description,
-      location: report.location,
-      priority: report.priority,
-      capturedAt: new Date().toISOString(),
-    }, readNotificationIds.current);
-    setNotificaciones((current) => [
-      notification,
-      ...current.filter((item) => item.issueId !== report.issueId),
-    ]);
-  }, [reportPhoto]);
-
-  const hasUnreadNotifications = notificaciones.some((item) => item.unread);
+    addNotificationLocally(report);
+  }, [reportPhoto, addNotificationLocally]);
 
   const handleHardwareBack = useCallback((): boolean => {
     if (cancelDialogOpen) {
@@ -387,11 +223,6 @@ export function useHome() {
   useHardwareBackButton(handleHardwareBack);
 
   return {
-    notificaciones,
-    hasMoreNotifications,
-    isLoadingNotifications,
-    isRefreshingNotifications,
-    isExpanded,
     activeView,
     selectedReport,
     reportPhoto,
@@ -401,18 +232,8 @@ export function useHome() {
     configMenuState,
     previousView,
     transitionDirection,
-    pullDistance,
-    listRef,
-    hasUnreadNotifications,
     setIsNavEntering,
-    setPullDistance,
     setConfigMenuState,
-    handleMarkAsRead,
-    handleRefreshNotifications,
-    handleLoadMoreNotifications,
-    handleCollapse,
-    handleTouchStart,
-    handleTouchEnd,
     navigateTo,
     requestNavigation,
     handleHomeClick,
