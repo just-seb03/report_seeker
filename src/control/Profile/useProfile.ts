@@ -10,11 +10,11 @@ export function useProfile() {
 	const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
 
 	useEffect(() => {
-		const handleUserUpdate = (e: any) => {
+		const handleUserUpdate = (e: CustomEvent<Trabajador>) => {
 			setUser(e.detail);
 		};
-		window.addEventListener('user_updated', handleUserUpdate);
-		return () => window.removeEventListener('user_updated', handleUserUpdate);
+		window.addEventListener('user_updated', handleUserUpdate as EventListener);
+		return () => window.removeEventListener('user_updated', handleUserUpdate as EventListener);
 	}, []);
 
 	const updateProfilePicture = async () => {

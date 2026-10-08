@@ -69,6 +69,8 @@ export function isPinRecoveryLink(url: string): boolean {
 }
 
 export async function sendPinRecoveryLink(email: string, workerId: string): Promise<void> {
+  // 1. Envía un correo con un "enlace mágico" (usando Firebase Auth) al usuario 
+  // para verificar que es dueño del buzón antes de permitirle cambiar el PIN.
   const normalizedEmail = email.trim();
   await sendSignInLinkToEmail(auth, normalizedEmail, {
     url: getRecoveryContinueUrl(),
@@ -87,10 +89,14 @@ export async function completePinRecoveryEmailLink(
   email: string,
   url: string
 ): Promise<UserCredential> {
+  // 2. Procesa el click del usuario en el enlace recibido en su correo, 
+  // completando el inicio de sesión temporal y sin contraseña.
   return signInWithEmailLink(auth, email.trim(), url);
 }
 
 export async function verifyPinRecoveryWorker(workerId: string): Promise<boolean> {
+  // 3. Comprueba que el correo con el que el usuario acaba de ingresar coincida 
+  // con el que está registrado en su documento de perfil en Firestore.
   const user = auth.currentUser;
   if (!user?.email || !user.emailVerified) {
     throw new Error('La sesión no contiene un correo verificado.');
@@ -117,6 +123,8 @@ export async function verifyPinRecoveryWorker(workerId: string): Promise<boolean
 }
 
 export async function updatePinRecoveryWorker(workerId: string, newPin: string): Promise<void> {
+  // 4. Escribe el nuevo PIN en el perfil del usuario en Firestore
+  // y luego cierra la sesión temporal de recuperación para forzar un login normal.
   if (!/^\d{5}$/.test(workerId)) {
     throw new Error('El ID del trabajador no es válido.');
   }

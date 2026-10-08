@@ -531,11 +531,15 @@ export type Language = 'es' | 'en';
 export let currentLanguage: Language = (localStorage.getItem('appLanguage') as Language) || 'es';
 
 export function setLanguage(lang: Language) {
+  // Cambia el idioma en tiempo de ejecución, guarda la preferencia en caché (LocalStorage) 
+  // y dispara un evento global para que React fuerce un re-render de la UI.
   currentLanguage = lang;
   localStorage.setItem('appLanguage', lang);
   window.dispatchEvent(new Event('languagechange'));
 }
 
+// 't' es un objeto reactivo (Proxy) que intercepta los accesos. 
+// En lugar de hacer `TEXTS[currentLang].prop`, podemos simplemente usar `t.prop`.
 export const t = new Proxy(TEXTS['es'], {
   get(_target, prop) {
     return TEXTS[currentLanguage][prop as keyof typeof TEXTS['es']];

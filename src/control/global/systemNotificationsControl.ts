@@ -35,6 +35,8 @@ function setUnreadPushCount(count: number) {
 }
 
 export async function resetPushNotificationCount() {
+  // Limpia el contador de "reportes nuevos" (badge) y elimina de la barra de estado de Android 
+  // las notificaciones generadas localmente cuando el usuario abre la app y las lee.
   setUnreadPushCount(0);
   try {
     const delivered = await LocalNotifications.getDeliveredNotifications();
@@ -81,6 +83,9 @@ async function saveTempNotificationImage(blob: Blob): Promise<string | undefined
 }
 
 export async function sendReportNotification(title: string, body: string, photoBlob?: Blob | null) {
+  // Genera una notificación emergente (Local Notification) en el dispositivo.
+  // Es útil cuando el usuario guarda un reporte offline y la app quiere avisarle del estado, 
+  // o cuando la app está en segundo plano y el radar de sincronización detecta un nuevo reporte.
   try {
     const permStatus = await LocalNotifications.checkPermissions();
     if (permStatus.display !== 'granted') {

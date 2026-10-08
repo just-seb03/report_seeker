@@ -53,7 +53,12 @@ export async function seedTrabajadores() {
   }
 }
 
+// ============================================================================
+// LÓGICA DE AUTENTICACIÓN
+// ============================================================================
+
 export async function loginWithFirebase(trabajador_id: number, pin: string): Promise<Trabajador | null> {
+  // 1. Conecta con Firestore para buscar un documento que coincida con el ID y el PIN exactos.
   let snapshot;
   try {
     const q = query(
@@ -84,6 +89,7 @@ export async function loginWithFirebase(trabajador_id: number, pin: string): Pro
 }
 
 export function getCurrentUser(): Trabajador | null {
+  // Recupera el usuario activo de la caché síncrona de LocalStorage
   const data = localStorage.getItem('logged_in_user');
   if (!data) return null;
   try {
@@ -94,6 +100,8 @@ export function getCurrentUser(): Trabajador | null {
 }
 
 export function updateUserLocal(user: Trabajador) {
+  // Actualiza los datos del usuario en memoria (ej. después de cambiar la foto)
+  // y dispara un CustomEvent para que los hooks reactivos (useProfile) se enteren.
   localStorage.setItem('logged_in_user', JSON.stringify(user));
   window.dispatchEvent(new CustomEvent('user_updated', { detail: user }));
 }

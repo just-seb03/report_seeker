@@ -73,6 +73,7 @@ export async function sendEmailChangeLink(
   currentEmail: string,
   workerId: number
 ): Promise<void> {
+  // 1. Envía el enlace "mágico" al correo nuevo del trabajador para verificar su propiedad.
   const normalizedEmail = email.trim();
   const normalizedCurrentEmail = currentEmail.trim();
   if (!isValidEmailChangeRequest({
@@ -105,6 +106,7 @@ export async function completeEmailChangeLink(
   request: EmailChangeRequest,
   url: string
 ): Promise<void> {
+  // 2. Procesa el enlace "mágico" cuando el trabajador hace click desde su bandeja de entrada.
   if (!isValidEmailChangeRequest(request)) {
     throw new Error('La solicitud pendiente de cambio de correo no es válida.');
   }
@@ -142,6 +144,8 @@ export async function completeEmailChangeLink(
 }
 
 export async function updateEmailChangeWorker(request: EmailChangeRequest): Promise<void> {
+  // 3. Una vez verificado el enlace, esto hace la actualización real del campo "email" en Firestore
+  // usando transacciones para garantizar consistencia.
   if (!isValidEmailChangeRequest(request)) {
     throw new Error('La solicitud pendiente de cambio de correo no es válida.');
   }

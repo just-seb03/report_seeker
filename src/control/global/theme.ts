@@ -21,6 +21,8 @@
 import { createTheme, type PaletteMode } from '@mui/material';
 
 export function createAppTheme(mode: PaletteMode) {
+  // Genera dinámicamente el tema visual base (Material UI Theme).
+  // Permite a toda la aplicación adaptarse automáticamente al modo claro u oscuro seleccionado por el usuario.
   const isDarkMode = mode === 'dark';
 
   return createTheme({

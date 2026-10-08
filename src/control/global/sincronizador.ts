@@ -46,10 +46,13 @@ export interface IssueReportFirebase {
 }
 
 export async function updateSyncedReportPriority(firebaseId: string, priority: string): Promise<void> {
+    // Actualiza el campo prioridad directamente en Firestore para un reporte ya sincronizado.
     await updateDoc(doc(db, "reportes_sincronizados", firebaseId), { prioridad: priority });
 }
 
 export async function verifyReportManagementConnection(): Promise<void> {
+    // Prueba rápida de conectividad y acceso a Firestore trayendo un solo documento.
+    // Lanza excepción si el dispositivo está offline o no tiene permisos.
     await getDocsFromServer(query(collection(db, "reportes_sincronizados"), limit(1)));
 }
 
