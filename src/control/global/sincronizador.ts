@@ -29,6 +29,7 @@ import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { initializeDatabase } from '../../database';
+import { useAppStore } from '../../store/useAppStore';
 
 // Estructura oficial del JSON que viajará a Firebase
 export interface IssueReportFirebase {
@@ -130,7 +131,7 @@ export async function syncPendingReports() {
             console.log(`✅ [Sincronizador] Reporte local #${reporteLocal.issue_id} sincronizado con éxito (Cloud ID: ${cloudId})`);
             
             // Avisar a la UI (Home) que hay nuevos reportes sincronizados
-            window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+            useAppStore.getState().triggerReportsSync();
 
         } catch (err) {
             console.error(`❌ [Sincronizador] Error sincronizando reporte #${reporteLocal.issue_id}`, err);
@@ -213,7 +214,7 @@ export function startListeningForNewReports() {
                         `UPDATE issues_riesgos SET prioridad = ? WHERE firebase_id = ?`,
                         [data.prioridad || 'Normal', change.doc.id]
                     );
-                    window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+                    useAppStore.getState().triggerReportsSync();
                 } catch (error) {
                     console.error(`[Sincronizador] Error actualizando el reporte modificado ${change.doc.id}:`, error);
                 }
@@ -305,7 +306,7 @@ export function startListeningForNewReports() {
 
         // 4. Avisar a la interfaz gráfica (React) UNA SOLA VEZ al final, para no saturar SQLite
         if (snapshot.docChanges().some(change => change.type === "added")) {
-            window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+            useAppStore.getState().triggerReportsSync();
         }
     }, (error) => {
         console.error("[Sincronizador] ❌ Error en el radar de Firebase:", error);

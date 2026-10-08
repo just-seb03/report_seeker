@@ -22,6 +22,8 @@
  *        idioma seleccionado.                                                                 *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+import { useAppStore, type Language } from '../../store/useAppStore';
+
 export function getTranslatedSeverity(raw: string | undefined): string {
   if (!raw) return '';
   const lower = raw.toLowerCase();
@@ -526,16 +528,13 @@ export const TEXTS = {
   }
 };
 
-export type Language = 'es' | 'en';
-
 export let currentLanguage: Language = (localStorage.getItem('appLanguage') as Language) || 'es';
 
 export function setLanguage(lang: Language) {
   // Cambia el idioma en tiempo de ejecución, guarda la preferencia en caché (LocalStorage) 
-  // y dispara un evento global para que React fuerce un re-render de la UI.
+  // y actualiza el store de Zustand para que la app re-renderice.
   currentLanguage = lang;
-  localStorage.setItem('appLanguage', lang);
-  window.dispatchEvent(new Event('languagechange'));
+  useAppStore.getState().setLanguage(lang);
 }
 
 // 't' es un objeto reactivo (Proxy) que intercepta los accesos. 

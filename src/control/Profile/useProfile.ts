@@ -1,21 +1,14 @@
-import { useState, useEffect } from 'react';
-import { getCurrentUser, updateUserLocal, type Trabajador } from '../global/authControl';
+import { useState } from 'react';
+import { updateUserLocal } from '../global/authControl';
+import { useAppStore } from '../../store/useAppStore';
 import { captureReportPhoto } from '../Home/cameraControl';
 import { insertOrUpdateTrabajadorLocal } from '../../database';
 import { db } from '../../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
 export function useProfile() {
-	const [user, setUser] = useState<Trabajador | null>(getCurrentUser());
+	const user = useAppStore(state => state.currentUser);
 	const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
-
-	useEffect(() => {
-		const handleUserUpdate = (e: CustomEvent<Trabajador>) => {
-			setUser(e.detail);
-		};
-		window.addEventListener('user_updated', handleUserUpdate as EventListener);
-		return () => window.removeEventListener('user_updated', handleUserUpdate as EventListener);
-	}, []);
 
 	const updateProfilePicture = async () => {
 		if (!user) return;

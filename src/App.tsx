@@ -22,11 +22,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
+import { useAppStore } from './store/useAppStore';
 import { resetPushNotificationCount } from './control/global/systemNotificationsControl';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import Home from './pages/Home';
 import Login from './pages/Login';
-import { getCurrentUser, logout, type Trabajador } from './control/global/authControl';
+import { logout } from './control/global/authControl';
 import {
   isPinRecoveryLink,
   savePendingNativePinRecoveryLink
@@ -42,11 +43,13 @@ import '@fontsource/inter/700.css';
 import '@fontsource/inter/800.css';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<Trabajador | null>(getCurrentUser());
+  const currentUser = useAppStore(state => state.currentUser);
+  const setCurrentUser = useAppStore(state => state.setCurrentUser);
+  const isDarkMode = useAppStore(state => state.isDarkMode);
+  const toggleDarkMode = useAppStore(state => state.toggleDarkMode);
+  
   const [actionLinkLaunch, setActionLinkLaunch] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(
-    () => window.localStorage.getItem('report-seeker-theme') === 'dark',
-  );
+
   const appTheme = useMemo(
     () => createAppTheme(isDarkMode ? 'dark' : 'light'),
     [isDarkMode],
@@ -70,12 +73,6 @@ function App() {
       setActionLinkLaunch((launch) => launch + 1);
     };
 
-    const handleLanguageChange = () => {
-      // Forzar un re-render global sin desmontar los componentes
-      setActionLinkLaunch(l => l + 1);
-    };
-    window.addEventListener('languagechange', handleLanguageChange);
-
     resetPushNotificationCount();
     const sub = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
       if (isActive) resetPushNotificationCount();
@@ -83,9 +80,6 @@ function App() {
     const actionLinkSub = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
       handleActionLink(url);
     });
-
-    const handleLogout = () => setCurrentUser(null);
-    window.addEventListener('user_logout', handleLogout);
 
     const currentUrl = window.location.href;
     if (isEmailChangeLink(currentUrl) || isPinRecoveryLink(currentUrl)) {
@@ -103,12 +97,8 @@ function App() {
     return () => {
       sub.then(listener => listener.remove());
       actionLinkSub.then(listener => listener.remove());
-      window.removeEventListener('user_logout', handleLogout);
-      window.removeEventListener('languagechange', handleLanguageChange);
     };
   }, []);
-
-  const handleToggleManualTheme = () => setIsDarkMode((isDark) => !isDark);
 
   useEffect(() => {
     const mode = isDarkMode ? 'dark' : 'light';
@@ -124,7 +114,7 @@ function App() {
       {currentUser ? (
         <Home
           isDarkMode={isDarkMode}
-          onToggleManualTheme={handleToggleManualTheme}
+          onToggleManualTheme={toggleDarkMode}
         />
       ) : (
         <Login

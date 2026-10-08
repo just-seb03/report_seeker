@@ -19,12 +19,14 @@
 
 import { useState, useEffect } from 'react';
 import { getPendingIssueReports, type IssueReport } from '../../database';
+import { useAppStore } from '../../store/useAppStore';
 
 export function useQueue() {
   // Hook que se encarga de consultar periódicamente la base de datos local (SQLite)
   // para obtener todos los reportes que se encuentren en estado 'pendiente' (offline-first).
   const [reports, setReports] = useState<IssueReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const reportsSyncToken = useAppStore(state => state.reportsSyncToken);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -45,15 +47,11 @@ export function useQueue() {
     
     fetchReports();
     
-    // Escuchamos el evento global para recargar la cola si otro componente
-    // o el Sincronizador en segundo plano llega a subir un reporte y marca todo como limpio.
-    window.addEventListener('reportes_actualizados', fetchReports);
-    
+    // Escuchamos el evento global para recargar la cola
     return () => {
       controller.abort();
-      window.removeEventListener('reportes_actualizados', fetchReports);
     };
-  }, []);
+  }, [reportsSyncToken]);
 
   return {
     reports,

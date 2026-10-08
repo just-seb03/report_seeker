@@ -24,6 +24,7 @@ import { db } from '../../firebase';
 import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { insertOrUpdateTrabajadorLocal } from '../../database';
 import { hashPin } from './cryptoControl';
+import { useAppStore } from '../../store/useAppStore';
 
 export interface Trabajador {
   trabajador_id: number;
@@ -104,13 +105,12 @@ export function getCurrentUser(): Trabajador | null {
 
 export function updateUserLocal(user: Trabajador) {
   // Actualiza los datos del usuario en memoria (ej. después de cambiar la foto)
-  // y dispara un CustomEvent para que los hooks reactivos (useProfile) se enteren.
   localStorage.setItem('logged_in_user', JSON.stringify(user));
-  window.dispatchEvent(new CustomEvent('user_updated', { detail: user }));
+  useAppStore.getState().setCurrentUser(user);
 }
 
 export function logout() {
   localStorage.removeItem('logged_in_user');
   sessionStorage.setItem('skip_welcome', 'true');
-  window.dispatchEvent(new CustomEvent('user_logout'));
+  useAppStore.getState().logout();
 }

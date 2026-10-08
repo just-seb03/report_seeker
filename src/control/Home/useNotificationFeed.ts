@@ -22,6 +22,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { getIssueReportsPage } from '../../database';
 import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';
 import { type Notificacion } from '../../components/Home/NotificationSheet';
+import { useAppStore } from '../../store/useAppStore';
 
 const notificationPageSize = 50;
 
@@ -32,6 +33,7 @@ export function useNotificationFeed(onListRefresh?: () => void) {
   const [hasMoreNotifications, setHasMoreNotifications] = useState(false);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
   const [isRefreshingNotifications, setIsRefreshingNotifications] = useState(false);
+  const reportsSyncToken = useAppStore(state => state.reportsSyncToken);
 
   const isLoadingMoreNotifications = useRef(false);
   const isRefreshingNotificationsRef = useRef(false);
@@ -74,13 +76,11 @@ export function useNotificationFeed(onListRefresh?: () => void) {
     };
 
     loadInitialReports();
-    window.addEventListener('reportes_actualizados', loadInitialReports);
 
     return () => {
       controller.abort();
-      window.removeEventListener('reportes_actualizados', loadInitialReports);
     };
-  }, []);
+  }, [reportsSyncToken]);
 
   const handleRefreshNotifications = useCallback(async () => {
     if (

@@ -24,6 +24,7 @@ import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { useState } from 'react';
 import { Network } from '@capacitor/network';
 import { syncPendingReports } from '../../control/global/sincronizador';
+import { useAppStore } from '../../store/useAppStore';
 import SyncErrorDialog from './SyncErrorDialog';
 
 export default function SyncQueueButton() {
@@ -46,7 +47,7 @@ export default function SyncQueueButton() {
       await syncPendingReports();
       
       // Disparamos el evento para que las vistas escuchen el cambio y se actualicen solas
-      window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+      useAppStore.getState().triggerReportsSync();
 
     } catch (e) {
       console.error('Error durante la sincronización manual:', e);

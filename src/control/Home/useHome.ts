@@ -25,6 +25,7 @@ import { captureReportPhoto } from './cameraControl';
 import { useHardwareBackButton } from './backButtonControl';
 import { deletePhotoFile } from './imageCleanupControl';
 import { sendReportNotification } from '../global/systemNotificationsControl';
+import { useAppStore } from '../../store/useAppStore';
 import { type ReportPhoto } from '../../pages/Report';
 
 export type NavigationView = 'home' | 'report' | 'profile' | 'info-report' | 'report-management' | 'configuration' | 'queue' | 'seekie' | 'sumario';
@@ -177,7 +178,7 @@ export function useHome({
     try {
       const status = await Network.getStatus();
       if (!status.connected) {
-         window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+         useAppStore.getState().triggerReportsSync();
          return;
       }
     } catch(e) {

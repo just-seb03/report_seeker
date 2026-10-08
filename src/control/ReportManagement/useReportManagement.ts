@@ -25,6 +25,7 @@ import {
   updateSyncedReportPriority,
   verifyReportManagementConnection
 } from '../global/sincronizador';
+import { useAppStore } from '../../store/useAppStore';
 
 type SeveritySaveError = 'offline' | 'save';
 
@@ -86,7 +87,7 @@ export function useReportManagement(report: IssueReport) {
       await updateIssueReportPriority(report.issueId, nextPriority);
 
       setPriority(nextPriority);
-      window.dispatchEvent(new CustomEvent('reportes_actualizados'));
+      useAppStore.getState().triggerReportsSync();
       return true;
     } catch (error) {
       console.error(`No se pudo guardar la severidad del reporte #${report.issueId}:`, error);
