@@ -31,6 +31,7 @@ import './index.css';
 
 
 import { startListeningForNewReports, initPushNotifications } from './control/global/sincronizador';
+import { initializeSyncEngine } from './control/global/SyncEngine';
 
 if (Capacitor.isNativePlatform()) {
   void initializeDatabase().then(() => {
@@ -38,6 +39,8 @@ if (Capacitor.isNativePlatform()) {
     startListeningForNewReports();
     // Preparamos el teléfono para recibir Push Notifications con la app cerrada
     initPushNotifications();
+    // Iniciar motor de sincronización (tareas de background y recovery de red)
+    initializeSyncEngine();
   }).catch((error: unknown) => {
     console.error('No se pudo inicializar la base de datos SQLite', error);
   });
