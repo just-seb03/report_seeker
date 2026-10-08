@@ -23,6 +23,7 @@
 import { db } from '../../firebase';
 import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { insertOrUpdateTrabajadorLocal } from '../../database';
+import { hashPin } from './cryptoControl';
 
 export interface Trabajador {
   trabajador_id: number;
@@ -45,7 +46,8 @@ export async function seedTrabajadores() {
 
   try {
     for (const t of trabajadores) {
-      await setDoc(doc(db, 'trabajadores', t.trabajador_id.toString()), t);
+      const tHashed = { ...t, pin: await hashPin(t.pin) };
+      await setDoc(doc(db, 'trabajadores', tHashed.trabajador_id.toString()), tHashed);
     }
     console.log("✅ [Auth] Trabajadores de prueba inyectados en Firebase");
   } catch (error) {
@@ -61,10 +63,11 @@ export async function loginWithFirebase(trabajador_id: number, pin: string): Pro
   // 1. Conecta con Firestore para buscar un documento que coincida con el ID y el PIN exactos.
   let snapshot;
   try {
+    const hashedPin = await hashPin(pin);
     const q = query(
       collection(db, 'trabajadores'),
       where('trabajador_id', '==', trabajador_id),
-      where('pin', '==', pin)
+      where('pin', '==', hashedPin)
     );
 
     snapshot = await getDocs(q);

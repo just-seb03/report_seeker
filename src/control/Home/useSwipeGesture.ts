@@ -1,3 +1,22 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : useSwipeGesture.ts                                               *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                              *
+ *                                                                                             *
+ *          Fecha de Inicio : 07 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 07 de Octubre de 2026 [SA]                                       *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   useSwipeGesture -- Hook que aísla y maneja la física táctil y gestos del Home.            *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useState, useRef, useCallback } from 'react';
 
 export function useSwipeGesture() {

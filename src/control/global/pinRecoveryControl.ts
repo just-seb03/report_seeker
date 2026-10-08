@@ -37,6 +37,7 @@ import {
 } from 'firebase/auth';
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
+import { hashPin } from './cryptoControl';
 
 const PIN_RECOVERY_REQUEST_KEY = 'pin_recovery_request';
 const PENDING_NATIVE_RECOVERY_LINK_KEY = 'pending_native_pin_recovery_link';
@@ -149,7 +150,8 @@ export async function updatePinRecoveryWorker(workerId: string, newPin: string):
     throw new Error('No se pudo confirmar que el correo pertenezca a este trabajador.');
   }
 
-  await updateDoc(workerReference, { pin: newPin });
+  const hashedPin = await hashPin(newPin);
+  await updateDoc(workerReference, { pin: hashedPin });
   await signOut(auth);
   window.localStorage.removeItem(PIN_RECOVERY_REQUEST_KEY);
 }

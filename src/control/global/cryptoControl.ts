@@ -4,7 +4,7 @@
  *                                                                                             *
  *                 Proyecto : proyecto_minera                                                  *
  *                                                                                             *
- *                  Archivo : useNativeImage.ts                                                *
+ *                  Archivo : cryptoControl.ts                                                 *
  *                                                                                             *
  *              Programador : Sebastian Arredondo                                              *
  *                                                                                             *
@@ -14,28 +14,13 @@
  *                                                                                             *
  *---------------------------------------------------------------------------------------------*
  * Funciones:                                                                                  *
- *   useNativeImage -- Hook para centralizar la conversión de rutas nativas a URLs usables     *
- *        en la web mediante Capacitor.                                                        *
+ *   hashPin -- Aplica SHA-256 a un PIN en texto plano y devuelve el hash en hexadecimal.       *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { useState, useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
-
-export function useNativeImage(rawUrl: string | null | undefined): string | null | undefined {
-  const [displayUrl, setDisplayUrl] = useState<string | null | undefined>(rawUrl);
-
-  useEffect(() => {
-    if (!rawUrl) {
-      setDisplayUrl(rawUrl);
-      return;
-    }
-
-    if (rawUrl.startsWith('file://') && Capacitor.isNativePlatform()) {
-      setDisplayUrl(Capacitor.convertFileSrc(rawUrl));
-    } else {
-      setDisplayUrl(rawUrl);
-    }
-  }, [rawUrl]);
-
-  return displayUrl;
+export async function hashPin(pin: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }

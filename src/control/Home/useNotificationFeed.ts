@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : useNotificationFeed.ts                                           *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                              *
+ *                                                                                             *
+ *          Fecha de Inicio : 07 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 07 de Octubre de 2026 [SA]                                       *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   useNotificationFeed -- Hook que maneja el ciclo de vida, paginación y estado de lectura   *
+ *        del muro principal de reportes de riesgo.                                            *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getIssueReportsPage } from '../../database';
 import { getInitialReadNotificationIds, saveReadNotificationIds, toNotification } from './notificationsControl';

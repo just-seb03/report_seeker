@@ -22,6 +22,7 @@ import { useState } from 'react';
 import PinPad from '../global/PinPad';
 import LoginErrorDialog from '../global/LoginErrorDialog';
 import { getCurrentUser, updateUserLocal } from '../../control/global/authControl';
+import { hashPin } from '../../control/global/cryptoControl';
 import { db } from '../../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { insertOrUpdateTrabajadorLocal } from '../../database';
@@ -55,7 +56,8 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
 
       if (newVal.length === 4) {
         if (step === 'confirm_current') {
-          if (newVal === user?.pin) {
+          const hashedInput = await hashPin(newVal);
+          if (hashedInput === user?.pin) {
             // Animación al siguiente paso
             setStep('loading');
             setTimeout(() => {
@@ -87,11 +89,12 @@ export default function ChangePinDialog({ onClose, isClosing }: ChangePinDialogP
       const docId = String(user.trabajador_id);
       console.log('Doc ID a actualizar:', docId);
 
+      const hashedNewPin = await hashPin(newPin);
       const userRef = doc(db, 'trabajadores', docId);
-      await updateDoc(userRef, { pin: newPin });
+      await updateDoc(userRef, { pin: hashedNewPin });
       console.log('Firebase updateDoc completado con exito.');
       
-      const updatedUser = { ...user, pin: newPin };
+      const updatedUser = { ...user, pin: hashedNewPin };
       updateUserLocal(updatedUser);
       await insertOrUpdateTrabajadorLocal(updatedUser);
       console.log('Actualizacion local completada.');

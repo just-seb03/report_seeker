@@ -1,3 +1,23 @@
+/***********************************************************************************************
+ ***                               C O N F I D E N T I A L  ---  M C S                       ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Proyecto : proyecto_minera                                                  *
+ *                                                                                             *
+ *                  Archivo : useHome.ts                                                       *
+ *                                                                                             *
+ *              Programador : Sebastian Arredondo                                              *
+ *                                                                                             *
+ *          Fecha de Inicio : 02 de Octubre de 2026                                            *
+ *                                                                                             *
+ *     Última Actualización : 07 de Octubre de 2026 [SA]                                       *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Funciones:                                                                                  *
+ *   useHome -- Custom hook orquestador del Home que maneja la navegación, el botón Atrás de   *
+ *        hardware y el estado de la aplicación.                                               *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Network } from '@capacitor/network';
 import { type IssueReport } from '../../database';
