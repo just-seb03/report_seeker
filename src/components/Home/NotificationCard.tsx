@@ -36,7 +36,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { getIssueReportImage } from '../../database';
-import { Capacitor } from '@capacitor/core';
+import { useNativeImage } from '../../control/global/useNativeImage';
 
 interface NotificationCardProps {
   titulo: string; detalle: string; ubicacion?: string; fecha?: string; currentTime: number;
@@ -89,25 +89,23 @@ export default function NotificationCard({
   useEffect(() => {
     if (!expanded || issueId === undefined || image !== null) return;
 
-    let isActive = true;
+    const controller = new AbortController();
     getIssueReportImage(issueId)
       .then((reportImage) => {
-        if (!isActive) return;
-        if (reportImage?.startsWith('file://') && Capacitor.isNativePlatform()) {
-            import('@capacitor/core').then(({ Capacitor }) => {
-                if (isActive) setImage(Capacitor.convertFileSrc(reportImage));
-            });
-        } else {
-            setImage(reportImage);
-        }
+        if (!controller.signal.aborted) setImage(reportImage);
       })
-      .catch((error: unknown) => console.error('No se pudo cargar la fotografía del reporte', error))
+      .catch((error: any) => {
+        if (error.name === 'AbortError') return;
+        console.error('No se pudo cargar la fotografía del reporte', error);
+      })
       .finally(() => {
-        if (isActive) setImageLoading(false);
+        if (!controller.signal.aborted) setImageLoading(false);
       });
 
-    return () => { isActive = false; };
+    return () => { controller.abort(); };
   }, [expanded, image, issueId]);
+
+  const displayImage = useNativeImage(image);
 
   const handleHeaderClick = () => {
     const isOpening = !expanded;
@@ -201,8 +199,8 @@ export default function NotificationCard({
           }}
         >
           <Box sx={{ width: '100%', height: 160, bgcolor: 'action.hover', borderRadius: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2, border: 1, borderStyle: 'dashed', borderColor: 'divider' }}>
-            {image ? (
-              <Box component="img" src={image} alt={`Evidencia del reporte: ${titulo}`} sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 2 }} />
+            {displayImage ? (
+              <Box component="img" src={displayImage} alt={`Evidencia del reporte: ${titulo}`} sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 2 }} />
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                 <InsertPhotoOutlinedIcon color="disabled" sx={{ fontSize: 48 }} />
