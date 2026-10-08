@@ -27,7 +27,8 @@
  *        notificación.                                                                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-import { t, currentLanguage, getTranslatedSeverity } from '../../control/global/i18n';
+import { t, getTranslatedSeverity } from '../../control/global/i18n';
+import { useAppStore } from '../../store/useAppStore';
 import { useState, type KeyboardEvent } from 'react';
 import { Box, Typography, Collapse, Avatar, alpha, useTheme } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -45,7 +46,7 @@ interface NotificationCardProps {
   onMarkAsRead?: () => void;
 }
 
-function formatRelativeTime(fecha: string, currentTime: number): string {
+function formatRelativeTime(fecha: string, currentTime: number, currentLanguage: string): string {
   const publishedAt = Date.parse(fecha);
   if (Number.isNaN(publishedAt)) return t.notification.now;
 
@@ -67,7 +68,7 @@ function formatRelativeTime(fecha: string, currentTime: number): string {
   return relativeTime.format(-Math.floor(elapsedMonths / 12), 'year');
 }
 
-function formatPublicationDate(fecha?: string): string {
+function formatPublicationDate(fecha: string | undefined, currentLanguage: string): string {
   if (!fecha || Number.isNaN(Date.parse(fecha))) return t.notification.unknownDate;
   return new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(fecha));
 }
@@ -75,14 +76,14 @@ function formatPublicationDate(fecha?: string): string {
 export default function NotificationCard({
   titulo, detalle, ubicacion, fecha, currentTime, unread = false, prioridad = 'Normal', workerName, workerPhoto, imagen, onOpenReport, onMarkAsRead,
 }: NotificationCardProps) {
-
+  const currentLanguage = useAppStore(state => state.language);
   const theme = useTheme();
   const [expanded, setExpanded] = useState(false);
   const isRead = !unread;
   const isHighPriority = ['alta', 'grave', 'high'].includes(prioridad.toLowerCase());
   const isModeratePriority = ['media', 'moderada', 'medium', 'warning'].includes(prioridad.toLowerCase());
   const isLowPriority = ['leve', 'baja', 'low'].includes(prioridad.toLowerCase());
-  const relativeTime = fecha ? formatRelativeTime(fecha, currentTime) : 'ahora';
+  const relativeTime = fecha ? formatRelativeTime(fecha, currentTime, currentLanguage) : 'ahora';
 
   const displayImage = useNativeImage(imagen);
 
@@ -223,7 +224,7 @@ export default function NotificationCard({
                 {workerName || t.notification.unknownWorker}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.secondary">{formatPublicationDate(fecha)}</Typography>
+            <Typography variant="caption" color="text.secondary">{formatPublicationDate(fecha, currentLanguage)}</Typography>
           </Box>
 
         </Box>

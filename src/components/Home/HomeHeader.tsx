@@ -116,9 +116,9 @@ export default function HomeHeader({
           }}
         >
           {hasPending ? (
-            t.home.headerPendingReports.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)
+            t.home.headerPendingReports.split("\n").map((line: string, i: number) => <span style={{display: "block"}} key={i}>{line}</span>)
           ) : (
-            t.home.headerNewReports.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)
+            t.home.headerNewReports.split("\n").map((line: string, i: number) => <span style={{display: "block"}} key={i}>{line}</span>)
           )}
         </Typography>
 
@@ -137,7 +137,7 @@ export default function HomeHeader({
             })
           }}
         >
-          {t.home.headerAllGood.split("\n").map((line, i) => <span style={{display: "block"}} key={i}>{line}</span>)}
+          {t.home.headerAllGood.split("\n").map((line: string, i: number) => <span style={{display: "block"}} key={i}>{line}</span>)}
         </Typography>
       </Box>
       

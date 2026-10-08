@@ -27,7 +27,8 @@ import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import { IconButton, Box, Typography, AppBar, Toolbar, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Paper } from '@mui/material';
 import ChangePinDialog from '../components/Configuration/ChangePinDialog';
 import ChangeEmailDialog from '../components/Configuration/ChangeEmailDialog';
-import { t, currentLanguage, setLanguage } from '../control/global/i18n';
+import { t, setLanguage } from '../control/global/i18n';
+import { useAppStore } from '../store/useAppStore';
 
 type ConfigurationProps = {
   onBack: () => void;
@@ -40,6 +41,7 @@ type ConfigurationProps = {
 export default function Configuration({ onBack, isDarkMode, onToggleTheme, configMenuState, setConfigMenuState }: ConfigurationProps) {
   const [renderPin, setRenderPin] = useState(configMenuState === 'pin');
   const [renderEmail, setRenderEmail] = useState(configMenuState === 'email');
+  const currentLanguage = useAppStore(state => state.language);
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
